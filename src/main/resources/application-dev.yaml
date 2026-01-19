@@ -8,3 +8,17 @@ spring:
     console:
       enabled: ${H2_CONSOLE_ENABLED:true}
       path: ${H2_CONSOLE_PATH:/h2-console}
+  jpa:
+    hibernate:
+      ddl-auto: update # 개발 환경에서는 스키마 자동 업데이트
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100 # In-memory batch fetching for to-many associations
+logging:
+  level:
+    org.hibernate.SQL: debug # Hibernate가 생성하는 SQL을 콘솔에 출력 (개발 시 필수)
+    org.hibernate.orm.jdbc.bind: trace # SQL 파라미터 바인딩 정보 출력 (개발 시 필수)
+    com.github.gavlyukovskiy.p6spy: debug # P6Spy SQL 로깅 활성화 (개발 시 필수)
+    # JPQL 쿼리 로깅 (필요시 주석 해제)
+    # org.hibernate.hql.internal.ast.HqlSqlWalker: debug
+    # org.hibernate.hql.internal.ast.QueryTranslatorImpl: debug
