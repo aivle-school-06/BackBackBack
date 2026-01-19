@@ -25,11 +25,13 @@
 
 ## **3\. 작업 흐름 (Workflow)**
 
-1. **Analysis:** 변경 전 관련 파일을 읽고 전체 맥락과 의존성을 파악한다.
-2. **Strategy:** 수정 범위와 영향 범위를 먼저 생각한 뒤 작업을 시작한다.
-3. **Implementation:** 변경은 가능한 한 작은 단위(Atomic)로 수행한다.
-4. **Verification:** 수정 후 컴파일 에러 가능성, 린트(Lint) 위반 여부를 스스로 점검한다.
-5. **Suggestion:** 필요 시 간단한 테스트 방법 또는 검증 절차(cURL 예시 등)를 제안한다.
+1. **Load Context:** 작업 시작 전 .context.md (또는 지정된 컨텍스트 파일)를 읽어 현재 진행 상황을 파악한다. (See Section 10)
+2. **Analysis:** 변경 전 관련 파일을 읽고 전체 맥락과 의존성을 파악한다.
+3. **Strategy:** 수정 범위와 영향 범위를 먼저 생각한 뒤 작업을 시작한다.
+4. **Implementation:** 변경은 가능한 한 작은 단위(Atomic)로 수행한다.
+5. **Verification:** 수정 후 컴파일 에러 가능성, 린트(Lint) 위반 여부를 스스로 점검한다.
+6. **Suggestion:** 필요 시 간단한 테스트 방법 또는 검증 절차(cURL 예시 등)를 제안한다.
+7. **Update Context:** 작업 완료 후, 변경 사항과 다음 할 일을 컨텍스트 파일에 기록한다.
 
 ## **4\. 코드 스타일 (Code Style)**
 
@@ -128,11 +130,42 @@
 * feat: added validation (Past tense used)
 * fix: fixed bug. (Period used, vague description)
 
-## **10\. Notes for Codex (Self-Check)**
+## **10\. Context & Handover Protocol (컨텍스트 보존)**
+
+AI 세션이 단절되거나 변경되더라도 작업의 연속성을 유지하기 위해, 루트 경로의 .context.md 파일을 통해 상태를 관리한다.
+
+### **Protocol Rules**
+
+* **Read First:** 모든 작업 시작 전, .context.md를 읽어 현재 작업 단계(Current Task)와 남은 작업(Next Steps)을 파악한다.
+* **Write Always:** 하나의 작업 단위(Task)가 끝날 때마다 .context.md를 최신 상태로 갱신한다.
+* **Structure:** .context.md는 아래의 형식을 유지해야 한다.
+
+### **Context File Template (.context.md)**
+
+```md
+# Development Context
+
+## 1. Current Goal (현재 목표)
+- [ ] 사용자 로그인 API 구현 및 JWT 발급
+
+## 2. Recent Changes (최근 변경 사항)
+- feat: User 엔티티 생성 (YYYY-MM-DD)
+- chore: Spring Security 의존성 추가
+
+## 3. Next Steps (다음 할 일)
+1. SecurityConfig 설정 클래스 작성
+2. AuthController 로그인 엔드포인트 구현
+
+## 4. Known Issues (알려진 문제/보류 사항)
+- Refresh Token 저장소(Redis) 연결 정보 확인 필요
+```
+
+## **11\. Notes for Codex (Self-Check)**
 
 작업을 완료하기 전 다음 체크리스트를 스스로 확인한다.
 
 1. \[ \] **언어 규칙 준수:** 응답은 한국어인가? 커밋 메시지는 영어인가?
-2. \[ \] **안전성:** 하드코딩된 비밀번호나 민감 정보가 없는가?
-3. \[ \] **완결성:** 생성된 코드가 문법 에러 없이 컴파일 가능한가?
-4. \[ \] **원자성:** 하나의 커밋에 하나의 변경 사항만 담겨 있는가?
+2. \[ \] **컨텍스트 동기화:** 작업 완료 후 .context.md 파일이 갱신되었는가?
+3. \[ \] **안전성:** 하드코딩된 비밀번호나 민감 정보가 없는가?
+4. \[ \] **완결성:** 생성된 코드가 문법 에러 없이 컴파일 가능한가?
+5. \[ \] **원자성:** 하나의 커밋에 하나의 변경 사항만 담겨 있는가?
