@@ -17,3 +17,18 @@
 - 작업 컨텍스트를 기록하는 파일이며, 루트 경로에 둡니다.
 - 작업 시작 전 읽고, 작업 종료 후 반드시 업데이트합니다.
 - 형식은 `AGENTS.md`의 컨텍스트 템플릿을 따릅니다.
+
+## 로컬 실행 예시 (ENV 설정)
+- `.env.example`를 참고해 필요한 환경 변수를 주입합니다.
+- Spring Boot는 기본적으로 `.env`를 자동 로딩하지 않으므로, 셸/IDE 실행 설정에서 환경 변수를 지정합니다.
+
+```bash
+export SPRING_PROFILES_ACTIVE=dev
+export DEV_DB_URL=jdbc:h2:mem:devdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+export DEV_DB_USERNAME=sa
+export DEV_DB_PASSWORD=
+export H2_CONSOLE_ENABLED=true
+export H2_CONSOLE_PATH=/h2-console
+
+./gradlew bootRun
+```

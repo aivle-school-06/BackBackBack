@@ -138,6 +138,7 @@ AI 세션이 단절되거나 변경되더라도 작업의 연속성을 유지하
 
 * **Read First:** 모든 작업 시작 전, .context.md를 읽어 현재 작업 단계(Current Task)와 남은 작업(Next Steps)을 파악한다.
 * **Write Always:** 하나의 작업 단위(Task)가 끝날 때마다 .context.md를 최신 상태로 갱신한다.
+* **Append History:** 기존 내용을 삭제하지 말고, 이전 상태를 날짜와 함께 요약해 History 섹션에 추가한다.
 * **Structure:** .context.md는 아래의 형식을 유지해야 한다.
 
 ### **Context File Template (.context.md)**
@@ -158,6 +159,9 @@ AI 세션이 단절되거나 변경되더라도 작업의 연속성을 유지하
 
 ## 4. Known Issues (알려진 문제/보류 사항)
 - Refresh Token 저장소(Redis) 연결 정보 확인 필요
+
+## 5. History (이전 기록)
+- 2026-01-19 | 작업: 로그인 API 구현 진행 | 결과: JWT 발급 로직 추가 | 이슈: 없음
 ```
 
 ## **11\. Notes for Codex (Self-Check)**
