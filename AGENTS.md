@@ -9,6 +9,7 @@
 
 1. **Interaction (대화 및 문서):** 모든 설명, 질문, 가이드, PR 본문은 \*\*한국어(Korean)\*\*로 작성한다.
 2. **Git System (버전 관리):** 브랜치 이름과 커밋 메시지는 반드시 \*\*영어(English)\*\*로 작성한다.
+3. **Exception (영어 사용 예외):** 사용자가 명시적으로 영어 응답을 요청한 경우에 한해 해당 요청과 응답은 영어로 작성한다.
 
 ## **1\. 기본 원칙 (Core Principles)**
 
@@ -25,13 +26,13 @@
 
 ## **3\. 작업 흐름 (Workflow)**
 
-1. **Load Context:** 작업 시작 전 .context.md (또는 지정된 컨텍스트 파일)를 읽어 현재 진행 상황을 파악한다. (See Section 10)
+1. **Load Context:** 작업 시작 전 .context.md와 개인 로그(.context.d/{collaboratorId}.md)를 읽어 현재 진행 상황을 파악한다. (See Section 10, 11)
 2. **Analysis:** 변경 전 관련 파일을 읽고 전체 맥락과 의존성을 파악한다.
 3. **Strategy:** 수정 범위와 영향 범위를 먼저 생각한 뒤 작업을 시작한다.
 4. **Implementation:** 변경은 가능한 한 작은 단위(Atomic)로 수행한다.
 5. **Verification:** 수정 후 컴파일 에러 가능성, 린트(Lint) 위반 여부를 스스로 점검한다.
 6. **Suggestion:** 필요 시 간단한 테스트 방법 또는 검증 절차(cURL 예시 등)를 제안한다.
-7. **Update Context:** 작업 완료 후, 변경 사항과 다음 할 일을 컨텍스트 파일에 기록한다.
+7. **Update Context:** 커밋 전에 개인 로그를 읽고, 공유할 가치가 있는 변경을 .context.md에 기록한다.
 
 ## **4\. 코드 스타일 (Code Style)**
 
@@ -137,7 +138,7 @@ AI 세션이 단절되거나 변경되더라도 작업의 연속성을 유지하
 ### **Protocol Rules**
 
 * **Read First:** 모든 작업 시작 전, .context.md를 읽어 현재 작업 단계(Current Task)와 남은 작업(Next Steps)을 파악한다.
-* **Write Always:** 하나의 작업 단위(Task)가 끝날 때마다 .context.md를 최신 상태로 갱신한다.
+* **Write Before Commit:** 커밋 직전에 개인 로그를 참고하여 .context.md를 최신 상태로 갱신한다.
 * **Append History:** 기존 내용을 삭제하지 말고, 이전 상태를 날짜와 함께 요약해 History 섹션에 추가한다.
 * **Structure:** .context.md는 아래의 형식을 유지해야 한다.
 
@@ -164,7 +165,41 @@ AI 세션이 단절되거나 변경되더라도 작업의 연속성을 유지하
 - 2026-01-19 | 작업: 로그인 API 구현 진행 | 결과: JWT 발급 로직 추가 | 이슈: 없음
 ```
 
-## **11\. Notes for Codex (Self-Check)**
+## **11\. Per-User Session Log (개인 로그)**
+
+개인 로그는 협업자별 경미한 작업 기록을 위한 보조 로그이며, .context.md와 별도로 관리한다.
+
+### **Protocol Rules**
+
+* **Auto-Detect:** 세션 시작 시 자동으로 협업자 ID를 결정한다. 우선순위는 `git config user.email` → `git config user.name` 순이다.
+* **Sanitize:** 협업자 ID는 소문자화하고, 영숫자/점/언더스코어/하이픈 이외 문자는 `-`로 치환한다.
+* **Uncertainty:** ID가 비어 있거나 모호한 경우, 진행 전에 사용자 확인을 받는다.
+* **Location:** 로그는 `.context.d/{collaboratorId}.md`에 저장하며 Git 추적 대상이다.
+* **Creation:** 해당 파일이 없으면 템플릿을 기반으로 생성한다.
+* **Stability:** 확인된 로그는 별도 요청이 없는 한 동일 로그를 세션 내 유지한다.
+* **Task Logging:** 작업 단위는 개인 로그에 먼저 기록한다.
+* **Context Sync:** 커밋 전에 개인 로그를 읽고 .context.md를 갱신한다.
+* **Context Filter:** 로컬 선호나 로컬 환경 설정만의 변화는 .context.md에 기록하지 않는다. 단, 추후 영향을 줄 가능성이 있으면 기록한다.
+* **Tracked Changes:** Git 추적 대상 파일 변경은 .context.md 업데이트 대상으로 간주하며, 중요도에 따라 간결히 요약한다.
+
+### **Template (.context.d/{collaboratorId}.md)**
+
+```md
+# Per-User Session Log
+
+## 1. Owner (소유자)
+- id: {collaboratorId}
+- source: git config user.email | git config user.name
+- email: {user.email or not set}
+
+## 2. Recent Notes (최근 메모)
+- YYYY-MM-DD | 작업: ... | 결과: ... | 이슈: ...
+
+## 3. History (이전 기록)
+- YYYY-MM-DD | 작업: ... | 결과: ... | 이슈: ...
+```
+
+## **12\. Notes for Codex (Self-Check)**
 
 작업을 완료하기 전 다음 체크리스트를 스스로 확인한다.
 
@@ -173,3 +208,10 @@ AI 세션이 단절되거나 변경되더라도 작업의 연속성을 유지하
 3. \[ \] **안전성:** 하드코딩된 비밀번호나 민감 정보가 없는가?
 4. \[ \] **완결성:** 생성된 코드가 문법 에러 없이 컴파일 가능한가?
 5. \[ \] **원자성:** 하나의 커밋에 하나의 변경 사항만 담겨 있는가?
+
+## **12\. Environment (개발 환경)**
+
+* Java (Gradle JVM): 21.0.9
+* Spring Boot: 3.5.9
+* Spring Framework (spring-core): 6.2.15
+* Gradle: 8.14.3
