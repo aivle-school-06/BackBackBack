@@ -3,9 +3,10 @@
 ## 1. Owner (소유자)
 - id: awkawkaardvark
 - source: git config user.name
-- email: (not set)
+- email: a081127@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-20 | 작업: GitHub 설정 디버깅 시도 기록 | 결과: 여러 세션에 걸친 디버깅 작업 반영 | 이슈: GitHub 설정 디버깅 진행 중
 - 2026-01-20 | 작업: 사용자 선호 기록 | 결과: 응답 언어 영어 선호 반영 | 이슈: 없음
 - 2026-01-20 | 작업: 개인 로그 우선 기록/컨텍스트 갱신 규칙 반영 | 결과: AGENTS.md 프로토콜 갱신 | 이슈: 없음
 - 2026-01-20 | 작업: 개인 로그 초기화 | 결과: 로그 파일 생성 | 이슈: git user.email 미설정으로 user.name 사용
