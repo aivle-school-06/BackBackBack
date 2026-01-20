@@ -1,14 +1,19 @@
 package com.aivle.project.post.entity;
 
+import com.aivle.project.category.entity.CategoriesEntity;
 import com.aivle.project.common.entity.BaseEntity;
+import com.aivle.project.user.entity.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -28,11 +33,13 @@ public class PostsEntity extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "user_id", nullable = false)
-	private Long userId;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "user_id", nullable = false)
+	private UserEntity user;
 
-	@Column(name = "category_id", nullable = false)
-	private Long categoryId;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "category_id", nullable = false)
+	private CategoriesEntity category;
 
 	@Column(name = "title", nullable = false, length = 200)
 	private String title;
