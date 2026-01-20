@@ -90,6 +90,31 @@ class CustomUserDetailsServiceTest {
 		assertThat(user.getDeletedAt()).isNotNull();
 	}
 
+	@Test
+	@DisplayName("이미 탈퇴된 사용자는 withdraw 재호출 시 상태/삭제 시간이 유지된다")
+	void withdraw_doesNotChangeWhenAlreadyDeleted() {
+		UserEntity user = createUser("withdraw-again@test.com", UserStatus.ACTIVE);
+
+		user.withdraw();
+		var firstDeletedAt = user.getDeletedAt();
+
+		user.withdraw();
+
+		assertThat(user.getStatus()).isEqualTo(UserStatus.INACTIVE);
+		assertThat(user.getDeletedAt()).isEqualTo(firstDeletedAt);
+	}
+
+	@Test
+	@DisplayName("사용자 저장 시 UUID가 자동 생성된다")
+	void save_setsUuid() {
+		UserEntity user = createUser("uuid@test.com", UserStatus.ACTIVE);
+
+		userRepository.save(user);
+		entityManager.flush();
+
+		assertThat(user.getUuid()).isNotNull();
+	}
+
 	private UserEntity createUser(String email, UserStatus status) {
 		UserEntity user = newUserEntity();
 		ReflectionTestUtils.setField(user, "email", email);

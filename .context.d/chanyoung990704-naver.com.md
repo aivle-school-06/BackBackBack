@@ -6,6 +6,8 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-20 | 작업: withdraw 재호출 동작 테스트 추가 | 결과: 삭제 상태 유지 검증 | 이슈: 없음
+- 2026-01-20 | 작업: UserEntity UUID 자동 생성 테스트 추가 | 결과: 저장 시 UUID 생성 검증 | 이슈: 없음
 - 2026-01-20 | 작업: UserDetails 테스트 DisplayName 추가 | 결과: 테스트 목적을 한국어로 명시 | 이슈: 없음
 - 2026-01-20 | 작업: GrantedAuthority 제네릭 타입 오류 수정 | 결과: CustomUserDetails 스트림 타입 명시 | 이슈: 없음
 - 2026-01-20 | 작업: 코드 주석 한글화 | 결과: main/test 주석을 한국어로 변경 | 이슈: 없음
