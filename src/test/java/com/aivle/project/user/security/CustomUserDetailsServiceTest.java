@@ -43,7 +43,7 @@ class CustomUserDetailsServiceTest {
 
 	@Test
 	@DisplayName("이메일로 조회 시 역할 권한이 UserDetails에 반영된다")
-	void loadUd으serByUsername_returnsAuthoritiesFromRoles() {
+	void loadUserByUsername_returnsAuthoritiesFromRoles() {
 		String email = "user@test.com";
 		UserEntity user = createUser(email, UserStatus.ACTIVE);
 		userRepository.save(user);
