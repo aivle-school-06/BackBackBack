@@ -1,5 +1,7 @@
 package com.aivle.project.common.config;
 
+import com.aivle.project.auth.service.AccessTokenBlacklistService;
+import com.aivle.project.auth.token.AccessTokenValidator;
 import com.aivle.project.auth.token.JwtKeyProvider;
 import com.aivle.project.auth.token.JwtProperties;
 import com.aivle.project.common.security.RestAccessDeniedHandler;
@@ -88,11 +90,11 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public JwtDecoder jwtDecoder() {
+	public JwtDecoder jwtDecoder(OAuth2TokenValidator<Jwt> accessTokenValidator) {
 		RSAPublicKey publicKey = jwtKeyProvider.loadPublicKey();
 		NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(publicKey).build();
-		OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefaultWithIssuer(jwtProperties.getIssuer());
-		decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(validator));
+		OAuth2TokenValidator<Jwt> defaultValidator = JwtValidators.createDefaultWithIssuer(jwtProperties.getIssuer());
+		decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(defaultValidator, accessTokenValidator));
 		return decoder;
 	}
 
@@ -105,6 +107,11 @@ public class SecurityConfig {
 			.keyID(jwtProperties.getKeys().getCurrentKid())
 			.build();
 		return new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(rsaKey)));
+	}
+
+	@Bean
+	public OAuth2TokenValidator<Jwt> accessTokenValidator(AccessTokenBlacklistService accessTokenBlacklistService) {
+		return new AccessTokenValidator(accessTokenBlacklistService);
 	}
 
 	@Bean

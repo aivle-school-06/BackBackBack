@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,6 +17,7 @@ import com.aivle.project.user.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -145,5 +147,67 @@ class RefreshTokenServiceTest {
 		verify(setOperations).remove("sessions:" + USER_ID, "rt-old");
 		verify(valueOperations).set(eq("refresh:rt-new"), any(String.class), any(Duration.class));
 		verify(refreshTokenRepository, atLeastOnce()).save(any(RefreshTokenEntity.class));
+	}
+
+	@Test
+	@DisplayName("전체 로그아웃 시 사용자 리프레시 토큰을 모두 폐기한다")
+	void revokeByUserId_shouldRevokeAllTokens() {
+		// given: 사용자 토큰 목록을 준비
+		RefreshTokenEntity entity1 = new RefreshTokenEntity(
+			"rt-10",
+			USER_ID,
+			EMAIL,
+			"device-1",
+			"ios",
+			"127.0.0.1",
+			LocalDateTime.now().plusDays(1)
+		);
+		RefreshTokenEntity entity2 = new RefreshTokenEntity(
+			"rt-11",
+			USER_ID,
+			EMAIL,
+			"device-2",
+			"android",
+			"127.0.0.1",
+			LocalDateTime.now().plusDays(1)
+		);
+		when(refreshTokenRepository.findAllByUserIdAndRevokedFalse(USER_ID)).thenReturn(List.of(entity1, entity2));
+
+		// when: 전체 로그아웃을 수행
+		refreshTokenService.revokeByUserId(USER_ID);
+
+		// then: Redis/DB에서 토큰이 폐기되고 세션 키가 제거된다
+		verify(redisTemplate).delete("refresh:rt-10");
+		verify(redisTemplate).delete("refresh:rt-11");
+		verify(setOperations).remove("sessions:" + USER_ID, "rt-10");
+		verify(setOperations).remove("sessions:" + USER_ID, "rt-11");
+		verify(redisTemplate).delete("sessions:" + USER_ID);
+		verify(refreshTokenRepository, atLeastOnce()).save(any(RefreshTokenEntity.class));
+	}
+
+	@Test
+	@DisplayName("디바이스 로그아웃 시 해당 디바이스 토큰만 폐기한다")
+	void revokeByUserIdAndDeviceId_shouldRevokeDeviceTokens() {
+		// given: 특정 디바이스 토큰을 준비
+		RefreshTokenEntity entity = new RefreshTokenEntity(
+			"rt-20",
+			USER_ID,
+			EMAIL,
+			"device-3",
+			"ios",
+			"127.0.0.1",
+			LocalDateTime.now().plusDays(1)
+		);
+		when(refreshTokenRepository.findAllByUserIdAndDeviceIdAndRevokedFalse(USER_ID, "device-3"))
+			.thenReturn(List.of(entity));
+
+		// when: 디바이스 로그아웃을 수행
+		refreshTokenService.revokeByUserIdAndDeviceId(USER_ID, "device-3");
+
+		// then: 해당 토큰만 폐기된다
+		verify(redisTemplate).delete("refresh:rt-20");
+		verify(setOperations).remove("sessions:" + USER_ID, "rt-20");
+		verify(redisTemplate, never()).delete("sessions:" + USER_ID);
+		verify(refreshTokenRepository, atLeastOnce()).save(entity);
 	}
 }
