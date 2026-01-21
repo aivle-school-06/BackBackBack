@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.aivle.project.auth.dto.LoginRequest;
 import com.aivle.project.auth.dto.TokenResponse;
 import com.aivle.project.common.error.ErrorResponse;
+import com.aivle.project.common.config.TestSecurityConfig;
 import com.aivle.project.user.entity.RoleEntity;
 import com.aivle.project.user.entity.RoleName;
 import com.aivle.project.user.entity.UserEntity;
@@ -20,13 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,31 +56,15 @@ import org.testcontainers.utility.DockerImageName;
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")
 @Transactional
-@Import(AuthIntegrationTest.TestSecurityController.class)
+@Import({AuthIntegrationTest.TestSecurityController.class, TestSecurityConfig.class})
 class AuthIntegrationTest {
 
 	private static final String TEST_ISSUER = "project-test";
 	private static final String TEST_KID = "test-kid";
 
-	private static final Path PRIVATE_KEY_PATH;
-	private static final Path PUBLIC_KEY_PATH;
-
 	@Container
 	static final GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:7.0"))
 		.withExposedPorts(6379);
-
-	static {
-		try {
-			Path tempDir = Files.createTempDirectory("jwt-keys");
-			KeyPair keyPair = generateKeyPair();
-			PRIVATE_KEY_PATH = tempDir.resolve("private.pem");
-			PUBLIC_KEY_PATH = tempDir.resolve("public.pem");
-			writePem(PRIVATE_KEY_PATH, "PRIVATE KEY", keyPair.getPrivate().getEncoded());
-			writePem(PUBLIC_KEY_PATH, "PUBLIC KEY", keyPair.getPublic().getEncoded());
-		} catch (IOException ex) {
-			throw new IllegalStateException("JWT 테스트 키 생성에 실패했습니다", ex);
-		}
-	}
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -114,8 +92,6 @@ class AuthIntegrationTest {
 		registry.add("jwt.issuer", () -> TEST_ISSUER);
 		registry.add("jwt.access-token.expiration", () -> 1800);
 		registry.add("jwt.refresh-token.expiration", () -> 604800);
-		registry.add("jwt.keys.private-key-path", () -> PRIVATE_KEY_PATH.toString());
-		registry.add("jwt.keys.public-key-path", () -> PUBLIC_KEY_PATH.toString());
 		registry.add("jwt.keys.current-kid", () -> TEST_KID);
 		registry.add("jwt.legacy.role-prefix-support-enabled", () -> true);
 		registry.add("jwt.legacy.role-prefix-accept-until-epoch", () -> 0);
@@ -247,22 +223,6 @@ class AuthIntegrationTest {
 		} catch (ReflectiveOperationException ex) {
 			throw new IllegalStateException("UserEntity 생성에 실패했습니다", ex);
 		}
-	}
-
-	private static KeyPair generateKeyPair() throws IOException {
-		try {
-			KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-			generator.initialize(2048);
-			return generator.generateKeyPair();
-		} catch (Exception ex) {
-			throw new IOException("RSA 키 생성에 실패했습니다", ex);
-		}
-	}
-
-	private static void writePem(Path path, String type, byte[] encoded) throws IOException {
-		String base64 = Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(encoded);
-		String pem = "-----BEGIN " + type + "-----\n" + base64 + "\n-----END " + type + "-----\n";
-		Files.writeString(path, pem, StandardCharsets.US_ASCII);
 	}
 
 	@RestController
