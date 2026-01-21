@@ -83,4 +83,26 @@ class AccessTokenValidatorTest {
 		// then: 성공 결과가 반환된다
 		assertThat(result.hasErrors()).isFalse();
 	}
+
+	@Test
+	@DisplayName("전체 로그아웃 기준과 동일한 시각의 토큰은 허용한다")
+	void validate_shouldAllowWhenIssuedAtEqualsLogoutAllAt() {
+		// given: 로그아웃 기준과 동일한 발급 시각을 가진 토큰을 준비
+		Instant now = Instant.now();
+		Jwt jwt = Jwt.withTokenValue("access")
+			.header("alg", "RS256")
+			.subject("user-uuid")
+			.issuedAt(now)
+			.expiresAt(now.plusSeconds(60))
+			.jti("jti-4")
+			.build();
+		when(accessTokenBlacklistService.isBlacklisted("jti-4")).thenReturn(false);
+		when(accessTokenBlacklistService.getLogoutAllAt("user-uuid")).thenReturn(now);
+
+		// when: 토큰을 검증
+		OAuth2TokenValidatorResult result = new AccessTokenValidator(accessTokenBlacklistService).validate(jwt);
+
+		// then: 성공 결과가 반환된다
+		assertThat(result.hasErrors()).isFalse();
+	}
 }
