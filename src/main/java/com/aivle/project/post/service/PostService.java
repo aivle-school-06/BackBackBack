@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UserPostService {
+public class PostService {
 
 	private final PostsRepository postsRepository;
 	private final UserRepository userRepository;

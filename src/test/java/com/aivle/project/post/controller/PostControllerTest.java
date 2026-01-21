@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("dev")
 @Transactional
 @Import(TestSecurityConfig.class)
-class UserPostControllerTest {
+class PostControllerTest {
 
 	private static final String USER_ID_HEADER = "X-User-Id";
 
