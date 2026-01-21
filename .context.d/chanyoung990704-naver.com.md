@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-21 | 작업: 전역 예외 처리 리팩터링 | 결과: 공통 에러 코드/필드 에러 응답/GlobalExceptionHandler 추가 및 Auth 핸들러 통합 | 이슈: 없음
 - 2026-01-20 | 작업: 이슈 템플릿 추가 | 결과: 일반 이슈 템플릿 생성 | 이슈: 없음
 - 2026-01-20 | 작업: 테스트 설명/주석 보강 및 오류 수정 | 결과: Auth/RefreshToken 테스트 DisplayName과 given-when-then 추가 | 이슈: 없음
 - 2026-01-20 | 작업: JWT 인증 단위 테스트 추가 | 결과: Auth/RefreshToken/JwtToken 테스트 작성 | 이슈: 없음
