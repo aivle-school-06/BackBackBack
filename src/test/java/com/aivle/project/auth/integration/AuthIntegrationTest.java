@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.aivle.project.auth.dto.LoginRequest;
+import com.aivle.project.auth.dto.SignupRequest;
+import com.aivle.project.auth.dto.SignupResponse;
 import com.aivle.project.auth.dto.TokenResponse;
 import com.aivle.project.auth.repository.RefreshTokenRepository;
 import com.aivle.project.common.error.ErrorResponse;
@@ -183,6 +185,30 @@ class AuthIntegrationTest {
 		// then: 표준 에러 응답을 반환한다
 		ErrorResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class);
 		assertThat(response.code()).isEqualTo("AUTH_401");
+	}
+
+	@Test
+	@DisplayName("회원가입 성공 시 사용자 정보가 반환된다")
+	void signup_shouldReturnCreatedUser() throws Exception {
+		// given: 회원가입 요청을 준비
+		SignupRequest request = new SignupRequest();
+		request.setEmail("signup@test.com");
+		request.setPassword("password123");
+		request.setName("signup-user");
+		request.setPhone("01012345678");
+
+		// when: 회원가입 요청을 수행
+		MvcResult result = mockMvc.perform(post("/auth/signup")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isCreated())
+			.andReturn();
+
+		// then: 응답과 DB 저장을 확인
+		SignupResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), SignupResponse.class);
+		assertThat(response.email()).isEqualTo("signup@test.com");
+		assertThat(response.role()).isEqualTo(RoleName.USER);
+		assertThat(userRepository.findByEmail("signup@test.com")).isPresent();
 	}
 
 	@Test

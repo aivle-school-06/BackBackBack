@@ -65,8 +65,6 @@ class RefreshTokenServiceTest {
 	@BeforeEach
 	void setUp() {
 		ObjectMapper objectMapper = new ObjectMapper();
-		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-		when(redisTemplate.opsForSet()).thenReturn(setOperations);
 		refreshTokenService = new RefreshTokenService(redisTemplate, objectMapper, refreshTokenRepository, jwtTokenService);
 	}
 
@@ -74,6 +72,8 @@ class RefreshTokenServiceTest {
 	@DisplayName("리프레시 토큰 저장 시 Redis와 DB에 모두 기록한다")
 	void storeToken_shouldPersistToRedisAndDatabase() throws Exception {
 		// given: 사용자 정보와 만료 시간 설정을 준비
+		stubValueOperations();
+		stubSetOperations();
 		CustomUserDetails userDetails = mock(CustomUserDetails.class);
 		when(userDetails.getUuid()).thenReturn(UUID.randomUUID());
 		when(userDetails.getUsername()).thenReturn(EMAIL);
@@ -99,6 +99,8 @@ class RefreshTokenServiceTest {
 	@DisplayName("Redis 미스 시 DB에서 로드하고 캐시를 복구한다")
 	void loadValidToken_shouldFallbackToDatabaseAndRehydrateCache() {
 		// given: Redis 미스와 DB에 존재하는 토큰 상태를 준비
+		stubValueOperations();
+		stubSetOperations();
 		LocalDateTime expiresAt = LocalDateTime.now().plusDays(1);
 		RefreshTokenEntity entity = new RefreshTokenEntity("rt-2", USER_ID, EMAIL, "device-2", "android", "127.0.0.1", expiresAt);
 		ReflectionTestUtils.setField(entity, "createdAt", LocalDateTime.now().minusMinutes(5));
@@ -121,6 +123,8 @@ class RefreshTokenServiceTest {
 	@DisplayName("리프레시 회전 시 기존 토큰이 폐기되고 신규 토큰이 저장된다")
 	void rotateToken_shouldRevokeOldAndStoreNew() throws Exception {
 		// given: 기존 토큰이 Redis와 DB에 존재하는 상태를 준비
+		stubValueOperations();
+		stubSetOperations();
 		RefreshTokenCache existing = new RefreshTokenCache(
 			"rt-old",
 			USER_ID,
@@ -153,6 +157,7 @@ class RefreshTokenServiceTest {
 	@DisplayName("전체 로그아웃 시 사용자 리프레시 토큰을 모두 폐기한다")
 	void revokeByUserId_shouldRevokeAllTokens() {
 		// given: 사용자 토큰 목록을 준비
+		stubSetOperations();
 		RefreshTokenEntity entity1 = new RefreshTokenEntity(
 			"rt-10",
 			USER_ID,
@@ -189,6 +194,7 @@ class RefreshTokenServiceTest {
 	@DisplayName("디바이스 로그아웃 시 해당 디바이스 토큰만 폐기한다")
 	void revokeByUserIdAndDeviceId_shouldRevokeDeviceTokens() {
 		// given: 특정 디바이스 토큰을 준비
+		stubSetOperations();
 		RefreshTokenEntity entity = new RefreshTokenEntity(
 			"rt-20",
 			USER_ID,
@@ -209,5 +215,13 @@ class RefreshTokenServiceTest {
 		verify(setOperations).remove("sessions:" + USER_ID, "rt-20");
 		verify(redisTemplate, never()).delete("sessions:" + USER_ID);
 		verify(refreshTokenRepository, atLeastOnce()).save(entity);
+	}
+
+	private void stubValueOperations() {
+		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+	}
+
+	private void stubSetOperations() {
+		when(redisTemplate.opsForSet()).thenReturn(setOperations);
 	}
 }

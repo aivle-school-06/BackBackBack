@@ -62,7 +62,8 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers("/auth/login", "/auth/refresh", "/error").permitAll()
+				.requestMatchers("/auth/login", "/auth/refresh", "/auth/signup", "/auth/console", "/error").permitAll()
+				.requestMatchers("/assets/**").permitAll()
 				.anyRequest().authenticated()
 			)
 			.oauth2ResourceServer(oauth2 -> oauth2

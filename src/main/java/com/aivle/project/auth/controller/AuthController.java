@@ -1,12 +1,16 @@
 package com.aivle.project.auth.controller;
 
 import com.aivle.project.auth.dto.LoginRequest;
+import com.aivle.project.auth.dto.SignupRequest;
+import com.aivle.project.auth.dto.SignupResponse;
 import com.aivle.project.auth.dto.TokenRefreshRequest;
 import com.aivle.project.auth.dto.TokenResponse;
 import com.aivle.project.auth.service.AuthService;
+import com.aivle.project.auth.service.SignUpService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
 	private final AuthService authService;
+	private final SignUpService signUpService;
 
 	@PostMapping("/login")
 	public ResponseEntity<TokenResponse> login(
@@ -37,6 +42,11 @@ public class AuthController {
 	@PostMapping("/refresh")
 	public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody TokenRefreshRequest request) {
 		return ResponseEntity.ok(authService.refresh(request));
+	}
+
+	@PostMapping("/signup")
+	public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(signUpService.signup(request));
 	}
 
 	@PostMapping("/logout")
