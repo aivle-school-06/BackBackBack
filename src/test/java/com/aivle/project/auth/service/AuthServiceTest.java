@@ -6,11 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.aivle.project.auth.dto.LoginRequest;
 import com.aivle.project.auth.dto.TokenRefreshRequest;
 import com.aivle.project.auth.dto.TokenResponse;
+import com.aivle.project.auth.exception.AuthErrorCode;
 import com.aivle.project.auth.exception.AuthException;
 import com.aivle.project.auth.token.JwtTokenService;
 import com.aivle.project.auth.token.RefreshTokenCache;
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -138,5 +141,44 @@ class AuthServiceTest {
 		// when & then: 비활성 사용자는 예외가 발생한다
 		assertThatThrownBy(() -> authService.refresh(request))
 			.isInstanceOf(AuthException.class);
+	}
+
+	@Test
+	@DisplayName("인증 실패 시 로그인 요청이 거절된다")
+	void login_shouldThrowWhenAuthenticationFails() {
+		// given: 인증 실패 상태를 준비
+		AuthService authService = new AuthService(authenticationManager, jwtTokenService, refreshTokenService, userDetailsService);
+
+		LoginRequest request = new LoginRequest();
+		request.setEmail("user@example.com");
+		request.setPassword("wrong-password");
+
+		when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+			.thenThrow(new BadCredentialsException("Bad credentials"));
+
+		// when & then: 인증 실패면 AuthException이 발생한다
+		assertThatThrownBy(() -> authService.login(request, "127.0.0.1"))
+			.isInstanceOf(AuthException.class);
+
+		verifyNoInteractions(jwtTokenService, refreshTokenService);
+	}
+
+	@Test
+	@DisplayName("리프레시 토큰이 유효하지 않으면 예외가 전파된다")
+	void refresh_shouldThrowWhenRefreshTokenInvalid() {
+		// given: 리프레시 토큰 검증 실패 상태를 준비
+		AuthService authService = new AuthService(authenticationManager, jwtTokenService, refreshTokenService, userDetailsService);
+
+		TokenRefreshRequest request = new TokenRefreshRequest();
+		request.setRefreshToken("invalid-refresh");
+
+		when(jwtTokenService.createRefreshToken()).thenReturn("new-token");
+		when(refreshTokenService.rotateToken("invalid-refresh", "new-token"))
+			.thenThrow(new AuthException(AuthErrorCode.INVALID_REFRESH_TOKEN));
+
+		// when & then: 예외가 그대로 전달된다
+		assertThatThrownBy(() -> authService.refresh(request))
+			.isInstanceOf(AuthException.class)
+			.hasMessage(AuthErrorCode.INVALID_REFRESH_TOKEN.getMessage());
 	}
 }
