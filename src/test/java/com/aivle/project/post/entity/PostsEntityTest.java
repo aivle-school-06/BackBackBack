@@ -1,24 +1,27 @@
-package com.aivle.project.post.entity;
+package com.aivle.project.post;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.aivle.project.category.entity.CategoriesEntity;
+import com.aivle.project.common.config.TestSecurityConfig;
+import com.aivle.project.post.entity.PostStatus;
+import com.aivle.project.post.entity.PostsEntity;
 import com.aivle.project.user.entity.UserEntity;
 import com.aivle.project.user.entity.UserStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-//@SpringBootTest
-@DataJpaTest //jwt 문제 해결되면 SpringBootTest로 전환
+@SpringBootTest
 @ActiveProfiles("dev")
 @Transactional
+@Import(TestSecurityConfig.class)
 class PostsEntityTest {
 
 	private static final String DEFAULT_TITLE = "test title";
