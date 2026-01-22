@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.aivle.project.auth.dto.LoginRequest;
 import com.aivle.project.auth.dto.TokenResponse;
-import com.aivle.project.common.error.ErrorResponse;
+import com.aivle.project.common.dto.ApiResponse;
 import com.aivle.project.common.config.TestSecurityConfig;
 import com.aivle.project.user.entity.RoleEntity;
 import com.aivle.project.user.entity.RoleName;
@@ -177,8 +177,11 @@ class AuthIntegrationTest {
 			.andReturn();
 
 		// then: 표준 에러 응답을 반환한다
-		ErrorResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class);
-		assertThat(response.code()).isEqualTo("AUTH_401");
+		ApiResponse<Void> response = objectMapper.readValue(
+			result.getResponse().getContentAsString(),
+			new TypeReference<ApiResponse<Void>>() {}
+		);
+		assertThat(response.error().code()).isEqualTo("AUTH_401");
 	}
 
 	private String loginAndGetAccessToken(String email, String password, String deviceId) throws Exception {
