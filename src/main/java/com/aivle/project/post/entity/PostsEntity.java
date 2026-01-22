@@ -70,4 +70,46 @@ public class PostsEntity extends BaseEntity {
 			status = PostStatus.PUBLISHED;
 		}
 	}
+
+	/**
+	 * 게시글 생성.
+	 */
+	public static PostsEntity create(
+		UserEntity user,
+		CategoriesEntity category,
+		String title,
+		String content,
+		boolean isPinned,
+		PostStatus status,
+		Long actorId
+	) {
+		PostsEntity post = new PostsEntity();
+		post.user = user;
+		post.category = category;
+		post.title = title;
+		post.content = content;
+		post.isPinned = isPinned;
+		post.status = status != null ? status : PostStatus.PUBLISHED;
+		post.createdBy = actorId;
+		post.updatedBy = actorId;
+		return post;
+	}
+
+	/**
+	 * 게시글 수정.
+	 */
+	public void update(String title, String content, CategoriesEntity category, Long actorId) {
+		this.title = title;
+		this.content = content;
+		this.category = category;
+		this.updatedBy = actorId;
+	}
+
+	/**
+	 * 게시글 소프트 삭제.
+	 */
+	public void markDeleted(Long actorId) {
+		delete();
+		this.updatedBy = actorId;
+	}
 }
