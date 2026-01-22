@@ -67,7 +67,7 @@ class PostControllerTest {
 		request.setContent("content");
 
 		// when: 게시글 생성 요청
-		MvcResult createResult = mockMvc.perform(post("/User/posts")
+		MvcResult createResult = mockMvc.perform(post("/posts")
 				.header(USER_ID_HEADER, user.getId())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
@@ -77,7 +77,7 @@ class PostControllerTest {
 		PostResponse created = objectMapper.readValue(createResult.getResponse().getContentAsString(), PostResponse.class);
 
 		// then: 조회 시 동일한 게시글이 반환된다
-		MvcResult getResult = mockMvc.perform(get("/User/posts/{id}", created.id()))
+		MvcResult getResult = mockMvc.perform(get("/posts/{id}", created.id()))
 			.andExpect(status().isOk())
 			.andReturn();
 
@@ -105,7 +105,7 @@ class PostControllerTest {
 		request.setTitle("after");
 
 		// when: 수정 요청
-		MvcResult updateResult = mockMvc.perform(patch("/User/posts/{id}", post.getId())
+		MvcResult updateResult = mockMvc.perform(patch("/posts/{id}", post.getId())
 				.header(USER_ID_HEADER, user.getId())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
@@ -135,7 +135,7 @@ class PostControllerTest {
 		request.setTitle("forbidden");
 
 		// when: 다른 사용자가 수정 요청
-		mockMvc.perform(patch("/User/posts/{id}", post.getId())
+		mockMvc.perform(patch("/posts/{id}", post.getId())
 				.header(USER_ID_HEADER, other.getId())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
@@ -156,12 +156,12 @@ class PostControllerTest {
 		entityManager.flush();
 
 		// when: 삭제 요청
-		mockMvc.perform(delete("/User/posts/{id}", post.getId())
+		mockMvc.perform(delete("/posts/{id}", post.getId())
 				.header(USER_ID_HEADER, user.getId()))
 			.andExpect(status().isNoContent());
 
 		// then: 조회 시 404
-		mockMvc.perform(get("/User/posts/{id}", post.getId()))
+		mockMvc.perform(get("/posts/{id}", post.getId()))
 			.andExpect(status().isNotFound());
 	}
 
@@ -180,12 +180,12 @@ class PostControllerTest {
 		entityManager.flush();
 
 		// when: 하나를 삭제
-		mockMvc.perform(delete("/User/posts/{id}", deleted.getId())
+		mockMvc.perform(delete("/posts/{id}", deleted.getId())
 				.header(USER_ID_HEADER, user.getId()))
 			.andExpect(status().isNoContent());
 
 		// then: 목록에는 남은 글만 존재
-		MvcResult listResult = mockMvc.perform(get("/User/posts"))
+		MvcResult listResult = mockMvc.perform(get("/posts"))
 			.andExpect(status().isOk())
 			.andReturn();
 
