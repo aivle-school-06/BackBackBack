@@ -72,6 +72,43 @@ class CommentIntegrationTest {
 		assertThat(reply.depth()).isEqualTo(1);
 	}
 
+	@Test
+	@DisplayName("여러 대댓글이 순서대로 생성되고 조회된다")
+	void list_multipleReplies_shouldOrderBySequence() {
+		// given: 사용자/카테고리/게시글을 준비
+		UserEntity writer = persistUser("writer-multi@test.com", "작성자");
+		UserEntity commenter = persistUser("commenter-multi@test.com", "댓글러");
+		CategoriesEntity category = persistCategory("자유게시판");
+		PostsEntity post = persistPost(writer, category, "다중 대댓글", "내용입니다");
+
+		CommentCreateRequest parentRequest = new CommentCreateRequest();
+		parentRequest.setPostId(post.getId());
+		parentRequest.setContent("부모 댓글");
+		CommentResponse parent = commentsService.create(commenter.getId(), parentRequest);
+
+		CommentCreateRequest replyOneRequest = new CommentCreateRequest();
+		replyOneRequest.setPostId(post.getId());
+		replyOneRequest.setParentId(parent.id());
+		replyOneRequest.setContent("대댓글 1");
+		CommentResponse replyOne = commentsService.create(writer.getId(), replyOneRequest);
+
+		CommentCreateRequest replyTwoRequest = new CommentCreateRequest();
+		replyTwoRequest.setPostId(post.getId());
+		replyTwoRequest.setParentId(parent.id());
+		replyTwoRequest.setContent("대댓글 2");
+		CommentResponse replyTwo = commentsService.create(writer.getId(), replyTwoRequest);
+
+		// when
+		List<CommentResponse> responses = commentsService.listByPost(post.getId());
+
+		// then
+		assertThat(responses).hasSize(3);
+		assertThat(responses.get(1).id()).isEqualTo(replyOne.id());
+		assertThat(responses.get(2).id()).isEqualTo(replyTwo.id());
+		assertThat(responses.get(1).sequence()).isEqualTo(0);
+		assertThat(responses.get(2).sequence()).isEqualTo(1);
+	}
+
 	private UserEntity persistUser(String email, String name) {
 		UserEntity user = UserEntity.create(email, "encoded-password", name, "010-0000-0000", UserStatus.ACTIVE);
 		entityManager.persist(user);
