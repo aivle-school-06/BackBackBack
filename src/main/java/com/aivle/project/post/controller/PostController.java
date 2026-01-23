@@ -10,7 +10,6 @@ import com.aivle.project.post.dto.PostUpdateRequest;
 import com.aivle.project.post.service.PostService;
 import com.aivle.project.user.entity.UserEntity;
 import jakarta.validation.Valid;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -60,9 +59,8 @@ public class PostController {
 		@CurrentUser UserEntity user,
 		@Valid @RequestBody PostCreateRequest request
 	) {
-		UUID userUuid = user.getUuid();
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(ApiResponse.ok(postService.create(userUuid, request)));
+			.body(ApiResponse.ok(postService.create(user, request)));
 	}
 
 	@PatchMapping("/{postId}")
@@ -71,8 +69,7 @@ public class PostController {
 		@PathVariable Long postId,
 		@Valid @RequestBody PostUpdateRequest request
 	) {
-		UUID userUuid = user.getUuid();
-		return ResponseEntity.ok(ApiResponse.ok(postService.update(userUuid, postId, request)));
+		return ResponseEntity.ok(ApiResponse.ok(postService.update(user, postId, request)));
 	}
 
 	@DeleteMapping("/{postId}")
@@ -80,8 +77,7 @@ public class PostController {
 		@CurrentUser UserEntity user,
 		@PathVariable Long postId
 	) {
-		UUID userUuid = user.getUuid();
-		postService.delete(userUuid, postId);
+		postService.delete(user, postId);
 		return ResponseEntity.ok(ApiResponse.ok());
 	}
 }

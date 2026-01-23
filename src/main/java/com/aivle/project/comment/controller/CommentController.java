@@ -9,7 +9,6 @@ import com.aivle.project.common.security.CurrentUser;
 import com.aivle.project.user.entity.UserEntity;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,10 +42,9 @@ public class CommentController {
 		@PathVariable Long postId,
 		@Valid @RequestBody CommentCreateRequest request
 	) {
-		UUID userUuid = user.getUuid();
 		request.setPostId(postId);
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(ApiResponse.ok(commentsService.create(userUuid, request)));
+			.body(ApiResponse.ok(commentsService.create(user, request)));
 	}
 
 	@PatchMapping("/comments/{commentId}")
@@ -55,8 +53,7 @@ public class CommentController {
 		@PathVariable Long commentId,
 		@Valid @RequestBody CommentUpdateRequest request
 	) {
-		UUID userUuid = user.getUuid();
-		return ResponseEntity.ok(ApiResponse.ok(commentsService.update(userUuid, commentId, request)));
+		return ResponseEntity.ok(ApiResponse.ok(commentsService.update(user.getId(), commentId, request)));
 	}
 
 	@DeleteMapping("/comments/{commentId}")
@@ -64,8 +61,7 @@ public class CommentController {
 		@CurrentUser UserEntity user,
 		@PathVariable Long commentId
 	) {
-		UUID userUuid = user.getUuid();
-		commentsService.delete(userUuid, commentId);
+		commentsService.delete(user.getId(), commentId);
 		return ResponseEntity.ok(ApiResponse.ok());
 	}
 }
