@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-23 | 작업: dev 회원가입 이메일 인증 스킵 처리 | 결과: dev 프로파일에서 이메일 인증 생략 및 SignUpService 테스트 보강 | 이슈: 없음
 - 2026-01-23 | 작업: 이메일 인증 기능 추가 | 결과: 이메일 인증 엔티티/서비스/컨트롤러, 마이그레이션 및 테스트 추가 | 이슈: 없음
 - 2026-01-23 | 작업: 테스트 메일 빈 모킹 및 dev 이메일 설정 import | 결과: 테스트용 JavaMailSender 모킹 추가, dev 프로파일에서 application-email.yml 로딩 | 이슈: 없음
 - 2026-01-22 | 작업: 댓글 CRUD 컨트롤러 및 통합 테스트 추가 | 결과: CommentController와 CRUD 통합 테스트 추가, 전체 테스트 통과 | 이슈: 없음

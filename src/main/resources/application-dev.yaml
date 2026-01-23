@@ -24,3 +24,8 @@ logging:
     # JPQL 쿼리 로깅 (필요시 주석 해제)
     # org.hibernate.hql.internal.ast.HqlSqlWalker: debug
     # org.hibernate.hql.internal.ast.QueryTranslatorImpl: debug
+
+app:
+  email:
+    verification:
+      skip: true

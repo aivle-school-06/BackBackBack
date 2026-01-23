@@ -26,6 +26,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.aivle.project.auth.mapper.AuthMapper;
 import com.aivle.project.user.service.EmailVerificationService;
@@ -72,6 +73,38 @@ class SignUpServiceTest {
 		// then: 사용자 저장과 매핑이 수행된다
 		assertThat(response.email()).isEqualTo("new@test.com");
 		verify(userDomainService).register("new@test.com", "encoded", "tester", "01012345678", RoleName.USER);
+	}
+
+	@Test
+	@DisplayName("dev 환경에서는 이메일 인증을 생략하고 사용자를 활성화한다")
+	void signup_shouldSkipEmailVerificationWhenConfigured() {
+		// given: 이메일 인증 스킵 설정과 회원가입 요청을 준비
+		SignUpService signUpService = new SignUpService(userDomainService, emailVerificationService, passwordEncoder, authMapper);
+		ReflectionTestUtils.setField(signUpService, "skipEmailVerification", true);
+
+		SignupRequest request = new SignupRequest();
+		request.setEmail("dev@test.com");
+		request.setPassword("password123");
+		request.setName("tester");
+		request.setPhone("01012345678");
+
+		UserEntity user = UserEntity.create("dev@test.com", "encoded", "tester", "01012345678", UserStatus.PENDING);
+		ReflectionTestUtils.setField(user, "id", 1L);
+		SignupResponse signupResponse = new SignupResponse(1L, java.util.UUID.randomUUID(), "dev@test.com", UserStatus.ACTIVE, RoleName.USER);
+
+		when(userDomainService.existsByEmail("dev@test.com")).thenReturn(false);
+		when(passwordEncoder.encode("password123")).thenReturn("encoded");
+		when(userDomainService.register("dev@test.com", "encoded", "tester", "01012345678", RoleName.USER))
+			.thenReturn(user);
+		when(authMapper.toSignupResponse(user, RoleName.USER)).thenReturn(signupResponse);
+
+		// when: 회원가입을 수행
+		SignupResponse response = signUpService.signup(request);
+
+		// then: 이메일 인증 전송 없이 사용자 활성화가 호출된다
+		assertThat(response.email()).isEqualTo("dev@test.com");
+		verify(userDomainService).activateUser(1L);
+		verify(emailVerificationService, org.mockito.Mockito.never()).sendVerificationEmail(user, "dev@test.com");
 	}
 
 	@Test
