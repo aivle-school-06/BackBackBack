@@ -76,6 +76,34 @@ class SignUpServiceTest {
 	}
 
 	@Test
+	@DisplayName("회원가입 시 인증 이메일이 발송된다")
+	void signup_shouldSendVerificationEmail() {
+		// given: 회원가입 요청과 사용자 상태를 준비
+		SignUpService signUpService = new SignUpService(userDomainService, emailVerificationService, passwordEncoder, authMapper);
+		SignupRequest request = new SignupRequest();
+		request.setEmail("verify@test.com");
+		request.setPassword("password123");
+		request.setName("tester");
+		request.setPhone("01012345678");
+
+		UserEntity user = UserEntity.create("verify@test.com", "encoded", "tester", "01012345678", UserStatus.PENDING);
+		SignupResponse signupResponse = new SignupResponse(1L, java.util.UUID.randomUUID(), "verify@test.com", UserStatus.PENDING, RoleName.USER);
+
+		when(userDomainService.existsByEmail("verify@test.com")).thenReturn(false);
+		when(passwordEncoder.encode("password123")).thenReturn("encoded");
+		when(userDomainService.register("verify@test.com", "encoded", "tester", "01012345678", RoleName.USER))
+			.thenReturn(user);
+		when(authMapper.toSignupResponse(user, RoleName.USER)).thenReturn(signupResponse);
+
+		// when: 회원가입을 수행
+		SignupResponse response = signUpService.signup(request);
+
+		// then: 인증 이메일 발송이 수행된다
+		assertThat(response.email()).isEqualTo("verify@test.com");
+		verify(emailVerificationService).sendVerificationEmail(user, "verify@test.com");
+	}
+
+	@Test
 	@DisplayName("dev 환경에서는 이메일 인증을 생략하고 사용자를 활성화한다")
 	void signup_shouldSkipEmailVerificationWhenConfigured() {
 		// given: 이메일 인증 스킵 설정과 회원가입 요청을 준비

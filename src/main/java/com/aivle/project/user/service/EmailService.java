@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -19,6 +20,9 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    @Value("${app.email.verification.base-url:http://localhost:8080}")
+    private String verificationBaseUrl;
+
     /**
      * 이메일 인증 링크 전송 (비동기).
      */
@@ -26,7 +30,7 @@ public class EmailService {
     public void sendVerificationEmail(String toEmail, String verificationToken) {
         try {
             String subject = "Aivle Project - 이메일 인증";
-            String verificationUrl = "http://localhost:8080/api/auth/verify-email?token=" + verificationToken;
+            String verificationUrl = buildVerificationUrl(verificationToken);
 
             String htmlContent = String.format("""
                 <html>
@@ -73,5 +77,12 @@ public class EmailService {
         } catch (MessagingException e) {
             throw new RuntimeException("이메일 전송 중 오류 발생", e);
         }
+    }
+
+    private String buildVerificationUrl(String verificationToken) {
+        String baseUrl = verificationBaseUrl.endsWith("/")
+            ? verificationBaseUrl.substring(0, verificationBaseUrl.length() - 1)
+            : verificationBaseUrl;
+        return baseUrl + "/api/auth/verify-email?token=" + verificationToken;
     }
 }
