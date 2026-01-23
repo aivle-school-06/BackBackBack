@@ -171,6 +171,30 @@
 			white-space: pre-wrap;
 		}
 
+		.file-list {
+			display: grid;
+			gap: 12px;
+			margin-top: 16px;
+		}
+
+		.file-item {
+			border: 1px solid var(--line);
+			border-radius: 16px;
+			padding: 14px 16px;
+			background: #fbfaf8;
+			display: grid;
+			gap: 6px;
+		}
+
+		.file-title {
+			font-weight: 600;
+		}
+
+		.file-meta {
+			font-size: 12px;
+			color: var(--muted);
+		}
+
 		@keyframes rise {
 			from {
 				opacity: 0;
@@ -232,6 +256,16 @@
 			</ul>
 		</section>
 
+		<section class="card" style="animation-delay: 0.16s;">
+			<h2>업로드 파일 조회</h2>
+			<label for="list-post-id">postId</label>
+			<input id="list-post-id" type="number" placeholder="조회할 게시글 ID">
+			<div class="actions">
+				<button class="secondary" id="list-btn" type="button">목록 조회</button>
+			</div>
+			<div id="file-list" class="file-list">조회된 파일이 없습니다.</div>
+		</section>
+
 		<section class="card" style="animation-delay: 0.2s;">
 			<h2>응답 로그</h2>
 			<pre class="log" id="log">대기 중...</pre>
@@ -246,6 +280,9 @@
 		const uploadBtn = document.getElementById("upload-btn");
 		const clearBtn = document.getElementById("clear-btn");
 		const postIdInput = document.getElementById("post-id");
+		const listPostIdInput = document.getElementById("list-post-id");
+		const listBtn = document.getElementById("list-btn");
+		const fileListEl = document.getElementById("file-list");
 		const accessPreview = document.getElementById("access-preview");
 		const refreshPreview = document.getElementById("refresh-preview");
 
@@ -327,8 +364,132 @@
 			}
 		};
 
+		const fetchFileList = async () => {
+			const postId = listPostIdInput.value;
+			if (!postId) {
+				setLog("조회할 postId를 입력하세요.");
+				return;
+			}
+			if (!state.accessToken) {
+				setLog("Access Token이 없습니다. Auth Console에서 로그인 후 다시 시도하세요.");
+				return;
+			}
+
+			setLog("파일 목록 조회 중...");
+			try {
+				const response = await fetch(`/posts/${postId}/files`, {
+					method: "GET",
+					headers: {
+						Authorization: "Bearer " + state.accessToken
+					}
+				});
+				const text = await response.text();
+				let data = text;
+				try {
+					data = JSON.parse(text);
+				} catch (e) {
+					// ignore
+				}
+				if (!response.ok) {
+					setLog({ status: response.status, body: data });
+					return;
+				}
+				renderFileList(data.data || []);
+				setLog({ status: response.status, body: data });
+			} catch (e) {
+				setLog("파일 목록 조회 실패: " + e.message);
+			}
+		};
+
+		const renderFileList = (items) => {
+			if (!fileListEl) return;
+			fileListEl.innerHTML = "";
+			if (!items || items.length === 0) {
+				fileListEl.textContent = "조회된 파일이 없습니다.";
+				return;
+			}
+			items.forEach((item) => {
+				const wrapper = document.createElement("div");
+				wrapper.className = "file-item";
+
+				const title = document.createElement("div");
+				title.className = "file-title";
+				title.textContent = `${item.originalFilename} (${Math.round(item.fileSize / 1024)} KB)`;
+
+				const meta = document.createElement("div");
+				meta.className = "file-meta";
+				meta.textContent = `${item.contentType} · id=${item.id}`;
+
+				const actions = document.createElement("div");
+				actions.className = "actions";
+
+				const viewBtn = document.createElement("button");
+				viewBtn.type = "button";
+				viewBtn.className = "secondary";
+				viewBtn.textContent = "보기";
+				viewBtn.addEventListener("click", () => openFile(item.id));
+
+				const downloadBtn = document.createElement("button");
+				downloadBtn.type = "button";
+				downloadBtn.className = "primary";
+				downloadBtn.textContent = "다운로드";
+				downloadBtn.addEventListener("click", () => downloadFile(item.id, item.originalFilename));
+
+				actions.appendChild(viewBtn);
+				actions.appendChild(downloadBtn);
+
+				wrapper.appendChild(title);
+				wrapper.appendChild(meta);
+				wrapper.appendChild(actions);
+				fileListEl.appendChild(wrapper);
+			});
+		};
+
+		const fetchFileBlob = async (fileId) => {
+			const response = await fetch(`/files/${fileId}`, {
+				method: "GET",
+				headers: {
+					Authorization: "Bearer " + state.accessToken
+				}
+			});
+			if (!response.ok) {
+				const text = await response.text();
+				throw new Error(text);
+			}
+			const blob = await response.blob();
+			return { blob, contentType: response.headers.get("Content-Type") || blob.type };
+		};
+
+		const openFile = async (fileId) => {
+			try {
+				const { blob } = await fetchFileBlob(fileId);
+				const url = URL.createObjectURL(blob);
+				window.open(url, "_blank");
+				setTimeout(() => URL.revokeObjectURL(url), 60000);
+			} catch (e) {
+				setLog("파일 열기 실패: " + e.message);
+			}
+		};
+
+		const downloadFile = async (fileId, filename) => {
+			try {
+				const { blob } = await fetchFileBlob(fileId);
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement("a");
+				link.href = url;
+				link.download = filename || `file-${fileId}`;
+				document.body.appendChild(link);
+				link.click();
+				link.remove();
+				setTimeout(() => URL.revokeObjectURL(url), 60000);
+			} catch (e) {
+				setLog("다운로드 실패: " + e.message);
+			}
+		};
+
 		fileInput.addEventListener("change", updateFileHint);
 		uploadBtn.addEventListener("click", uploadFiles);
+		listBtn.addEventListener("click", fetchFileList);
 		clearBtn.addEventListener("click", () => setLog("대기 중..."));
 
 		loadTokens();

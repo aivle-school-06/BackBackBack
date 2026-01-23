@@ -4,6 +4,8 @@ import com.aivle.project.common.error.CommonErrorCode;
 import com.aivle.project.common.error.CommonException;
 import com.aivle.project.file.dto.FileResponse;
 import com.aivle.project.file.entity.FilesEntity;
+import com.aivle.project.file.exception.FileErrorCode;
+import com.aivle.project.file.exception.FileException;
 import com.aivle.project.file.repository.FilesRepository;
 import com.aivle.project.file.storage.FileStorageService;
 import com.aivle.project.file.storage.StoredFile;
@@ -55,6 +57,28 @@ public class FileService {
 		}
 
 		return responses;
+	}
+
+	@Transactional(readOnly = true)
+	public List<FileResponse> list(Long postId, UserEntity user) {
+		PostsEntity post = findPost(postId);
+		Long userId = requireUserId(user);
+		validateOwner(post, userId);
+		return filesRepository.findAllByPostIdAndDeletedAtIsNullOrderByCreatedAtAsc(postId).stream()
+			.map(FileResponse::from)
+			.toList();
+	}
+
+	@Transactional(readOnly = true)
+	public FilesEntity getFile(Long fileId, UserEntity user) {
+		FilesEntity file = filesRepository.findById(fileId)
+			.orElseThrow(() -> new FileException(FileErrorCode.FILE_404_NOT_FOUND));
+		if (file.isDeleted()) {
+			throw new FileException(FileErrorCode.FILE_404_NOT_FOUND);
+		}
+		Long userId = requireUserId(user);
+		validateOwner(file.getPost(), userId);
+		return file;
 	}
 
 	private PostsEntity findPost(Long postId) {

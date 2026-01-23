@@ -14,6 +14,7 @@ public enum FileErrorCode implements ErrorCode {
 	FILE_400_EXTENSION("FILE_400_EXTENSION", "허용되지 않은 파일 확장자입니다.", HttpStatus.BAD_REQUEST),
 	FILE_400_CONTENT_TYPE("FILE_400_CONTENT_TYPE", "허용되지 않은 파일 타입입니다.", HttpStatus.BAD_REQUEST),
 	FILE_400_SIGNATURE("FILE_400_SIGNATURE", "파일 시그니처가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
+	FILE_404_NOT_FOUND("FILE_404_NOT_FOUND", "파일을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 	FILE_500_SIGNATURE("FILE_500_SIGNATURE", "파일 시그니처 검증 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 	FILE_500_STORAGE("FILE_500_STORAGE", "파일 저장에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
