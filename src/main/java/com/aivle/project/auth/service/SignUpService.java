@@ -7,6 +7,7 @@ import com.aivle.project.auth.exception.AuthException;
 import com.aivle.project.auth.mapper.AuthMapper;
 import com.aivle.project.user.entity.RoleName;
 import com.aivle.project.user.entity.UserEntity;
+import com.aivle.project.user.service.EmailVerificationService;
 import com.aivle.project.user.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 회원가입 처리.
+ * 회원가입 처리 (이메일 인증 포함).
  */
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SignUpService {
 
 	private final UserDomainService userDomainService;
+	private final EmailVerificationService emailVerificationService;
 	private final PasswordEncoder passwordEncoder;
 	private final AuthMapper authMapper;
 
@@ -43,7 +45,10 @@ public class SignUpService {
 			RoleName.USER
 		);
 
-		log.info("Signup successful for email: {}", request.getEmail());
+		// 이메일 인증 토큰 생성 및 전송
+		emailVerificationService.sendVerificationEmail(user, request.getEmail());
+
+		log.info("Signup successful for email: {}, awaiting email verification", request.getEmail());
 		return authMapper.toSignupResponse(user, RoleName.USER);
 	}
 }

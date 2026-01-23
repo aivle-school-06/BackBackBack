@@ -28,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.aivle.project.auth.mapper.AuthMapper;
+import com.aivle.project.user.service.EmailVerificationService;
 import com.aivle.project.user.service.UserDomainService;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +36,9 @@ class SignUpServiceTest {
 
 	@Mock
 	private UserDomainService userDomainService;
+
+	@Mock
+	private EmailVerificationService emailVerificationService;
 
 	@Mock
 	private PasswordEncoder passwordEncoder;
@@ -46,7 +50,7 @@ class SignUpServiceTest {
 	@DisplayName("회원가입 시 사용자와 USER 역할을 저장한다")
 	void signup_shouldPersistUserAndRole() {
 		// given: 회원가입 요청과 역할 정보를 준비
-		SignUpService signUpService = new SignUpService(userDomainService, passwordEncoder, authMapper);
+		SignUpService signUpService = new SignUpService(userDomainService, emailVerificationService, passwordEncoder, authMapper);
 		SignupRequest request = new SignupRequest();
 		request.setEmail("new@test.com");
 		request.setPassword("password123");
@@ -74,7 +78,7 @@ class SignUpServiceTest {
 	@DisplayName("이미 존재하는 이메일이면 회원가입이 실패한다")
 	void signup_shouldFailWhenEmailExists() {
 		// given: 기존 사용자 이메일을 준비
-		SignUpService signUpService = new SignUpService(userDomainService, passwordEncoder, authMapper);
+		SignUpService signUpService = new SignUpService(userDomainService, emailVerificationService, passwordEncoder, authMapper);
 		SignupRequest request = new SignupRequest();
 		request.setEmail("dup@test.com");
 		request.setPassword("password123");
