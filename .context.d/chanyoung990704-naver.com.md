@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-23 | 작업: 테스트 메일 빈 모킹 및 dev 이메일 설정 import | 결과: 테스트용 JavaMailSender 모킹 추가, dev 프로파일에서 application-email.yml 로딩 | 이슈: 없음
 - 2026-01-22 | 작업: 댓글 CRUD 컨트롤러 및 통합 테스트 추가 | 결과: CommentController와 CRUD 통합 테스트 추가, 전체 테스트 통과 | 이슈: 없음
 - 2026-01-22 | 작업: Repository 슬라이스 테스트 추가 | 결과: PostsRepository/CommentsRepository DataJpaTest 추가 및 전체 테스트 통과 | 이슈: 없음
 - 2026-01-22 | 작업: AccessTokenBlacklistService 단위 테스트 추가 | 결과: 블랙리스트/로그아웃 기준 로직 단위 테스트와 전체 테스트 통과 | 이슈: 없음
