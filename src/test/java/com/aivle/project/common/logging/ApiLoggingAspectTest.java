@@ -30,7 +30,8 @@ class ApiLoggingAspectTest {
 
 		String result = apiLoggingAspect.mask(map);
 
-		assertThat(result).contains("\"email\":\"test@example.com\"");
+		// 이메일도 민감한 정보이므로 마스킹됨
+		assertThat(result).contains("\"email\":\"te***@example.com\"");
 		assertThat(result).contains("\"password\":\"****\"");
 		assertThat(result).doesNotContain("secret123");
 	}
