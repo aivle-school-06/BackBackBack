@@ -6,7 +6,11 @@ import com.aivle.project.file.exception.FileErrorCode;
 import com.aivle.project.file.exception.FileException;
 import com.aivle.project.file.service.FileService;
 import com.aivle.project.user.entity.UserEntity;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * 파일 조회/다운로드 API.
  */
+@Tag(name = "파일", description = "파일 다운로드 API")
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/files")
@@ -33,8 +38,15 @@ public class FileDownloadController {
 
 	@GetMapping("/{fileId}")
 	@SecurityRequirement(name = "bearerAuth")
+	@Operation(summary = "파일 다운로드", description = "파일을 다운로드하거나 외부 URL로 리다이렉트합니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "다운로드 성공"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "302", description = "외부 스토리지 리다이렉트"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "파일 없음")
+	})
 	public ResponseEntity<?> download(
 		@CurrentUser UserEntity user,
+		@Parameter(description = "파일 ID", example = "1")
 		@PathVariable Long fileId
 	) {
 		FilesEntity file = fileService.getFile(fileId, user);
