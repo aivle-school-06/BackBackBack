@@ -5,6 +5,7 @@ import com.aivle.project.common.security.CurrentUser;
 import com.aivle.project.file.dto.FileResponse;
 import com.aivle.project.file.service.FileService;
 import com.aivle.project.user.entity.UserEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ public class FileController {
 	private final FileService fileService;
 
 	@PostMapping("/{postId}/files")
+	@SecurityRequirement(name = "bearerAuth")
 	public ResponseEntity<ApiResponse<List<FileResponse>>> upload(
 		@CurrentUser UserEntity user,
 		@PathVariable Long postId,
@@ -38,6 +40,7 @@ public class FileController {
 	}
 
 	@GetMapping("/{postId}/files")
+	@SecurityRequirement(name = "bearerAuth")
 	public ResponseEntity<ApiResponse<List<FileResponse>>> list(
 		@CurrentUser UserEntity user,
 		@PathVariable Long postId

@@ -40,7 +40,7 @@ public class CommentController {
 	private final CommentsService commentsService;
 
 	@GetMapping("/posts/{postId}/comments")
-	@Operation(summary = "댓글 목록 조회", description = "게시글 댓글 목록을 조회합니다.")
+	@Operation(summary = "댓글 목록 조회", description = "게시글 댓글 목록을 조회합니다.", security = {})
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공",
 			content = @Content(schema = @Schema(implementation = ApiResponse.class)))

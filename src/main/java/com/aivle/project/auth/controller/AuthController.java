@@ -37,7 +37,7 @@ public class AuthController {
 	private final SignUpService signUpService;
 
 	@PostMapping("/login")
-	@Operation(summary = "로그인", description = "이메일/비밀번호로 로그인하고 토큰을 발급합니다.")
+	@Operation(summary = "로그인", description = "이메일/비밀번호로 로그인하고 토큰을 발급합니다.", security = {})
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "로그인 성공",
 			content = @Content(schema = @Schema(implementation = TokenResponse.class))),
@@ -52,7 +52,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/refresh")
-	@Operation(summary = "토큰 재발급", description = "리프레시 토큰으로 액세스 토큰을 재발급합니다.")
+	@Operation(summary = "토큰 재발급", description = "리프레시 토큰으로 액세스 토큰을 재발급합니다.", security = {})
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "재발급 성공",
 			content = @Content(schema = @Schema(implementation = TokenResponse.class))),
@@ -63,7 +63,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/signup")
-	@Operation(summary = "회원가입", description = "신규 회원을 등록합니다.")
+	@Operation(summary = "회원가입", description = "신규 회원을 등록합니다.", security = {})
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "회원가입 성공",
 			content = @Content(schema = @Schema(implementation = SignupResponse.class))),

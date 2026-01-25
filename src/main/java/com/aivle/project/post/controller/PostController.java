@@ -43,7 +43,7 @@ public class PostController {
 	private final PostService postService;
 
 	@GetMapping
-	@Operation(summary = "게시글 목록 조회", description = "게시글 목록을 페이지네이션으로 조회합니다.")
+	@Operation(summary = "게시글 목록 조회", description = "게시글 목록을 페이지네이션으로 조회합니다.", security = {})
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공",
 			content = @Content(schema = @Schema(implementation = ApiResponse.class)))
@@ -67,7 +67,7 @@ public class PostController {
 	}
 
 	@GetMapping("/{postId}")
-	@Operation(summary = "게시글 상세 조회", description = "게시글 상세 정보를 조회합니다.")
+	@Operation(summary = "게시글 상세 조회", description = "게시글 상세 정보를 조회합니다.", security = {})
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공",
 			content = @Content(schema = @Schema(implementation = ApiResponse.class))),

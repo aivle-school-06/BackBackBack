@@ -6,6 +6,7 @@ import com.aivle.project.file.exception.FileErrorCode;
 import com.aivle.project.file.exception.FileException;
 import com.aivle.project.file.service.FileService;
 import com.aivle.project.user.entity.UserEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,6 +32,7 @@ public class FileDownloadController {
 	private final FileService fileService;
 
 	@GetMapping("/{fileId}")
+	@SecurityRequirement(name = "bearerAuth")
 	public ResponseEntity<?> download(
 		@CurrentUser UserEntity user,
 		@PathVariable Long fileId
