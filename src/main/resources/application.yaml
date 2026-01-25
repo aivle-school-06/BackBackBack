@@ -31,6 +31,16 @@ spring:
       max-request-size: 20MB
       file-size-threshold: 2KB
 
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
 app:
   file:
     upload:

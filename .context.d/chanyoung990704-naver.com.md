@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-25 | 작업: Swagger 기본 설정 추가 | 결과: OpenApiConfig 생성 및 springdoc 설정 추가 | 이슈: 없음
 - 2026-01-25 | 작업: test 프로파일 파일 스토리지 스텁 추가 | 결과: TestFileStorageConfig로 FileStorageService 기본 빈 제공, EmailVerificationServiceTest에서 스텁 의존 제거 | 이슈: 없음
 - 2026-01-25 | 작업: 전체 테스트 실패 원인 분석 및 수정 | 결과: EmailVerificationServiceTest에 FileStorageService MockBean 추가로 컨텍스트 로딩 실패 해결 | 이슈: 없음
 - 2026-01-23 | 작업: 파일 조회/다운로드 및 콘솔 화면 개선 | 결과: 파일 목록/다운로드 API 추가 및 dev 콘솔에서 조회 지원 | 이슈: 없음
