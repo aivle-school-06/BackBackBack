@@ -40,6 +40,7 @@ springdoc:
     path: /swagger-ui.html
     operationsSorter: method
     tagsSorter: alpha
+    customCssUrl: /swagger-ui/custom.css
 
 app:
   file:
