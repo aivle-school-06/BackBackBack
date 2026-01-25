@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-25 | 작업: 핵심 컨트롤러 Swagger 문서화 | 결과: Auth/Post/Comment 컨트롤러에 Tag/Operation/Response/보안 요구사항 추가 | 이슈: 없음
 - 2026-01-25 | 작업: 파일 DTO Swagger 스키마 추가 | 결과: FileResponse에 @Schema 적용 | 이슈: 없음
 - 2026-01-25 | 작업: 핵심 DTO Swagger 스키마 추가 | 결과: Auth/Post/Comment/ApiResponse DTO에 @Schema 적용 | 이슈: 없음
 - 2026-01-25 | 작업: Swagger 기본 설정 추가 | 결과: OpenApiConfig 생성 및 springdoc 설정 추가 | 이슈: 없음
