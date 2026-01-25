@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-25 | 작업: 작업 에이전트 워크플로우 문서화 | 결과: 단위 작업/테스트/커밋/종합 테스트 절차 명시 | 이슈: 없음
 - 2026-01-25 | 작업: Swagger 공개 경로 보안 허용 | 결과: /swagger-ui, /api-docs 인증 예외 처리 | 이슈: 없음
 - 2026-01-25 | 작업: Swagger API 버전 관리 설정 | 결과: OpenAPI 버전/베이스 경로 설정값 추가 | 이슈: 없음
 - 2026-01-25 | 작업: Swagger UI 커스텀 테마 적용 | 결과: custom.css 추가 및 springdoc 설정 반영 | 이슈: 없음
