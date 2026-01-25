@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-25 | 작업: 파일 DTO Swagger 스키마 추가 | 결과: FileResponse에 @Schema 적용 | 이슈: 없음
 - 2026-01-25 | 작업: 핵심 DTO Swagger 스키마 추가 | 결과: Auth/Post/Comment/ApiResponse DTO에 @Schema 적용 | 이슈: 없음
 - 2026-01-25 | 작업: Swagger 기본 설정 추가 | 결과: OpenApiConfig 생성 및 springdoc 설정 추가 | 이슈: 없음
 - 2026-01-25 | 작업: test 프로파일 파일 스토리지 스텁 추가 | 결과: TestFileStorageConfig로 FileStorageService 기본 빈 제공, EmailVerificationServiceTest에서 스텁 의존 제거 | 이슈: 없음
