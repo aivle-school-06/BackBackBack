@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-25 | 작업: 개발/콘솔 및 이메일 인증 API 문서화 | 결과: EmailVerification/Dev/AuthConsole 컨트롤러에 Swagger 메타데이터 추가 | 이슈: 없음
 - 2026-01-25 | 작업: 파일 컨트롤러 Swagger 문서화 | 결과: File 업로드/조회/다운로드 API에 Tag/Operation/Response/파라미터 설명 추가 | 이슈: 없음
 - 2026-01-25 | 작업: Swagger 보안/공개 엔드포인트 정리 | 결과: 공개 엔드포인트 security 비활성화, 파일 API에 보안 요구사항 추가 | 이슈: 없음
 - 2026-01-25 | 작업: 핵심 컨트롤러 Swagger 문서화 | 결과: Auth/Post/Comment 컨트롤러에 Tag/Operation/Response/보안 요구사항 추가 | 이슈: 없음
