@@ -46,7 +46,9 @@ public class PostController {
 	@Operation(summary = "게시글 목록 조회", description = "게시글 목록을 페이지네이션으로 조회합니다.", security = {})
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공",
-			content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+			content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "요청값 오류"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<ApiResponse<PageResponse<PostResponse>>> list(
 		@Parameter(description = "페이지 번호(1부터 시작)", example = "1")
@@ -71,7 +73,8 @@ public class PostController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공",
 			content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글 없음")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<ApiResponse<PostResponse>> get(@PathVariable Long postId) {
 		return ResponseEntity.ok(ApiResponse.ok(postService.get(postId)));
@@ -83,7 +86,10 @@ public class PostController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "생성 성공",
 			content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "요청값 오류")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "요청값 오류"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 필요"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<ApiResponse<PostResponse>> create(
 		@CurrentUser UserEntity user,
@@ -100,7 +106,10 @@ public class PostController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "수정 성공",
 			content = @Content(schema = @Schema(implementation = ApiResponse.class))),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "요청값 오류"),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글 없음")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 필요"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<ApiResponse<PostResponse>> update(
 		@CurrentUser UserEntity user,
@@ -116,7 +125,10 @@ public class PostController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "삭제 성공",
 			content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글 없음")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 필요"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<ApiResponse<Void>> delete(
 		@CurrentUser UserEntity user,

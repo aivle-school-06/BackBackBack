@@ -41,7 +41,9 @@ public class AuthController {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "로그인 성공",
 			content = @Content(schema = @Schema(implementation = TokenResponse.class))),
-		@ApiResponse(responseCode = "400", description = "요청값 오류")
+		@ApiResponse(responseCode = "400", description = "요청값 오류"),
+		@ApiResponse(responseCode = "401", description = "인증 실패"),
+		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<TokenResponse> login(
 		@Valid @RequestBody LoginRequest request,
@@ -56,7 +58,9 @@ public class AuthController {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "재발급 성공",
 			content = @Content(schema = @Schema(implementation = TokenResponse.class))),
-		@ApiResponse(responseCode = "400", description = "요청값 오류")
+		@ApiResponse(responseCode = "400", description = "요청값 오류"),
+		@ApiResponse(responseCode = "401", description = "재발급 실패"),
+		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody TokenRefreshRequest request) {
 		return ResponseEntity.ok(authService.refresh(request));
@@ -67,7 +71,8 @@ public class AuthController {
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "회원가입 성공",
 			content = @Content(schema = @Schema(implementation = SignupResponse.class))),
-		@ApiResponse(responseCode = "400", description = "요청값 오류")
+		@ApiResponse(responseCode = "400", description = "요청값 오류"),
+		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(signUpService.signup(request));

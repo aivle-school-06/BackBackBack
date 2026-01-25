@@ -42,7 +42,10 @@ public class FileDownloadController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "다운로드 성공"),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "302", description = "외부 스토리지 리다이렉트"),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "파일 없음")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 필요"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "파일 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<?> download(
 		@CurrentUser UserEntity user,

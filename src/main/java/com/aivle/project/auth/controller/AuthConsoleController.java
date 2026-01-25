@@ -36,7 +36,10 @@ public class AuthConsoleController {
 	@Operation(summary = "토큰 클레임 조회", description = "현재 토큰의 클레임을 확인합니다.")
 	@SecurityRequirement(name = "bearerAuth")
 	@ApiResponses({
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 필요"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ApiResponse<Map<String, Object>> claims(@AuthenticationPrincipal Jwt jwt) {
 		Map<String, Object> response = new LinkedHashMap<>();

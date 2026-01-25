@@ -32,7 +32,8 @@ public class EmailVerificationController {
     @Operation(summary = "이메일 인증", description = "이메일 인증 토큰을 검증합니다.", security = {})
     @ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "인증 성공"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "인증 실패")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "인증 실패"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public ResponseEntity<String> verifyEmail(
         @Parameter(description = "이메일 인증 토큰", example = "a1b2c3d4")
@@ -54,7 +55,8 @@ public class EmailVerificationController {
     @Operation(summary = "이메일 인증 재전송", description = "사용자에게 인증 메일을 재전송합니다.", security = {})
     @ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "재전송 성공"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "재전송 실패")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "재전송 실패"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public ResponseEntity<String> resendVerification(
         @Parameter(description = "사용자 ID", example = "1")

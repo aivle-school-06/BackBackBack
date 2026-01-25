@@ -43,7 +43,9 @@ public class CommentController {
 	@Operation(summary = "댓글 목록 조회", description = "게시글 댓글 목록을 조회합니다.", security = {})
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공",
-			content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+			content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<ApiResponse<List<CommentResponse>>> list(
 		@Parameter(description = "게시글 ID", example = "100")
@@ -58,7 +60,11 @@ public class CommentController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "생성 성공",
 			content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "요청값 오류")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "요청값 오류"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 필요"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<ApiResponse<CommentResponse>> create(
 		@CurrentUser UserEntity user,
@@ -78,7 +84,10 @@ public class CommentController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "수정 성공",
 			content = @Content(schema = @Schema(implementation = ApiResponse.class))),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "요청값 오류"),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "댓글 없음")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 필요"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "댓글 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<ApiResponse<CommentResponse>> update(
 		@CurrentUser UserEntity user,
@@ -95,7 +104,10 @@ public class CommentController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "삭제 성공",
 			content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "댓글 없음")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 필요"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "댓글 없음"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	public ResponseEntity<ApiResponse<Void>> delete(
 		@CurrentUser UserEntity user,
