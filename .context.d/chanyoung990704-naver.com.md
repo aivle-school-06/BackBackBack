@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-25 | 작업: Swagger API 버전 관리 설정 | 결과: OpenAPI 버전/베이스 경로 설정값 추가 | 이슈: 없음
 - 2026-01-25 | 작업: Swagger UI 커스텀 테마 적용 | 결과: custom.css 추가 및 springdoc 설정 반영 | 이슈: 없음
 - 2026-01-25 | 작업: API 예외 응답 문서화 | 결과: 주요 컨트롤러에 400/401/403/404/500 응답 정의 추가 | 이슈: 없음
 - 2026-01-25 | 작업: 에러 응답 Swagger 스키마 추가 | 결과: ErrorResponse/FieldErrorResponse에 @Schema 적용 | 이슈: 없음

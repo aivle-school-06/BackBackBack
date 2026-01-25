@@ -3,10 +3,13 @@ package com.aivle.project.common.config;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Swagger/OpenAPI 설정.
@@ -15,20 +18,36 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
 
 	private static final String SECURITY_SCHEME_NAME = "bearerAuth";
+	private final String apiVersion;
+	private final String apiBasePath;
+
+	public OpenApiConfig(
+		@Value("${app.api.version:v1}") String apiVersion,
+		@Value("${app.api.base-path:}") String apiBasePath
+	) {
+		this.apiVersion = apiVersion;
+		this.apiBasePath = apiBasePath;
+	}
 
 	@Bean
 	public OpenAPI openAPI() {
-		return new OpenAPI()
+		OpenAPI openAPI = new OpenAPI()
 			.info(new Info()
 				.title("Project API")
 				.description("Project API 문서")
-				.version("v1"))
+				.version(apiVersion))
 			.components(new Components()
 				.addSecuritySchemes(SECURITY_SCHEME_NAME, new SecurityScheme()
 					.name(SECURITY_SCHEME_NAME)
 					.type(SecurityScheme.Type.HTTP)
 					.scheme("bearer")
 					.bearerFormat("JWT")));
+
+		if (StringUtils.hasText(apiBasePath)) {
+			openAPI.addServersItem(new Server().url(apiBasePath));
+		}
+
+		return openAPI;
 	}
 
 	@Bean

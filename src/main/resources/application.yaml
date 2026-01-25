@@ -43,6 +43,8 @@ springdoc:
     customCssUrl: /swagger-ui/custom.css
 
 app:
+  api:
+    version: v1
   file:
     upload:
       max-size: 10485760
