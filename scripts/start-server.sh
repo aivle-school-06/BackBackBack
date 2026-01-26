@@ -2,11 +2,9 @@
 set -euo pipefail
 
 APP_DIR="${APP_DIR:-/home/ec2-user/app/BackBackBack}"
-LOG_DIR="${LOG_DIR:-$APP_DIR/logs}"
 PID_FILE="${PID_FILE:-$APP_DIR/app.pid}"
 
 cd "$APP_DIR"
-mkdir -p "$LOG_DIR"
 
 if [ -f "$APP_DIR/.env" ]; then
   set -a
@@ -14,8 +12,6 @@ if [ -f "$APP_DIR/.env" ]; then
   . "$APP_DIR/.env"
   set +a
 fi
-
-SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE:-dev}"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "[ERROR] docker 명령을 찾을 수 없습니다." >&2
@@ -43,13 +39,9 @@ fi
 
 $DOCKER_COMPOSE up -d
 
-JAR_PATH="${JAR_PATH:-}"
-if [ -z "$JAR_PATH" ]; then
-  JAR_PATH="$(ls -1 "$APP_DIR"/build/libs/*.jar 2>/dev/null | head -n 1 || true)"
-fi
-
-if [ -z "$JAR_PATH" ]; then
-  echo "[ERROR] JAR 파일을 찾지 못했습니다. JAR_PATH를 지정하거나 build/libs/*.jar를 포함하세요." >&2
+JAR_PATH="build/libs/project-0.0.1-SNAPSHOT.jar"
+if [ ! -f "$JAR_PATH" ]; then
+  echo "[ERROR] JAR 파일을 찾지 못했습니다: $JAR_PATH" >&2
   exit 1
 fi
 
@@ -61,9 +53,9 @@ if [ -f "$PID_FILE" ]; then
   rm -f "$PID_FILE"
 fi
 
-nohup java ${JAVA_OPTS:-} -jar "$JAR_PATH" \
-  --spring.profiles.active="$SPRING_PROFILES_ACTIVE" \
-  > "$LOG_DIR/app.log" 2>&1 &
+nohup java -Xmx256m -Xms128m -jar "$JAR_PATH" \
+  --spring.profiles.active=dev \
+  > app.log 2>&1 &
 
 echo $! > "$PID_FILE"
 echo "[INFO] 서버 시작 완료 (pid: $(cat "$PID_FILE"))"
