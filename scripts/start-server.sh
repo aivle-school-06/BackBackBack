@@ -13,6 +13,10 @@ if [ -f "$APP_DIR/.env" ]; then
   set +a
 fi
 
+if [ -f "$APP_DIR/scripts/stop-server.sh" ]; then
+  bash "$APP_DIR/scripts/stop-server.sh" || true
+fi
+
 if ! command -v docker >/dev/null 2>&1; then
   echo "[ERROR] docker 명령을 찾을 수 없습니다." >&2
   exit 1

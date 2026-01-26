@@ -3,13 +3,25 @@ set -euo pipefail
 
 APP_DIR="${APP_DIR:-/home/ec2-user/app/BackBackBack}"
 PID_FILE="${PID_FILE:-$APP_DIR/app.pid}"
+JAR_PATH="${JAR_PATH:-$APP_DIR/build/libs/project-0.0.1-SNAPSHOT.jar}"
 
-if [ ! -f "$PID_FILE" ]; then
-  echo "[INFO] PID 파일이 없어 종료를 건너뜁니다."
-  exit 0
+PID=""
+if [ -f "$PID_FILE" ]; then
+  PID="$(cat "$PID_FILE")"
 fi
 
-PID="$(cat "$PID_FILE")"
+if [ -z "$PID" ]; then
+  PID="$(pgrep -f "java.*${JAR_PATH}" || true)"
+fi
+
+if [ -z "$PID" ]; then
+  PID="$(pgrep -f "project-0.0.1-SNAPSHOT.jar" || true)"
+fi
+
+if [ -z "$PID" ]; then
+  echo "[INFO] 실행 중인 프로세스를 찾지 못했습니다."
+  exit 0
+fi
 
 if kill -0 "$PID" 2>/dev/null; then
   kill "$PID"
