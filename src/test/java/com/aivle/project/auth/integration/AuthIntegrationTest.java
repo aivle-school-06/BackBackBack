@@ -9,6 +9,7 @@ import com.aivle.project.auth.dto.LoginRequest;
 import com.aivle.project.auth.dto.SignupRequest;
 import com.aivle.project.auth.dto.SignupResponse;
 import com.aivle.project.auth.dto.TokenResponse;
+import com.aivle.project.auth.service.TurnstileService;
 import com.aivle.project.common.dto.ApiResponse;
 import com.aivle.project.common.config.TestSecurityConfig;
 import com.aivle.project.user.entity.RoleEntity;
