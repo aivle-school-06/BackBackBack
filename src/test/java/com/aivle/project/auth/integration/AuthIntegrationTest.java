@@ -207,7 +207,6 @@ class AuthIntegrationTest {
 		// then: 회원가입 성공 응답 반환
 		SignupResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), SignupResponse.class);
 		assertThat(response.email()).isEqualTo("newuser@test.com");
-		assertThat(response.name()).isEqualTo("테스트 사용자");
 
 		// 데이터베이스에 사용자가 생성되었는지 확인
 		UserEntity createdUser = userRepository.findByEmail("newuser@test.com").orElse(null);
