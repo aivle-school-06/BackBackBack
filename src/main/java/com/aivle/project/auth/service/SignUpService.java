@@ -35,11 +35,11 @@ public class SignUpService {
 	private boolean skipEmailVerification;
 
 	@Transactional
-	public SignupResponse signup(SignupRequest request) {
+	public SignupResponse signup(SignupRequest request, String remoteIp) {
 		log.info("Attempting signup for email: {}", request.getEmail());
 
 		// 1. Turnstile 봇 검증
-		if (!turnstileService.verifyTokenSync(request.getTurnstileToken(), null)) {
+		if (!turnstileService.verifyTokenSync(request.getTurnstileToken(), remoteIp)) {
 			log.warn("Signup rejected: Turnstile verification failed for email: {}", request.getEmail());
 			throw new AuthException(AuthErrorCode.TURNSTILE_VERIFICATION_FAILED);
 		}
