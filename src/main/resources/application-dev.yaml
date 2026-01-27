@@ -40,3 +40,4 @@ app:
 turnstile:
   secret-key: ${TURNSTILE_SECRET_KEY:}
   site-key: ${TURNSTILE_SITE_KEY:}
+  debug-enabled: true

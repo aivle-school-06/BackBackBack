@@ -1,5 +1,6 @@
 package com.aivle.project.auth.service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +34,9 @@ public class TurnstileService {
     @Value("${turnstile.timeout:5000}")
     private int timeoutMs;
 
+    @Value("${turnstile.debug-enabled:false}")
+    private boolean debugEnabled;
+
     /**
      * Turnstile 토큰을 검증합니다.
      *
@@ -57,6 +61,14 @@ public class TurnstileService {
             StringUtils.hasText(remoteIp) ? remoteIp : null
         );
 
+        logTurnstileDebug(
+            "Turnstile verify request. url={}, tokenPrefix={}, remoteIp={}, secretConfigured={}",
+            verifyUrl,
+            maskToken(token),
+            remoteIp,
+            StringUtils.hasText(secretKey)
+        );
+
         return webClient.post()
             .uri(verifyUrl)
             .contentType(MediaType.APPLICATION_JSON)
@@ -66,15 +78,36 @@ public class TurnstileService {
             .timeout(Duration.ofMillis(timeoutMs))
             .map(response -> {
                 if (response.success()) {
-                    log.debug("Turnstile verification successful for token: {}", token.substring(0, Math.min(10, token.length())) + "...");
+                    logTurnstileDebug(
+                        "Turnstile verification success. tokenPrefix={}, hostname={}, challengeTs={}, action={}, cdataPresent={}",
+                        maskToken(token),
+                        response.hostname(),
+                        response.challenge_ts(),
+                        response.action(),
+                        StringUtils.hasText(response.cdata())
+                    );
                     return true;
                 } else {
-                    log.warn("Turnstile verification failed. Error codes: {}", response.errorCodes());
+                    logTurnstileDebug(
+                        "Turnstile verification failed. tokenPrefix={}, errorCodes={}, hostname={}, challengeTs={}, action={}, cdataPresent={}",
+                        maskToken(token),
+                        response.errorCodes(),
+                        response.hostname(),
+                        response.challenge_ts(),
+                        response.action(),
+                        StringUtils.hasText(response.cdata())
+                    );
                     return false;
                 }
             })
             .onErrorResume(WebClientRequestException.class, e -> {
-                log.error("Network error during Turnstile verification: {}", e.getMessage());
+                log.error(
+                    "Network error during Turnstile verification. url={}, tokenPrefix={}, remoteIp={}, message={}",
+                    verifyUrl,
+                    maskToken(token),
+                    remoteIp,
+                    e.getMessage()
+                );
                 return Mono.just(false);
             })
             .onErrorResume(WebClientResponseException.class, e -> {
@@ -122,8 +155,25 @@ public class TurnstileService {
         boolean success,
         String challenge_ts,
         String hostname,
+        @JsonProperty("error-codes")
         String[] errorCodes,
         String action,
         String cdata
     ) {}
+
+    private void logTurnstileDebug(String message, Object... args) {
+        if (debugEnabled) {
+            log.info(message, args);
+            return;
+        }
+        log.debug(message, args);
+    }
+
+    private String maskToken(String token) {
+        if (!StringUtils.hasText(token)) {
+            return null;
+        }
+        int prefixLength = Math.min(10, token.length());
+        return token.substring(0, prefixLength) + "...";
+    }
 }
