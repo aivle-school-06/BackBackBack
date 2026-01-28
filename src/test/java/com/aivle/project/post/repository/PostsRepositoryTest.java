@@ -46,7 +46,7 @@ class PostsRepositoryTest {
 		entityManager.flush();
 
 		// when
-		second.markDeleted(user.getId());
+		second.markDeleted();
 		entityManager.flush();
 
 		var results = postsRepository.findAllByDeletedAtIsNullOrderByCreatedAtDesc();
@@ -68,7 +68,7 @@ class PostsRepositoryTest {
 		entityManager.flush();
 
 		// when
-		post.markDeleted(user.getId());
+		post.markDeleted();
 		entityManager.flush();
 
 		// then
@@ -95,7 +95,7 @@ class PostsRepositoryTest {
 	}
 
 	private PostsEntity newPost(UserEntity user, CategoriesEntity category, String title, String content) {
-		return PostsEntity.create(user, category, title, content, false, PostStatus.PUBLISHED, user.getId());
+		return PostsEntity.create(user, category, title, content, false, PostStatus.PUBLISHED);
 	}
 
 	private void setCreatedAt(PostsEntity post, LocalDateTime createdAt) {

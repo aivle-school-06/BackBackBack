@@ -34,9 +34,9 @@ class CommentsRepositoryTest {
 		CategoriesEntity category = persistCategory("comments");
 		PostsEntity post = persistPost(user, category, "title", "content");
 
-		CommentsEntity parent = CommentsEntity.create(post, user, null, "parent", 0, 0, user.getId());
-		CommentsEntity replyOne = CommentsEntity.create(post, user, parent, "reply-1", 1, 0, user.getId());
-		CommentsEntity replyTwo = CommentsEntity.create(post, user, parent, "reply-2", 1, 1, user.getId());
+		CommentsEntity parent = CommentsEntity.create(post, user, null, "parent", 0, 0);
+		CommentsEntity replyOne = CommentsEntity.create(post, user, parent, "reply-1", 1, 0);
+		CommentsEntity replyTwo = CommentsEntity.create(post, user, parent, "reply-2", 1, 1);
 
 		entityManager.persist(parent);
 		entityManager.persist(replyOne);
@@ -61,12 +61,12 @@ class CommentsRepositoryTest {
 		CategoriesEntity category = persistCategory("sequence");
 		PostsEntity post = persistPost(user, category, "title", "content");
 
-		CommentsEntity parent = CommentsEntity.create(post, user, null, "parent", 0, 0, user.getId());
+		CommentsEntity parent = CommentsEntity.create(post, user, null, "parent", 0, 0);
 		entityManager.persist(parent);
 		entityManager.flush();
 
-		CommentsEntity replyOne = CommentsEntity.create(post, user, parent, "reply-1", 1, 0, user.getId());
-		CommentsEntity replyTwo = CommentsEntity.create(post, user, parent, "reply-2", 1, 2, user.getId());
+		CommentsEntity replyOne = CommentsEntity.create(post, user, parent, "reply-1", 1, 0);
+		CommentsEntity replyTwo = CommentsEntity.create(post, user, parent, "reply-2", 1, 2);
 		entityManager.persist(replyOne);
 		entityManager.persist(replyTwo);
 		entityManager.flush();
@@ -86,8 +86,8 @@ class CommentsRepositoryTest {
 		CategoriesEntity category = persistCategory("top");
 		PostsEntity post = persistPost(user, category, "title", "content");
 
-		CommentsEntity first = CommentsEntity.create(post, user, null, "first", 0, 0, user.getId());
-		CommentsEntity second = CommentsEntity.create(post, user, null, "second", 0, 3, user.getId());
+		CommentsEntity first = CommentsEntity.create(post, user, null, "first", 0, 0);
+		CommentsEntity second = CommentsEntity.create(post, user, null, "second", 0, 3);
 		entityManager.persist(first);
 		entityManager.persist(second);
 		entityManager.flush();
@@ -119,7 +119,7 @@ class CommentsRepositoryTest {
 	}
 
 	private PostsEntity persistPost(UserEntity user, CategoriesEntity category, String title, String content) {
-		PostsEntity post = PostsEntity.create(user, category, title, content, false, PostStatus.PUBLISHED, user.getId());
+		PostsEntity post = PostsEntity.create(user, category, title, content, false, PostStatus.PUBLISHED);
 		entityManager.persist(post);
 		entityManager.flush();
 		return post;

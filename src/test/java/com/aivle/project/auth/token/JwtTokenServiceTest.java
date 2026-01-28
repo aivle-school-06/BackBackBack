@@ -40,6 +40,7 @@ class JwtTokenServiceTest {
 		// UserDetails Mock 설정
 		CustomUserDetails userDetails = mock(CustomUserDetails.class);
 		UUID uuid = UUID.randomUUID();
+		when(userDetails.getId()).thenReturn(1L);
 		when(userDetails.getUuid()).thenReturn(uuid);
 		when(userDetails.getUsername()).thenReturn("user@example.com");
 
@@ -60,6 +61,7 @@ class JwtTokenServiceTest {
 		// Issuer("iss") 검증 - 편의 메서드 대신 Claims Map에서 직접 조회하여 검증
 		assertThat(claims.getClaims().get("iss")).isEqualTo("project-local");
 		assertThat(claims.getSubject()).isEqualTo(uuid.toString());
+		assertThat(claims.getClaims().get("userId")).isEqualTo(1L);
 		assertThat(claims.getClaims().get("email")).isEqualTo("user@example.com");
 
 		// 권한 목록에서 ROLE_ 접두사가 유지되는지 확인

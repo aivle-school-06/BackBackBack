@@ -46,9 +46,4 @@ public class CompanyReportVersionsEntity extends BaseEntity {
 	@Column(name = "is_published", nullable = false)
 	private boolean published;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
 }

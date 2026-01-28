@@ -53,8 +53,7 @@ public class FileService {
 				stored.storageUrl(),
 				stored.originalFilename(),
 				stored.fileSize(),
-				stored.contentType(),
-				userId
+				stored.contentType()
 			);
 			FilesEntity saved = filesRepository.save(entity);
 			postFilesRepository.save(PostFilesEntity.create(post, saved));

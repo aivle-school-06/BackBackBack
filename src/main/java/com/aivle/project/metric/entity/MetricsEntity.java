@@ -36,9 +36,4 @@ public class MetricsEntity extends BaseEntity {
 	@Column(name = "unit", length = 20)
 	private String unit;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
 }

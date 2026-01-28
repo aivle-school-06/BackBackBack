@@ -372,8 +372,7 @@ class PostControllerIntegrationTest {
 			title,
 			content,
 			false,
-			PostStatus.PUBLISHED,
-			user.getId()
+			PostStatus.PUBLISHED
 		);
 		entityManager.persist(post);
 		entityManager.flush();

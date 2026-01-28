@@ -59,8 +59,7 @@ public class PostService {
 			request.getTitle().trim(),
 			request.getContent().trim(),
 			false,
-			PostStatus.PUBLISHED,
-			userId
+			PostStatus.PUBLISHED
 		);
 
 		PostsEntity saved = postsRepository.save(post);
@@ -84,7 +83,7 @@ public class PostService {
 
 		validatePatch(nextTitle, nextContent, request);
 
-		post.update(nextTitle, nextContent, nextCategory, userId);
+		post.update(nextTitle, nextContent, nextCategory);
 		return PostResponse.from(post);
 	}
 
@@ -93,7 +92,7 @@ public class PostService {
 		Long userId = requireUserId(user);
 		PostsEntity post = findPost(postId);
 		validateOwner(post, userId);
-		post.markDeleted(userId);
+		post.markDeleted();
 	}
 
 	private PostsEntity findPost(Long postId) {

@@ -59,12 +59,6 @@ public class PostsEntity extends BaseEntity {
 	@Column(name = "status", nullable = false, length = 20)
 	private PostStatus status = PostStatus.PUBLISHED;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
-
 	@PrePersist
 	private void prePersist() {
 		if (status == null) {
@@ -81,8 +75,7 @@ public class PostsEntity extends BaseEntity {
 		String title,
 		String content,
 		boolean isPinned,
-		PostStatus status,
-		Long actorId
+		PostStatus status
 	) {
 		PostsEntity post = new PostsEntity();
 		post.user = user;
@@ -91,27 +84,23 @@ public class PostsEntity extends BaseEntity {
 		post.content = content;
 		post.isPinned = isPinned;
 		post.status = status != null ? status : PostStatus.PUBLISHED;
-		post.createdBy = actorId;
-		post.updatedBy = actorId;
 		return post;
 	}
 
 	/**
 	 * 게시글 수정.
 	 */
-	public void update(String title, String content, CategoriesEntity category, Long actorId) {
+	public void update(String title, String content, CategoriesEntity category) {
 		this.title = title;
 		this.content = content;
 		this.category = category;
-		this.updatedBy = actorId;
 	}
 
 	/**
 	 * 게시글 소프트 삭제.
 	 */
-	public void markDeleted(Long actorId) {
+	public void markDeleted() {
 		delete();
-		this.updatedBy = actorId;
 	}
 
 	/**

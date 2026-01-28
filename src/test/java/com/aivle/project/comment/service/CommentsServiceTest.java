@@ -147,7 +147,7 @@ class CommentsServiceTest {
 		UserEntity user = mock(UserEntity.class);
 		given(user.getId()).willReturn(userId);
 
-		CommentsEntity realComment = CommentsEntity.create(mock(PostsEntity.class), user, null, "원래 내용", 0, 0, userId);
+		CommentsEntity realComment = CommentsEntity.create(mock(PostsEntity.class), user, null, "원래 내용", 0, 0);
 		ReflectionTestUtils.setField(realComment, "id", commentId);
 
 		given(commentsRepository.findById(commentId)).willReturn(Optional.of(realComment));
@@ -157,7 +157,6 @@ class CommentsServiceTest {
 
 		// then
 		assertThat(response.content()).isEqualTo("수정된 내용");
-		assertThat(realComment.getUpdatedBy()).isEqualTo(userId);
 	}
 
 	@Test
@@ -194,7 +193,7 @@ class CommentsServiceTest {
 		UserEntity user = mock(UserEntity.class);
 		given(user.getId()).willReturn(userId);
 
-		CommentsEntity comment = CommentsEntity.create(mock(PostsEntity.class), user, null, "내용", 0, 0, userId);
+		CommentsEntity comment = CommentsEntity.create(mock(PostsEntity.class), user, null, "내용", 0, 0);
 		ReflectionTestUtils.setField(comment, "id", commentId);
 
 		given(commentsRepository.findById(commentId)).willReturn(Optional.of(comment));
@@ -204,6 +203,5 @@ class CommentsServiceTest {
 
 		// then
 		assertThat(comment.isDeleted()).isTrue();
-		assertThat(comment.getUpdatedBy()).isEqualTo(userId);
 	}
 }

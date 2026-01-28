@@ -42,9 +42,4 @@ public class CompanyReportsEntity extends BaseEntity {
 	@JoinColumn(name = "post_id")
 	private PostsEntity post;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
 }

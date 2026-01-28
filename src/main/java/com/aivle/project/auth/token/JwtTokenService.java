@@ -41,6 +41,7 @@ public class JwtTokenService {
 			.issuedAt(now)
 			.expiresAt(expiresAt)
 			.id("at-" + UUID.randomUUID())
+			.claim("userId", userDetails.getId())
 			.claim("email", userDetails.getUsername())
 			.claim("roles", roles)
 			.claim("deviceId", deviceId)

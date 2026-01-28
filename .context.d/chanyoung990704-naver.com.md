@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-29 | 작업: Auditing 통합 및 테스트 정합 | 결과: BaseEntity에 createdBy/updatedBy 통합, SecurityAuditorAware 추가, userId 클레임 추가 및 엔티티/서비스/테스트 정리 | 이슈: MockBean deprecated 경고 지속
 - 2026-01-28 | 작업: dev Auth Console 호환성 보강 | 결과: /auth/logout, /auth/logout-all 미구현 시 안내 및 버튼 비활성화 처리 | 이슈: 없음
 - 2026-01-28 | 작업: ERD 문서 정리 | 결과: ERD.md 추가 및 README에 스키마 안내 섹션 추가 | 이슈: 없음
 - 2026-01-28 | 작업: UserRoleRepository 컴파일 오류 수정 | 결과: 잘못된 \\t 문자 제거로 빌드 복구, 전체 테스트 통과 | 이슈: 없음

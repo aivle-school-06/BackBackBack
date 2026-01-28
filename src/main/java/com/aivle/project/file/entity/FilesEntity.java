@@ -42,19 +42,12 @@ public class FilesEntity extends BaseEntity {
 	@Column(name = "content_type", nullable = false, length = 100)
 	private String contentType;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
-
 	public static FilesEntity create(
 		FileUsageType usageType,
 		String storageUrl,
 		String originalFilename,
 		long fileSize,
-		String contentType,
-		Long actorId
+		String contentType
 	) {
 		FilesEntity file = new FilesEntity();
 		file.usageType = usageType;
@@ -62,8 +55,6 @@ public class FilesEntity extends BaseEntity {
 		file.originalFilename = originalFilename;
 		file.fileSize = fileSize;
 		file.contentType = contentType;
-		file.createdBy = actorId;
-		file.updatedBy = actorId;
 		return file;
 	}
 }

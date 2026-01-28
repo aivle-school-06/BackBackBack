@@ -52,9 +52,4 @@ public class CompanyReportMetricValuesEntity extends BaseEntity {
 	@Column(name = "value_type", nullable = false, length = 20)
 	private MetricValueType valueType = MetricValueType.ACTUAL;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
 }

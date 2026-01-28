@@ -40,9 +40,4 @@ public class QuartersEntity extends BaseEntity {
 	@Column(name = "end_date", nullable = false)
 	private LocalDate endDate;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
 }

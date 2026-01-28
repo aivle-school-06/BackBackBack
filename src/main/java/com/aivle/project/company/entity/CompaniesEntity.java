@@ -40,9 +40,4 @@ public class CompaniesEntity extends BaseEntity {
 	@Column(name = "modify_date")
 	private LocalDate modifyDate;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
 }

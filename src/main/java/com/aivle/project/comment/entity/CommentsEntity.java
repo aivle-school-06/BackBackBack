@@ -58,20 +58,13 @@ public class CommentsEntity extends BaseEntity {
 	@OneToMany(mappedBy = "parent")
 	private List<CommentsEntity> replies = new ArrayList<>();
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
-
 	public static CommentsEntity create(
 		PostsEntity post,
 		UserEntity user,
 		CommentsEntity parent,
 		String content,
 		int depth,
-		int sequence,
-		Long actorId
+		int sequence
 	) {
 		CommentsEntity comment = new CommentsEntity();
 		comment.post = post;
@@ -80,18 +73,14 @@ public class CommentsEntity extends BaseEntity {
 		comment.content = content;
 		comment.depth = depth;
 		comment.sequence = sequence;
-		comment.createdBy = actorId;
-		comment.updatedBy = actorId;
 		return comment;
 	}
 
-	public void update(String content, Long actorId) {
+	public void update(String content) {
 		this.content = content;
-		this.updatedBy = actorId;
 	}
 
-	public void markDeleted(Long actorId) {
+	public void markDeleted() {
 		delete();
-		this.updatedBy = actorId;
 	}
 }

@@ -169,7 +169,6 @@ class PostServiceTest {
 
 		// then
 		assertThat(post.isDeleted()).isTrue();
-		assertThat(post.getUpdatedBy()).isEqualTo(1L);
 		verify(postsRepository).findByIdAndDeletedAtIsNull(100L);
 	}
 
@@ -189,7 +188,7 @@ class PostServiceTest {
 	}
 
 	private PostsEntity newPost(Long id, UserEntity user, CategoriesEntity category, String title, String content) {
-		PostsEntity post = PostsEntity.create(user, category, title, content, false, PostStatus.PUBLISHED, user.getId());
+		PostsEntity post = PostsEntity.create(user, category, title, content, false, PostStatus.PUBLISHED);
 		ReflectionTestUtils.setField(post, "id", id);
 		return post;
 	}
