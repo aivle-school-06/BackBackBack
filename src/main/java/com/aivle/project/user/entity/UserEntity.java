@@ -43,6 +43,9 @@ public class UserEntity extends BaseEntity {
 	@Column(name = "password", nullable = false, length = 255)
 	private String password;
 
+	@Column(name = "password_changed_at")
+	private java.time.LocalDateTime passwordChangedAt;
+
 	@Column(name = "name", nullable = false, length = 50)
 	private String name;
 
@@ -61,6 +64,9 @@ public class UserEntity extends BaseEntity {
 		if (status == null) {
 			status = UserStatus.PENDING;
 		}
+		if (passwordChangedAt == null) {
+			passwordChangedAt = java.time.LocalDateTime.now();
+		}
 	}
 
 	/**
@@ -73,6 +79,7 @@ public class UserEntity extends BaseEntity {
 		user.name = name;
 		user.phone = phone;
 		user.status = status;
+		user.passwordChangedAt = java.time.LocalDateTime.now();
 		return user;
 	}
 
@@ -89,5 +96,24 @@ public class UserEntity extends BaseEntity {
 	 */
 	public void setStatus(UserStatus status) {
 		this.status = status;
+	}
+
+	/**
+	 * 비밀번호 변경.
+	 */
+	public void updatePassword(String encodedPassword) {
+		this.password = encodedPassword;
+		this.passwordChangedAt = java.time.LocalDateTime.now();
+	}
+
+	/**
+	 * 비밀번호 만료 여부 확인 (90일).
+	 */
+	public boolean isPasswordExpired() {
+		java.time.LocalDateTime lastChanged = passwordChangedAt != null ? passwordChangedAt : getCreatedAt();
+		if (lastChanged == null) {
+			return false; // 생성일조차 없으면 아직 영속화되지 않은 상태
+		}
+		return lastChanged.isBefore(java.time.LocalDateTime.now().minusDays(90));
 	}
 }

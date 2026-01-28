@@ -16,9 +16,11 @@ public record TokenResponse(
 	@Schema(description = "리프레시 토큰", example = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...")
 	String refreshToken,
 	@Schema(description = "리프레시 토큰 만료(초)", example = "604800")
-	long refreshExpiresIn
+	long refreshExpiresIn,
+	@Schema(description = "비밀번호 만료 여부", example = "false")
+	boolean passwordExpired
 ) {
-	public static TokenResponse of(String accessToken, long accessExpiresIn, String refreshToken, long refreshExpiresIn) {
-		return new TokenResponse("Bearer", accessToken, accessExpiresIn, refreshToken, refreshExpiresIn);
+	public static TokenResponse of(String accessToken, long accessExpiresIn, String refreshToken, long refreshExpiresIn, boolean passwordExpired) {
+		return new TokenResponse("Bearer", accessToken, accessExpiresIn, refreshToken, refreshExpiresIn, passwordExpired);
 	}
 }

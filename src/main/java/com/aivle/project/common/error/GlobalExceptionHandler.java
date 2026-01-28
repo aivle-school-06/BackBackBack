@@ -9,6 +9,7 @@ import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -21,6 +22,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 /**
  * 전역 예외 처리 핸들러.
  */
+@Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
@@ -84,6 +86,7 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiResponse<Void>> handleUnexpected(Exception ex, HttpServletRequest request) {
+		log.error("Unexpected exception occurred: ", ex);
 		return buildResponse(CommonErrorCode.COMMON_500, request.getRequestURI());
 	}
 
