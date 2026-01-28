@@ -18,7 +18,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +59,7 @@ public class AuthService {
 	public TokenResponse refresh(TokenRefreshRequest request) {
 		String newRefreshToken = jwtTokenService.createRefreshToken();
 		RefreshTokenCache rotated = refreshTokenService.rotateToken(request.getRefreshToken(), newRefreshToken);
-		CustomUserDetails userDetails = (CustomUserDetails) loadUser(rotated.email());
+		CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserById(rotated.userId());
 		if (!userDetails.isEnabled()) {
 			throw new AuthException(AuthErrorCode.INVALID_REFRESH_TOKEN);
 		}
@@ -99,10 +98,6 @@ public class AuthService {
 		} catch (AuthenticationException ex) {
 			throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS);
 		}
-	}
-
-	private UserDetails loadUser(String email) {
-		return userDetailsService.loadUserByUsername(email);
 	}
 
 	private String normalizeDeviceId(String deviceId) {

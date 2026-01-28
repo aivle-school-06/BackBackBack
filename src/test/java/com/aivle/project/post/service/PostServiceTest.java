@@ -16,6 +16,8 @@ import com.aivle.project.post.dto.PostResponse;
 import com.aivle.project.post.dto.PostUpdateRequest;
 import com.aivle.project.post.entity.PostStatus;
 import com.aivle.project.post.entity.PostsEntity;
+import com.aivle.project.post.entity.PostViewCountsEntity;
+import com.aivle.project.post.repository.PostViewCountsRepository;
 import com.aivle.project.post.repository.PostsRepository;
 import com.aivle.project.user.entity.UserEntity;
 import com.aivle.project.user.entity.UserStatus;
@@ -41,6 +43,9 @@ class PostServiceTest {
 
 	@Mock
 	private PostsRepository postsRepository;
+
+	@Mock
+	private PostViewCountsRepository postViewCountsRepository;
 
 	@Mock
 	private CategoriesRepository categoriesRepository;
@@ -91,6 +96,7 @@ class PostServiceTest {
 			ReflectionTestUtils.setField(saved, "id", 100L);
 			return saved;
 		});
+		given(postViewCountsRepository.save(any(PostViewCountsEntity.class))).willAnswer(invocation -> invocation.getArgument(0));
 
 		// when
 		PostResponse response = postService.create(user, request);

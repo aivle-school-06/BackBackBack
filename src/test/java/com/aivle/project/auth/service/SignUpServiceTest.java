@@ -64,22 +64,22 @@ class SignUpServiceTest {
 		request.setTurnstileToken("valid-token");
 
 		UserEntity user = UserEntity.create("new@test.com", "encoded", "tester", "01012345678", UserStatus.ACTIVE);
-		SignupResponse signupResponse = new SignupResponse(1L, java.util.UUID.randomUUID(), "new@test.com", UserStatus.ACTIVE, RoleName.USER);
+		SignupResponse signupResponse = new SignupResponse(1L, java.util.UUID.randomUUID(), "new@test.com", UserStatus.ACTIVE, RoleName.ROLE_USER);
 
 		when(turnstileService.verifyTokenSync("valid-token", "127.0.0.1")).thenReturn(true);
 		when(turnstileService.verifyTokenSync("valid-token", "127.0.0.1")).thenReturn(true);
 		when(userDomainService.existsByEmail("new@test.com")).thenReturn(false);
 		when(passwordEncoder.encode("password123")).thenReturn("encoded");
-		when(userDomainService.register("new@test.com", "encoded", "tester", "01012345678", RoleName.USER))
+		when(userDomainService.register("new@test.com", "encoded", "tester", "01012345678", RoleName.ROLE_USER))
 			.thenReturn(user);
-		when(authMapper.toSignupResponse(user, RoleName.USER)).thenReturn(signupResponse);
+		when(authMapper.toSignupResponse(user, RoleName.ROLE_USER)).thenReturn(signupResponse);
 
 		// when: 회원가입을 수행
 		SignupResponse response = signUpService.signup(request, "127.0.0.1");
 
 		// then: 사용자 저장과 매핑이 수행된다
 		assertThat(response.email()).isEqualTo("new@test.com");
-		verify(userDomainService).register("new@test.com", "encoded", "tester", "01012345678", RoleName.USER);
+		verify(userDomainService).register("new@test.com", "encoded", "tester", "01012345678", RoleName.ROLE_USER);
 	}
 
 	@Test
@@ -95,14 +95,14 @@ class SignUpServiceTest {
 		request.setTurnstileToken("valid-token");
 
 		UserEntity user = UserEntity.create("verify@test.com", "encoded", "tester", "01012345678", UserStatus.PENDING);
-		SignupResponse signupResponse = new SignupResponse(1L, java.util.UUID.randomUUID(), "verify@test.com", UserStatus.PENDING, RoleName.USER);
+		SignupResponse signupResponse = new SignupResponse(1L, java.util.UUID.randomUUID(), "verify@test.com", UserStatus.PENDING, RoleName.ROLE_USER);
 
 		when(turnstileService.verifyTokenSync("valid-token", "127.0.0.1")).thenReturn(true);
 		when(userDomainService.existsByEmail("verify@test.com")).thenReturn(false);
 		when(passwordEncoder.encode("password123")).thenReturn("encoded");
-		when(userDomainService.register("verify@test.com", "encoded", "tester", "01012345678", RoleName.USER))
+		when(userDomainService.register("verify@test.com", "encoded", "tester", "01012345678", RoleName.ROLE_USER))
 			.thenReturn(user);
-		when(authMapper.toSignupResponse(user, RoleName.USER)).thenReturn(signupResponse);
+		when(authMapper.toSignupResponse(user, RoleName.ROLE_USER)).thenReturn(signupResponse);
 
 		// when: 회원가입을 수행
 		SignupResponse response = signUpService.signup(request, "127.0.0.1");
@@ -128,14 +128,14 @@ class SignUpServiceTest {
 
 		UserEntity user = UserEntity.create("dev@test.com", "encoded", "tester", "01012345678", UserStatus.PENDING);
 		ReflectionTestUtils.setField(user, "id", 1L);
-		SignupResponse signupResponse = new SignupResponse(1L, java.util.UUID.randomUUID(), "dev@test.com", UserStatus.ACTIVE, RoleName.USER);
+		SignupResponse signupResponse = new SignupResponse(1L, java.util.UUID.randomUUID(), "dev@test.com", UserStatus.ACTIVE, RoleName.ROLE_USER);
 
 		when(turnstileService.verifyTokenSync("valid-token", "127.0.0.1")).thenReturn(true);
 		when(userDomainService.existsByEmail("dev@test.com")).thenReturn(false);
 		when(passwordEncoder.encode("password123")).thenReturn("encoded");
-		when(userDomainService.register("dev@test.com", "encoded", "tester", "01012345678", RoleName.USER))
+		when(userDomainService.register("dev@test.com", "encoded", "tester", "01012345678", RoleName.ROLE_USER))
 			.thenReturn(user);
-		when(authMapper.toSignupResponse(user, RoleName.USER)).thenReturn(signupResponse);
+		when(authMapper.toSignupResponse(user, RoleName.ROLE_USER)).thenReturn(signupResponse);
 
 		// when: 회원가입을 수행
 		SignupResponse response = signUpService.signup(request, "127.0.0.1");

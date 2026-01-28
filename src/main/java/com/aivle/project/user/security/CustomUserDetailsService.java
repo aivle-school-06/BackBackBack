@@ -38,4 +38,21 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 		return CustomUserDetails.from(user, roles);
 	}
+
+	@Transactional(readOnly = true)
+	public UserDetails loadUserById(Long userId) {
+		var userRoles = userRoleRepository.findAllWithUserAndRoleByUserId(userId);
+		if (userRoles.isEmpty()) {
+			var user = userRepository.findById(userId)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+			return CustomUserDetails.from(user, List.of());
+		}
+
+		var user = userRoles.get(0).getUser();
+		List<RoleName> roles = userRoles.stream()
+			.map(userRole -> userRole.getRole().getName())
+			.toList();
+
+		return CustomUserDetails.from(user, roles);
+	}
 }

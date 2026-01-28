@@ -96,8 +96,7 @@ class AuthServiceTest {
 
 		RefreshTokenCache rotated = new RefreshTokenCache(
 			"new-token",
-			"user-uuid",
-			"user@example.com",
+			1L,
 			"device-1",
 			"ios",
 			"127.0.0.1",
@@ -110,7 +109,7 @@ class AuthServiceTest {
 
 		CustomUserDetails userDetails = mock(CustomUserDetails.class);
 		when(userDetails.isEnabled()).thenReturn(true);
-		when(userDetailsService.loadUserByUsername("user@example.com")).thenReturn(userDetails);
+		when(userDetailsService.loadUserById(1L)).thenReturn(userDetails);
 		when(jwtTokenService.createAccessToken(userDetails, "device-1")).thenReturn("access");
 		when(jwtTokenService.getAccessTokenExpirationSeconds()).thenReturn(1800L);
 		when(jwtTokenService.getRefreshTokenExpirationSeconds()).thenReturn(604800L);
@@ -135,8 +134,7 @@ class AuthServiceTest {
 
 		RefreshTokenCache rotated = new RefreshTokenCache(
 			"new-token",
-			"user-uuid",
-			"user@example.com",
+			1L,
 			"device-1",
 			"ios",
 			"127.0.0.1",
@@ -149,7 +147,7 @@ class AuthServiceTest {
 
 		CustomUserDetails userDetails = mock(CustomUserDetails.class);
 		when(userDetails.isEnabled()).thenReturn(false);
-		when(userDetailsService.loadUserByUsername("user@example.com")).thenReturn(userDetails);
+		when(userDetailsService.loadUserById(1L)).thenReturn(userDetails);
 
 		// when & then: 비활성 사용자는 예외가 발생한다
 		assertThatThrownBy(() -> authService.refresh(request))

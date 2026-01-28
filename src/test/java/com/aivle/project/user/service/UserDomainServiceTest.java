@@ -53,17 +53,17 @@ class UserDomainServiceTest {
 	@DisplayName("역할이 존재하면 해당 역할로 사용자 등록을 완료한다")
 	void register_shouldUseExistingRole() {
 		// given
-		RoleEntity role = new RoleEntity(RoleName.USER, "user role");
-		given(roleRepository.findByName(RoleName.USER)).willReturn(Optional.of(role));
+		RoleEntity role = new RoleEntity(RoleName.ROLE_USER, "user role");
+		given(roleRepository.findByName(RoleName.ROLE_USER)).willReturn(Optional.of(role));
 		given(userRepository.save(org.mockito.ArgumentMatchers.any(UserEntity.class)))
 			.willAnswer(invocation -> invocation.getArgument(0));
 
 		// when
-		UserEntity user = userDomainService.register("user@test.com", "encoded", "name", "010", RoleName.USER);
+		UserEntity user = userDomainService.register("user@test.com", "encoded", "name", "010", RoleName.ROLE_USER);
 
 		// then
 		assertThat(user.getEmail()).isEqualTo("user@test.com");
-		verify(roleRepository).findByName(RoleName.USER);
+		verify(roleRepository).findByName(RoleName.ROLE_USER);
 		verify(roleRepository, never()).save(org.mockito.ArgumentMatchers.any(RoleEntity.class));
 		verify(userRoleRepository).save(org.mockito.ArgumentMatchers.any(UserRoleEntity.class));
 	}
@@ -72,14 +72,14 @@ class UserDomainServiceTest {
 	@DisplayName("역할이 없으면 새 역할을 생성하고 사용자 등록을 완료한다")
 	void register_shouldCreateRoleWhenMissing() {
 		// given
-		given(roleRepository.findByName(RoleName.ADMIN)).willReturn(Optional.empty());
+		given(roleRepository.findByName(RoleName.ROLE_ADMIN)).willReturn(Optional.empty());
 		given(roleRepository.save(org.mockito.ArgumentMatchers.any(RoleEntity.class)))
 			.willAnswer(invocation -> invocation.getArgument(0));
 		given(userRepository.save(org.mockito.ArgumentMatchers.any(UserEntity.class)))
 			.willAnswer(invocation -> invocation.getArgument(0));
 
 		// when
-		UserEntity user = userDomainService.register("admin@test.com", "encoded", "name", "010", RoleName.ADMIN);
+		UserEntity user = userDomainService.register("admin@test.com", "encoded", "name", "010", RoleName.ROLE_ADMIN);
 
 		// then
 		assertThat(user.getEmail()).isEqualTo("admin@test.com");

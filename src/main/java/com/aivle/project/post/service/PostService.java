@@ -11,6 +11,8 @@ import com.aivle.project.post.dto.PostResponse;
 import com.aivle.project.post.dto.PostUpdateRequest;
 import com.aivle.project.post.entity.PostStatus;
 import com.aivle.project.post.entity.PostsEntity;
+import com.aivle.project.post.entity.PostViewCountsEntity;
+import com.aivle.project.post.repository.PostViewCountsRepository;
 import com.aivle.project.post.repository.PostsRepository;
 import com.aivle.project.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
 
 	private final PostsRepository postsRepository;
+	private final PostViewCountsRepository postViewCountsRepository;
 	private final CategoriesRepository categoriesRepository;
 
 	@Transactional(readOnly = true)
@@ -61,6 +64,7 @@ public class PostService {
 		);
 
 		PostsEntity saved = postsRepository.save(post);
+		postViewCountsRepository.save(PostViewCountsEntity.create(saved));
 		return PostResponse.from(saved);
 	}
 

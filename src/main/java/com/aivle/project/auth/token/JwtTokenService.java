@@ -33,7 +33,6 @@ public class JwtTokenService {
 
 		List<String> roles = userDetails.getAuthorities().stream()
 			.map(authority -> authority.getAuthority())
-			.map(this::stripRolePrefix)
 			.toList();
 
 		JwtClaimsSet claims = JwtClaimsSet.builder()
@@ -68,13 +67,4 @@ public class JwtTokenService {
 		return jwtProperties.getRefreshToken().getExpiration();
 	}
 
-	private String stripRolePrefix(String authority) {
-		if (authority == null) {
-			return "";
-		}
-		if (authority.startsWith("ROLE_")) {
-			return authority.substring("ROLE_".length());
-		}
-		return authority;
-	}
 }

@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-28 | 작업: Flyway 도입 + ERD 정합화 1~2단계 | 결과: V1 초기 마이그레이션/ddl-auto validate 적용, ROLE_ 통일/refresh_tokens·files·조회수 분리 및 신규 엔티티 추가, 테스트 보정 | 이슈: 없음
 - 2026-01-28 | 작업: SENTINEL PoC OpenAPI 스펙 Swagger UI 연결 | 결과: 정적 YAML 제공 및 Swagger UI 다중 문서 목록 추가 | 이슈: 없음
 - 2026-01-27 | 작업: SecurityConfig 정적 리소스 허용 및 CSP 헤더 추가 | 결과: favicon/정적 경로 permitAll, Turnstile 도메인 포함 CSP를 Report-Only로 설정 | 이슈: 없음
 - 2026-01-27 | 작업: Turnstile 디버그 로그 강화 | 결과: 검증 요청/응답 상세 로그 추가 및 dev에서 debug 활성화 | 이슈: 없음

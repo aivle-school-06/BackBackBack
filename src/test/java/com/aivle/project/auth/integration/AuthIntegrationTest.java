@@ -112,7 +112,7 @@ class AuthIntegrationTest {
 	@DisplayName("로그인 성공 시 토큰 응답을 반환한다")
 	void login_shouldReturnTokens() throws Exception {
 		// given: 활성 사용자와 역할을 준비
-		UserEntity user = createActiveUserWithRole("user@test.com", "password", RoleName.USER);
+		UserEntity user = createActiveUserWithRole("user@test.com", "password", RoleName.ROLE_USER);
 
 		LoginRequest request = new LoginRequest();
 		request.setEmail("user@test.com");
@@ -144,7 +144,7 @@ class AuthIntegrationTest {
 	@DisplayName("로그인 후 JWT 인증으로 보호된 엔드포인트에 접근한다")
 	void login_shouldAuthenticateWithJwtClaimsAndAuthorities() throws Exception {
 		// given: 활성 사용자와 역할을 준비
-		createActiveUserWithRole("auth@test.com", "password", RoleName.USER);
+		createActiveUserWithRole("auth@test.com", "password", RoleName.ROLE_USER);
 		String accessToken = loginAndGetAccessToken("auth@test.com", "password", "device-1");
 
 		// when: 보호된 엔드포인트에 접근
@@ -164,7 +164,7 @@ class AuthIntegrationTest {
 		assertThat(claims.get("deviceId").asText()).isEqualTo("device-1");
 		assertThat(claims.get("issuer").asText()).isEqualTo(TEST_ISSUER);
 		List<String> roles = objectMapper.convertValue(claims.get("roles"), new TypeReference<>() {});
-		assertThat(roles).contains("USER");
+		assertThat(roles).contains("ROLE_USER");
 
 		List<String> authorities = objectMapper.readValue(
 			authoritiesResult.getResponse().getContentAsString(),
@@ -255,7 +255,7 @@ class AuthIntegrationTest {
 		String email = "pwchange@test.com";
 		String oldPassword = "OldPassword123!";
 		String newPassword = "NewPassword123!";
-		createActiveUserWithRole(email, oldPassword, RoleName.USER);
+		createActiveUserWithRole(email, oldPassword, RoleName.ROLE_USER);
 		String accessToken = loginAndGetAccessToken(email, oldPassword, "device-1");
 
 		PasswordChangeRequest request = new PasswordChangeRequest(oldPassword, newPassword);

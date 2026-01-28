@@ -154,7 +154,7 @@ public class SecurityConfig {
 
 			boolean allowLegacyPrefix = isLegacyRolePrefixAllowed();
 			if (!allowLegacyPrefix && containsLegacyPrefix(roles)) {
-				throw new IllegalArgumentException("레거시 ROLE_ 접두사 토큰은 더 이상 허용되지 않습니다.");
+				throw new IllegalArgumentException("ROLE_ 접두사가 없는 레거시 토큰은 더 이상 허용되지 않습니다.");
 			}
 
 			List<GrantedAuthority> authorities = new ArrayList<>();
@@ -186,14 +186,14 @@ public class SecurityConfig {
 		}
 		String trimmed = role.trim();
 		if (trimmed.startsWith("ROLE_")) {
-			return allowLegacyPrefix ? trimmed : null;
+			return trimmed;
 		}
-		return "ROLE_" + trimmed;
+		return allowLegacyPrefix ? "ROLE_" + trimmed : null;
 	}
 
 	private boolean containsLegacyPrefix(List<String> roles) {
 		for (String role : roles) {
-			if (role != null && role.trim().startsWith("ROLE_")) {
+			if (role != null && !role.trim().startsWith("ROLE_")) {
 				return true;
 			}
 		}

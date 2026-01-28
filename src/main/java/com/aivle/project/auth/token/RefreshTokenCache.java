@@ -5,8 +5,7 @@ package com.aivle.project.auth.token;
  */
 public record RefreshTokenCache(
 	String token,
-	String userId,
-	String email,
+	Long userId,
 	String deviceId,
 	String deviceInfo,
 	String ipAddress,
@@ -18,7 +17,6 @@ public record RefreshTokenCache(
 		return new RefreshTokenCache(
 			newToken,
 			userId,
-			email,
 			deviceId,
 			deviceInfo,
 			ipAddress,

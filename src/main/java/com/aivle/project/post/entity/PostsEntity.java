@@ -16,6 +16,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,8 +49,8 @@ public class PostsEntity extends BaseEntity {
 	@Column(name = "content", nullable = false, columnDefinition = "LONGTEXT")
 	private String content;
 
-	@Column(name = "view_count", nullable = false)
-	private int viewCount = 0;
+	@OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
+	private PostViewCountsEntity viewCountEntity;
 
 	@Column(name = "is_pinned", nullable = false)
 	private boolean isPinned = false;
@@ -111,5 +112,12 @@ public class PostsEntity extends BaseEntity {
 	public void markDeleted(Long actorId) {
 		delete();
 		this.updatedBy = actorId;
+	}
+
+	/**
+	 * 조회수 조회 (없으면 0 반환).
+	 */
+	public int getViewCount() {
+		return viewCountEntity != null ? viewCountEntity.getViewCount() : 0;
 	}
 }

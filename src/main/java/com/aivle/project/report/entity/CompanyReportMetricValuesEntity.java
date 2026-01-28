@@ -1,0 +1,60 @@
+package com.aivle.project.report.entity;
+
+import com.aivle.project.common.entity.BaseEntity;
+import com.aivle.project.metric.entity.MetricValueType;
+import com.aivle.project.metric.entity.MetricsEntity;
+import com.aivle.project.quarter.entity.QuartersEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+/**
+ * company_report_metric_values 테이블에 매핑되는 지표 값 엔티티.
+ */
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "company_report_metric_values")
+public class CompanyReportMetricValuesEntity extends BaseEntity {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "report_version_id", nullable = false)
+	private CompanyReportVersionsEntity reportVersion;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "metric_id", nullable = false)
+	private MetricsEntity metric;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "quarter_id", nullable = false)
+	private QuartersEntity quarter;
+
+	@Column(name = "metric_value", precision = 20, scale = 4)
+	private BigDecimal metricValue;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "value_type", nullable = false, length = 20)
+	private MetricValueType valueType = MetricValueType.ACTUAL;
+
+	@Column(name = "created_by")
+	private Long createdBy;
+
+	@Column(name = "updated_by")
+	private Long updatedBy;
+}

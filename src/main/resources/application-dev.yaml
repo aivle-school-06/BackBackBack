@@ -12,7 +12,7 @@ spring:
       path: ${H2_CONSOLE_PATH:/h2-console}
   jpa:
     hibernate:
-      ddl-auto: create # 개발 환경에서는 스키마 자동 업데이트
+      ddl-auto: validate
     properties:
       hibernate:
         default_batch_fetch_size: 100 # In-memory batch fetching for to-many associations
