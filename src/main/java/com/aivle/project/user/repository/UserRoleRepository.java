@@ -16,6 +16,6 @@ public interface UserRoleRepository extends JpaRepository<UserRoleEntity, Long> 
 	@Query("select ur from UserRoleEntity ur join fetch ur.user u join fetch ur.role r where u.email = :email")
 	List<UserRoleEntity> findAllWithUserAndRoleByUserEmail(@Param("email") String email);
 
-\t@Query("select ur from UserRoleEntity ur join fetch ur.user u join fetch ur.role r where u.id = :userId")
-\tList<UserRoleEntity> findAllWithUserAndRoleByUserId(@Param("userId") Long userId);
+	@Query("select ur from UserRoleEntity ur join fetch ur.user u join fetch ur.role r where u.id = :userId")
+	List<UserRoleEntity> findAllWithUserAndRoleByUserId(@Param("userId") Long userId);
 }
