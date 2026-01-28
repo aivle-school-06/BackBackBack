@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-28 | 작업: ERD 문서 정리 | 결과: ERD.md 추가 및 README에 스키마 안내 섹션 추가 | 이슈: 없음
 - 2026-01-28 | 작업: UserRoleRepository 컴파일 오류 수정 | 결과: 잘못된 \\t 문자 제거로 빌드 복구, 전체 테스트 통과 | 이슈: 없음
 - 2026-01-28 | 작업: 파일/인증 테스트 정합화 | 결과: session 키 변경 및 post_files 매핑 기반 조회로 통합 테스트 보정, 테스트 설정에 TestSecurityConfig 적용 | 이슈: 없음
 - 2026-01-28 | 작업: H2 마이그레이션/테스트 프로파일 정리 | 결과: H2 전용 Flyway 스키마 추가, dev/test DB URL 및 Flyway 경로 정비, CompaniesEntity CHAR 컬럼 정합 | 이슈: 없음
