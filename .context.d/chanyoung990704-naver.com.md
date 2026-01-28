@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-28 | 작업: H2 마이그레이션/테스트 프로파일 정리 | 결과: H2 전용 Flyway 스키마 추가, dev/test DB URL 및 Flyway 경로 정비, CompaniesEntity CHAR 컬럼 정합 | 이슈: 없음
 - 2026-01-28 | 작업: 테스트 실패 원인 수정(카테고리 중복/테스트 JWT 키) | 결과: CommentIntegrationTest 카테고리 이름 고유화, EmailVerificationServiceTest에 TestSecurityConfig 적용 | 이슈: MockBean deprecated 경고 확인
 - 2026-01-28 | 작업: Flyway 도입 + ERD 정합화 1~2단계 | 결과: V1 초기 마이그레이션/ddl-auto validate 적용, ROLE_ 통일/refresh_tokens·files·조회수 분리 및 신규 엔티티 추가, 테스트 보정 | 이슈: 없음
 - 2026-01-28 | 작업: SENTINEL PoC OpenAPI 스펙 Swagger UI 연결 | 결과: 정적 YAML 제공 및 Swagger UI 다중 문서 목록 추가 | 이슈: 없음

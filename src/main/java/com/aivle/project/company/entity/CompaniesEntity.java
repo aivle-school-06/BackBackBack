@@ -25,7 +25,7 @@ public class CompaniesEntity extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "corp_code", nullable = false, length = 8)
+	@Column(name = "corp_code", nullable = false, length = 8, columnDefinition = "CHAR(8)")
 	private String corpCode;
 
 	@Column(name = "corp_name", nullable = false, length = 100)
@@ -34,7 +34,7 @@ public class CompaniesEntity extends BaseEntity {
 	@Column(name = "corp_eng_name", length = 200)
 	private String corpEngName;
 
-	@Column(name = "stock_code", length = 6)
+	@Column(name = "stock_code", length = 6, columnDefinition = "CHAR(6)")
 	private String stockCode;
 
 	@Column(name = "modify_date")
