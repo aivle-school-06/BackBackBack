@@ -20,6 +20,7 @@ public class CustomUserDetails implements UserDetails {
 	private final String email;
 	private final String password;
 	private final UserStatus status;
+	private final boolean passwordExpired;
 	private final List<GrantedAuthority> authorities;
 
 	private CustomUserDetails(
@@ -28,6 +29,7 @@ public class CustomUserDetails implements UserDetails {
 		String email,
 		String password,
 		UserStatus status,
+		boolean passwordExpired,
 		List<GrantedAuthority> authorities
 	) {
 		this.id = id;
@@ -35,6 +37,7 @@ public class CustomUserDetails implements UserDetails {
 		this.email = email;
 		this.password = password;
 		this.status = status;
+		this.passwordExpired = passwordExpired;
 		this.authorities = authorities;
 	}
 
@@ -50,6 +53,7 @@ public class CustomUserDetails implements UserDetails {
 			user.getEmail(),
 			user.getPassword(),
 			user.getStatus(),
+			user.isPasswordExpired(),
 			authorities
 		);
 	}
@@ -64,6 +68,10 @@ public class CustomUserDetails implements UserDetails {
 
 	public UserStatus getStatus() {
 		return status;
+	}
+
+	public boolean isPasswordExpired() {
+		return passwordExpired;
 	}
 
 	@Override

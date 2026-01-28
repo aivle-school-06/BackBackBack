@@ -3,9 +3,11 @@ package com.aivle.project.auth.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.aivle.project.auth.dto.LoginRequest;
+import com.aivle.project.auth.dto.PasswordChangeRequest;
 import com.aivle.project.auth.dto.SignupRequest;
 import com.aivle.project.auth.dto.SignupResponse;
 import com.aivle.project.auth.dto.TokenResponse;
@@ -244,6 +246,42 @@ class AuthIntegrationTest {
 		);
 		assertThat(response.success()).isFalse();
 		assertThat(response.error()).isNotNull();
+	}
+
+	@Test
+	@DisplayName("비밀번호 변경 시 비밀번호가 업데이트되고 타임스탬프가 기록된다")
+	void changePassword_shouldUpdatePasswordAndTimestamp() throws Exception {
+		// given: 활성 사용자 생성 및 로그인
+		String email = "pwchange@test.com";
+		String oldPassword = "OldPassword123!";
+		String newPassword = "NewPassword123!";
+		createActiveUserWithRole(email, oldPassword, RoleName.USER);
+		String accessToken = loginAndGetAccessToken(email, oldPassword, "device-1");
+
+		PasswordChangeRequest request = new PasswordChangeRequest(oldPassword, newPassword);
+
+		// when: 비밀번호 변경 요청
+		mockMvc.perform(post("/auth/change-password")
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk());
+
+		// then: 비밀번호가 변경되었는지 확인 (새 비밀번호로 로그인 시도)
+		LoginRequest loginRequest = new LoginRequest();
+		loginRequest.setEmail(email);
+		loginRequest.setPassword(newPassword);
+		loginRequest.setDeviceId("device-1");
+
+		mockMvc.perform(post("/auth/login")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(loginRequest)))
+			.andDo(print())
+			.andExpect(status().isOk());
+
+		// then: passwordChangedAt이 업데이트 되었는지 확인
+		UserEntity updatedUser = userRepository.findByEmail(email).orElseThrow();
+		assertThat(updatedUser.getPasswordChangedAt()).isNotNull();
 	}
 
 	private String loginAndGetAccessToken(String email, String password, String deviceId) throws Exception {

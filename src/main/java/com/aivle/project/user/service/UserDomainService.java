@@ -63,4 +63,13 @@ public class UserDomainService {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
 	}
+
+	/**
+	 * 비밀번호 변경.
+	 */
+	@Transactional
+	public void updatePassword(Long userId, String encodedPassword) {
+		UserEntity user = getUserById(userId);
+		user.updatePassword(encodedPassword);
+	}
 }

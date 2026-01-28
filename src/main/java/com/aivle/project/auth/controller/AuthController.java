@@ -1,12 +1,16 @@
 package com.aivle.project.auth.controller;
 
 import com.aivle.project.auth.dto.LoginRequest;
+import com.aivle.project.auth.dto.PasswordChangeRequest;
 import com.aivle.project.auth.dto.SignupRequest;
 import com.aivle.project.auth.dto.SignupResponse;
 import com.aivle.project.auth.dto.TokenRefreshRequest;
 import com.aivle.project.auth.dto.TokenResponse;
 import com.aivle.project.auth.service.AuthService;
 import com.aivle.project.auth.service.SignUpService;
+import com.aivle.project.common.security.CurrentUser;
+import com.aivle.project.user.entity.UserEntity;
+import com.aivle.project.user.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -64,6 +68,20 @@ public class AuthController {
 	})
 	public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody TokenRefreshRequest request) {
 		return ResponseEntity.ok(authService.refresh(request));
+	}
+
+	@PostMapping("/change-password")
+	@Operation(summary = "비밀번호 변경", description = "로그인된 사용자의 비밀번호를 변경합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "변경 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 비밀번호"),
+		@ApiResponse(responseCode = "401", description = "인증 필요")
+	})
+	public ResponseEntity<Void> changePassword(
+		@Parameter(hidden = true) @CurrentUser UserEntity user,
+		@Valid @RequestBody PasswordChangeRequest request) {
+		authService.changePassword(user, request);
+		return ResponseEntity.ok().build();
 	}
 
 	@PostMapping("/signup")

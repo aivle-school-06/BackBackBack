@@ -1,14 +1,17 @@
 package com.aivle.project.auth.service;
 
 import com.aivle.project.auth.dto.LoginRequest;
+import com.aivle.project.auth.dto.PasswordChangeRequest;
 import com.aivle.project.auth.dto.TokenRefreshRequest;
 import com.aivle.project.auth.dto.TokenResponse;
 import com.aivle.project.auth.exception.AuthErrorCode;
 import com.aivle.project.auth.exception.AuthException;
 import com.aivle.project.auth.token.JwtTokenService;
 import com.aivle.project.auth.token.RefreshTokenCache;
+import com.aivle.project.user.entity.UserEntity;
 import com.aivle.project.user.security.CustomUserDetails;
 import com.aivle.project.user.security.CustomUserDetailsService;
+import com.aivle.project.user.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
@@ -16,7 +19,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 로그인 및 토큰 재발급 처리.
@@ -29,6 +34,8 @@ public class AuthService {
 	private final JwtTokenService jwtTokenService;
 	private final RefreshTokenService refreshTokenService;
 	private final CustomUserDetailsService userDetailsService;
+	private final UserDomainService userDomainService;
+	private final PasswordEncoder passwordEncoder;
 
 	public TokenResponse login(LoginRequest request, String ipAddress) {
 		Authentication authentication = authenticate(request.getEmail(), request.getPassword());
@@ -39,11 +46,14 @@ public class AuthService {
 		String refreshToken = jwtTokenService.createRefreshToken();
 		refreshTokenService.storeToken(userDetails, refreshToken, deviceId, request.getDeviceInfo(), ipAddress);
 
+		boolean isPasswordExpired = userDetails.isPasswordExpired();
+
 		return TokenResponse.of(
 			accessToken,
 			jwtTokenService.getAccessTokenExpirationSeconds(),
 			refreshToken,
-			jwtTokenService.getRefreshTokenExpirationSeconds()
+			jwtTokenService.getRefreshTokenExpirationSeconds(),
+			isPasswordExpired
 		);
 	}
 
@@ -60,8 +70,25 @@ public class AuthService {
 			accessToken,
 			jwtTokenService.getAccessTokenExpirationSeconds(),
 			newRefreshToken,
-			jwtTokenService.getRefreshTokenExpirationSeconds()
+			jwtTokenService.getRefreshTokenExpirationSeconds(),
+			userDetails.isPasswordExpired()
 		);
+	}
+
+	@Transactional
+	public void changePassword(UserEntity user, PasswordChangeRequest request) {
+		// 현재 비밀번호 검증
+		if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+			throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS);
+		}
+
+		// 새 비밀번호가 기존 비밀번호와 같은지 검증
+		if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+			throw new IllegalArgumentException("새 비밀번호는 기존 비밀번호와 다르게 설정해야 합니다.");
+		}
+
+		// 비밀번호 변경
+		userDomainService.updatePassword(user.getId(), passwordEncoder.encode(request.getNewPassword()));
 	}
 
 	private Authentication authenticate(String email, String password) {
