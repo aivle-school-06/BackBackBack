@@ -135,7 +135,7 @@ class AuthIntegrationTest {
 
 		String refreshToken = response.refreshToken();
 		String refreshKey = "refresh:" + refreshToken;
-		String sessionKey = "sessions:" + user.getUuid();
+		String sessionKey = "sessions:" + user.getId();
 		assertThat(redisTemplate.opsForValue().get(refreshKey)).isNotNull();
 		assertThat(redisTemplate.opsForSet().isMember(sessionKey, refreshToken)).isTrue();
 	}

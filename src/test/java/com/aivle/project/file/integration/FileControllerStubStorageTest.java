@@ -8,7 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.aivle.project.category.entity.CategoriesEntity;
 import com.aivle.project.common.config.TestSecurityConfig;
 import com.aivle.project.file.entity.FilesEntity;
-import com.aivle.project.file.repository.FilesRepository;
+import com.aivle.project.file.entity.PostFilesEntity;
+import com.aivle.project.file.repository.PostFilesRepository;
 import com.aivle.project.file.storage.FileStorageService;
 import com.aivle.project.file.storage.StoredFile;
 import com.aivle.project.post.entity.PostStatus;
@@ -47,7 +48,7 @@ class FileControllerStubStorageTest {
 	private MockMvc mockMvc;
 
 	@Autowired
-	private FilesRepository filesRepository;
+	private PostFilesRepository postFilesRepository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -74,9 +75,9 @@ class FileControllerStubStorageTest {
 			.andExpect(status().isCreated());
 
 		// then
-		List<FilesEntity> saved = filesRepository.findAllByPostIdAndDeletedAtIsNullOrderByCreatedAtAsc(post.getId());
+		List<PostFilesEntity> saved = postFilesRepository.findAllActiveByPostIdOrderByCreatedAtAsc(post.getId());
 		assertThat(saved).hasSize(1);
-		assertThat(saved.get(0).getStorageUrl()).startsWith("memory://posts/");
+		assertThat(saved.get(0).getFile().getStorageUrl()).startsWith("memory://posts/");
 	}
 
 	private UserEntity persistUser(String email) {
