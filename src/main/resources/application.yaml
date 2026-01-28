@@ -41,6 +41,12 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     customCssUrl: /swagger-ui/custom.css
+    urls:
+      - name: project
+        url: /api-docs
+      - name: sentinel-poc
+        url: /openapi/SENTINEL_PoC_API.yaml
+    urlsPrimaryName: project
 
 app:
   api:
