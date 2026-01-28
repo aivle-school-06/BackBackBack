@@ -479,6 +479,15 @@
 		document.getElementById("logout-btn").addEventListener("click", async () => {
 			try {
 				const response = await apiFetch("/auth/logout", { method: "POST" });
+				if (response.status === 404 || response.status === 405) {
+					setLog("현재 /auth/logout API가 제공되지 않습니다. 콘솔 버튼을 비활성화합니다.");
+					document.getElementById("logout-btn").disabled = true;
+					return;
+				}
+				if (response.status === 401) {
+					setLog("로그인이 필요합니다. Auth Console에서 로그인 후 다시 시도하세요.");
+					return;
+				}
 				setLog({ status: response.status, message: "logout" });
 			} catch (error) {
 				setLog({ error: error.message });
@@ -488,6 +497,15 @@
 		document.getElementById("logout-all-btn").addEventListener("click", async () => {
 			try {
 				const response = await apiFetch("/auth/logout-all", { method: "POST" });
+				if (response.status === 404 || response.status === 405) {
+					setLog("현재 /auth/logout-all API가 제공되지 않습니다. 콘솔 버튼을 비활성화합니다.");
+					document.getElementById("logout-all-btn").disabled = true;
+					return;
+				}
+				if (response.status === 401) {
+					setLog("로그인이 필요합니다. Auth Console에서 로그인 후 다시 시도하세요.");
+					return;
+				}
 				setLog({ status: response.status, message: "logout-all" });
 			} catch (error) {
 				setLog({ error: error.message });
