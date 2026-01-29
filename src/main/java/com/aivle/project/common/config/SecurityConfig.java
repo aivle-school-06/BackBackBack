@@ -86,6 +86,7 @@ public class SecurityConfig {
 				).permitAll()
 				.requestMatchers("/dev/categories").permitAll()
 				.requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
+				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated()
 			)
 			.headers(headers -> headers.contentSecurityPolicy(csp -> csp
