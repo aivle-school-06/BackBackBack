@@ -312,6 +312,14 @@
 				<p class="footer-note">Auth Console에서 로그인 후 이 페이지를 새로고침하면 토큰이 반영됩니다.</p>
 			</div>
 
+			<div class="card" style="animation-delay: 0.06s;">
+				<h2>DART 기업 동기화</h2>
+				<div class="actions">
+					<button class="primary" type="button" id="dart-corp-sync">기업 목록 동기화 실행</button>
+				</div>
+				<p class="footer-note">관리자 토큰(ROLE_ADMIN) 필요. POST /admin/dart/corp-sync</p>
+			</div>
+
 			<div class="card" style="animation-delay: 0.08s;">
 				<h2>게시글 목록</h2>
 				<div class="row">
@@ -621,6 +629,16 @@
 			saveSession();
 			updateTokenView();
 			setLog("세션 상태를 초기화했습니다.");
+		});
+
+		document.getElementById("dart-corp-sync")?.addEventListener("click", async () => {
+			try {
+				const response = await apiFetch("/admin/dart/corp-sync", { method: "POST" });
+				const data = await response.json();
+				setLog({ status: response.status, data });
+			} catch (e) {
+				setLog({ error: e.message });
+			}
 		});
 
 		document.getElementById("list-posts")?.addEventListener("click", async () => {
