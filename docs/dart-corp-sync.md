@@ -19,3 +19,28 @@
 - 변경분 갱신(업서트) 로직 구현
 - 수동 실행 API + 스케줄 토글 구성
 - 테스트/운영 가이드 정리
+
+---
+
+## 5. 운영 가이드
+
+### 5.1 환경 변수
+- `DART_API_KEY`: DART API 인증키 (필수)
+
+### 5.2 수동 실행 API
+- `POST /admin/dart/corp-sync`
+- 권한: `ROLE_ADMIN`
+- 응답: 202 Accepted (jobExecutionId, status)
+
+### 5.3 스케줄러 설정
+- 기본 OFF: `dart.corp-sync.schedule.enabled=false`
+- 크론: `dart.corp-sync.schedule.cron` (기본 `0 0 3 * * *`)
+
+### 5.4 네트워크/재시도 설정
+- `dart.http.connect-timeout-ms` (기본 3000)
+- `dart.http.response-timeout-ms` (기본 10000)
+- `dart.http.retry-count` (기본 2)
+- `dart.http.retry-backoff-ms` (기본 1000)
+
+### 5.5 배치 이력 테이블
+- Flyway `V6__batch_schema.sql`로 배치 메타 테이블을 생성한다.
