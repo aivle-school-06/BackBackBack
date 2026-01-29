@@ -282,6 +282,12 @@
 							<input id="signup-phone" name="phone" type="text" placeholder="01012345678">
 						</div>
 					</div>
+					<div style="margin-top: 12px;">
+						<label class="checkbox">
+							<input id="signup-admin" type="checkbox">
+							관리자 권한으로 가입 (dev 전용)
+						</label>
+					</div>
 					<div style="margin-top: 14px;">
 						<label>Turnstile 검증</label>
 						<div class="turnstile-box">
@@ -432,6 +438,7 @@
 				password: document.getElementById("signup-password").value,
 				name: document.getElementById("signup-name").value,
 				phone: document.getElementById("signup-phone").value,
+				admin: document.getElementById("signup-admin")?.checked === true,
 				turnstileToken: turnstileToken
 			};
 
