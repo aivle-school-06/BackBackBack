@@ -1,0 +1,13 @@
+package com.aivle.project.metric.repository;
+
+import com.aivle.project.metric.entity.MetricsEntity;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * 지표 조회/저장 리포지토리.
+ */
+public interface MetricsRepository extends JpaRepository<MetricsEntity, Long> {
+
+	Optional<MetricsEntity> findByMetricCode(String metricCode);
+}
