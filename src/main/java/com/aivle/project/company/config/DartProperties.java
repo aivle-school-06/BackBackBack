@@ -18,6 +18,7 @@ public class DartProperties {
 	private String apiKey;
 
 	private final CorpSync corpSync = new CorpSync();
+	private final Http http = new Http();
 
 	@Getter
 	@Setter
@@ -44,5 +45,30 @@ public class DartProperties {
 		 * 크론 표현식 (기본: 매일 03:00 KST).
 		 */
 		private String cron = "0 0 3 * * *";
+	}
+
+	@Getter
+	@Setter
+	public static class Http {
+
+		/**
+		 * 연결 타임아웃 (ms).
+		 */
+		private int connectTimeoutMs = 3000;
+
+		/**
+		 * 응답 타임아웃 (ms).
+		 */
+		private int responseTimeoutMs = 10000;
+
+		/**
+		 * 재시도 횟수.
+		 */
+		private int retryCount = 2;
+
+		/**
+		 * 재시도 대기 시간 (ms).
+		 */
+		private int retryBackoffMs = 1000;
 	}
 }

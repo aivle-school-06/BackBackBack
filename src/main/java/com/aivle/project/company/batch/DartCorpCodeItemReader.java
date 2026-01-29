@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.zip.ZipEntry;
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.util.retry.Retry;
 
 /**
  * DART 기업 코드 Reader.
@@ -32,7 +34,7 @@ public class DartCorpCodeItemReader implements ItemStreamReader<DartCorpCodeItem
 private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.BASIC_ISO_DATE;
 
 	private final DartProperties dartProperties;
-	private final WebClient webClient = WebClient.builder().build();
+	private final WebClient dartWebClient;
 
 	private ZipInputStream zipInputStream;
 	private InputStream xmlInputStream;
@@ -46,16 +48,16 @@ private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.BASIC_
 			throw new ItemStreamException("DART_API_KEY가 설정되지 않았습니다.");
 		}
 		try {
-			byte[] zipBytes = webClient.get()
+			DartProperties.Http http = dartProperties.getHttp();
+			byte[] zipBytes = dartWebClient.get()
 				.uri(uriBuilder -> uriBuilder
-					.scheme("https")
-					.host("opendart.fss.or.kr")
 					.path("/api/corpCode.xml")
 					.queryParam("crtfc_key", apiKey)
 					.build())
 				.accept(MediaType.APPLICATION_OCTET_STREAM)
 				.retrieve()
 				.bodyToMono(byte[].class)
+				.retryWhen(Retry.backoff(http.getRetryCount(), Duration.ofMillis(http.getRetryBackoffMs())))
 				.block();
 			if (zipBytes == null || zipBytes.length == 0) {
 				throw new ItemStreamException("DART 기업 코드 ZIP 응답이 비어 있습니다.");
