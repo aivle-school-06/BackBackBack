@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-29 | 작업: 기업 동기화 JDBC 조회 컴파일 오류 수정 | 결과: NamedParameterJdbcTemplate query 모호성 해소 | 이슈: 없음
 - 2026-01-29 | 작업: DART 기업 동기화 운영 가이드 문서화 | 결과: 수동 실행 API/스케줄/환경변수/타임아웃 설정 정리 | 이슈: 없음
 - 2026-01-29 | 작업: DART 기업 동기화 테스트 추가 | 결과: Reader ZIP/XML 파싱 테스트 및 Processor 정규화 테스트 추가 | 이슈: 없음
 - 2026-01-29 | 작업: DART 배치 운영 설정 보강 | 결과: WebClient 타임아웃/재시도 설정, Batch 이력 테이블 마이그레이션 추가 | 이슈: 없음

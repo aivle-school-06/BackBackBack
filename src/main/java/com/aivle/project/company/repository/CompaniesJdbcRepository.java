@@ -29,12 +29,18 @@ public class CompaniesJdbcRepository {
 			return Collections.emptyMap();
 		}
 		MapSqlParameterSource params = new MapSqlParameterSource("codes", corpCodes);
-		Map<String, LocalDate> result = new HashMap<>();
-		namedParameterJdbcTemplate.query(
+		List<CorpModifyDateRow> rows = namedParameterJdbcTemplate.query(
 			"SELECT corp_code, modify_date FROM companies WHERE corp_code IN (:codes)",
 			params,
-			rs -> result.put(rs.getString("corp_code"), toLocalDate(rs.getDate("modify_date")))
+			(rs, rowNum) -> new CorpModifyDateRow(
+				rs.getString("corp_code"),
+				toLocalDate(rs.getDate("modify_date"))
+			)
 		);
+		Map<String, LocalDate> result = new HashMap<>();
+		for (CorpModifyDateRow row : rows) {
+			result.put(row.corpCode(), row.modifyDate());
+		}
 		return result;
 	}
 
@@ -75,5 +81,8 @@ public class CompaniesJdbcRepository {
 
 	private static Date toSqlDate(LocalDate date) {
 		return date == null ? null : Date.valueOf(date);
+	}
+
+	private record CorpModifyDateRow(String corpCode, LocalDate modifyDate) {
 	}
 }
