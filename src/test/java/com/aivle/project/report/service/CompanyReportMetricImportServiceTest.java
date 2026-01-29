@@ -61,8 +61,8 @@ class CompanyReportMetricImportServiceTest {
 			LocalDate.of(2025, 1, 1)
 		));
 		List<CompanyMetricValueCommand> commands = List.of(
-			new CompanyMetricValueCommand("20", "ROA", 0, new BigDecimal("1.23")),
-			new CompanyMetricValueCommand("000020", "ROE", -1, new BigDecimal("2.34"))
+			new CompanyMetricValueCommand("20", "ROA", 0, new BigDecimal("1.23"), 2, 3, "ROA_현재"),
+			new CompanyMetricValueCommand("000020", "ROE", -1, new BigDecimal("2.34"), 2, 7, "ROE_분기-1")
 		);
 
 		// when
@@ -96,9 +96,9 @@ class CompanyReportMetricImportServiceTest {
 			LocalDate.of(2025, 1, 1)
 		));
 		List<CompanyMetricValueCommand> commands = List.of(
-			new CompanyMetricValueCommand("000030", "ROA", 0, new BigDecimal("3.21")),
-			new CompanyMetricValueCommand("000030", "UNKNOWN_METRIC", 0, new BigDecimal("4.56")),
-			new CompanyMetricValueCommand("999999", "ROA", 0, new BigDecimal("7.89"))
+			new CompanyMetricValueCommand("000030", "ROA", 0, new BigDecimal("3.21"), 2, 3, "ROA_현재"),
+			new CompanyMetricValueCommand("000030", "UNKNOWN_METRIC", 0, new BigDecimal("4.56"), 2, 4, "UNK_현재"),
+			new CompanyMetricValueCommand("999999", "ROA", 0, new BigDecimal("7.89"), 3, 3, "ROA_현재")
 		);
 
 		// when

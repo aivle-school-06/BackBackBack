@@ -75,6 +75,7 @@ public class ExcelMetricParser {
 
 				String stockCode = readCellAsString(row.getCell(headerContext.stockCodeIndex), formatter);
 				if (stockCode.isBlank()) {
+					log.info("엑셀 파싱 스킵: 기업코드 없음 (row={})", rowIndex + 1);
 					continue;
 				}
 
@@ -82,12 +83,27 @@ public class ExcelMetricParser {
 					Cell cell = row.getCell(entry.getKey());
 					BigDecimal value = parseNumeric(cell, formatter);
 					HeaderSpec spec = entry.getValue();
+					int excelRow = rowIndex + 1;
+					int excelCol = entry.getKey() + 1;
 					commands.add(new CompanyMetricValueCommand(
 						stockCode,
 						spec.metricCode(),
 						spec.quarterOffset(),
-						value
+						value,
+						excelRow,
+						excelCol,
+						spec.headerName()
 					));
+					log.info(
+						"엑셀 파싱: row={}, col={}, stockCode={}, header={}, metricCode={}, offset={}, value={}",
+						excelRow,
+						excelCol,
+						stockCode,
+						spec.headerName(),
+						spec.metricCode(),
+						spec.quarterOffset(),
+						value
+					);
 				}
 			}
 
@@ -111,6 +127,8 @@ public class ExcelMetricParser {
 			HeaderSpec spec = parseMetricHeader(header);
 			if (spec != null) {
 				metricHeaders.put(cell.getColumnIndex(), spec);
+			} else if (!header.isBlank()) {
+				log.info("엑셀 파싱 스킵: 헤더 매핑 실패 (col={}, header={})", cell.getColumnIndex() + 1, header);
 			}
 		}
 
@@ -140,7 +158,7 @@ public class ExcelMetricParser {
 			return null;
 		}
 
-		return new HeaderSpec(metricCode, offset);
+		return new HeaderSpec(metricCode, offset, header);
 	}
 
 	private Integer parseQuarterOffset(String suffix) {
@@ -184,7 +202,7 @@ public class ExcelMetricParser {
 		}
 	}
 
-	private record HeaderSpec(String metricCode, int quarterOffset) {
+	private record HeaderSpec(String metricCode, int quarterOffset, String headerName) {
 	}
 
 	private record HeaderContext(int stockCodeIndex, Map<Integer, HeaderSpec> metricHeaders) {

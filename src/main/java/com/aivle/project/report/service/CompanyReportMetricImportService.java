@@ -50,6 +50,7 @@ public class CompanyReportMetricImportService {
 			return ReportImportResult.empty();
 		}
 
+		log.info("지표 적재 시작: baseQuarterKey={}, commands={}", baseQuarterKey, commands.size());
 		YearQuarter baseQuarter = QuarterCalculator.parseQuarterKey(baseQuarterKey);
 		QuartersEntity baseQuarterEntity = getOrCreateQuarter(baseQuarterKey, baseQuarter);
 
@@ -80,14 +81,27 @@ public class CompanyReportMetricImportService {
 				String metricCode = normalizeMetricCode(command.metricCode());
 				if (metricCode.isBlank()) {
 					skippedMetrics++;
-					log.info("지표 적재 스킵: metric_code 누락 (stockCode={})", stockCode);
+					log.info(
+						"지표 적재 스킵: metric_code 누락 (stockCode={}, row={}, col={}, header={})",
+						stockCode,
+						command.rowIndex(),
+						command.colIndex(),
+						command.headerName()
+					);
 					continue;
 				}
 
 				MetricsEntity metric = metricCache.computeIfAbsent(metricCode, this::findMetric);
 				if (metric == null) {
 					skippedMetrics++;
-					log.info("지표 적재 스킵: 지표 코드 미존재 (metricCode={}, stockCode={})", metricCode, stockCode);
+					log.info(
+						"지표 적재 스킵: 지표 코드 미존재 (metricCode={}, stockCode={}, row={}, col={}, header={})",
+						metricCode,
+						stockCode,
+						command.rowIndex(),
+						command.colIndex(),
+						command.headerName()
+					);
 					continue;
 				}
 
@@ -97,7 +111,15 @@ public class CompanyReportMetricImportService {
 					key -> getOrCreateQuarter(key, QuarterCalculator.parseQuarterKey(key))
 				);
 
-				seeds.add(new MetricValueSeed(metric, quarter, command.metricValue()));
+				seeds.add(new MetricValueSeed(
+					metric,
+					quarter,
+					command.metricValue(),
+					command.rowIndex(),
+					command.colIndex(),
+					command.headerName(),
+					command.quarterOffset()
+				));
 			}
 
 			if (seeds.isEmpty()) {
@@ -111,7 +133,31 @@ public class CompanyReportMetricImportService {
 
 			CompanyReportVersionsEntity version = createNewVersion(report);
 			List<CompanyReportMetricValuesEntity> values = new ArrayList<>();
+			Map<MetricKey, MetricValueSeed> duplicateCheck = new HashMap<>();
+			int duplicates = 0;
 			for (MetricValueSeed seed : seeds) {
+				MetricKey key = new MetricKey(seed.metric().getId(), seed.quarter().getId(), MetricValueType.ACTUAL);
+				MetricValueSeed existing = duplicateCheck.putIfAbsent(key, seed);
+				if (existing != null) {
+					duplicates++;
+					log.info(
+						"지표 중복 감지: stockCode={}, reportVersionId={}, metricId={}, quarterId={}, valueType={}, " +
+							"existing(row={}, col={}, header={}, offset={}), duplicate(row={}, col={}, header={}, offset={})",
+						stockCode,
+						version.getId(),
+						key.metricId(),
+						key.quarterId(),
+						key.valueType(),
+						existing.rowIndex(),
+						existing.colIndex(),
+						existing.headerName(),
+						existing.quarterOffset(),
+						seed.rowIndex(),
+						seed.colIndex(),
+						seed.headerName(),
+						seed.quarterOffset()
+					);
+				}
 				values.add(CompanyReportMetricValuesEntity.create(
 					version,
 					seed.metric(),
@@ -123,8 +169,19 @@ public class CompanyReportMetricImportService {
 
 			companyReportMetricValuesRepository.saveAll(values);
 			savedValues += values.size();
+			if (duplicates > 0) {
+				log.info("지표 적재 중복 요약: stockCode={}, duplicates={}", stockCode, duplicates);
+			}
 		}
 
+		log.info(
+			"지표 적재 완료: baseQuarterKey={}, total={}, saved={}, skippedCompanies={}, skippedMetrics={}",
+			baseQuarterKey,
+			commands.size(),
+			savedValues,
+			skippedCompanies,
+			skippedMetrics
+		);
 		return new ReportImportResult(commands.size(), savedValues, skippedCompanies, skippedMetrics);
 	}
 
@@ -136,7 +193,13 @@ public class CompanyReportMetricImportService {
 			}
 			String stockCode = normalizeStockCode(command.stockCode());
 			if (stockCode.isBlank()) {
-				log.info("지표 적재 스킵: 기업 코드 누락 (metricCode={})", command.metricCode());
+				log.info(
+					"지표 적재 스킵: 기업 코드 누락 (metricCode={}, row={}, col={}, header={})",
+					command.metricCode(),
+					command.rowIndex(),
+					command.colIndex(),
+					command.headerName()
+				);
 				continue;
 			}
 			grouped.computeIfAbsent(stockCode, key -> new ArrayList<>()).add(command);
@@ -202,7 +265,14 @@ public class CompanyReportMetricImportService {
 	private record MetricValueSeed(
 		MetricsEntity metric,
 		QuartersEntity quarter,
-		java.math.BigDecimal metricValue
+		java.math.BigDecimal metricValue,
+		int rowIndex,
+		int colIndex,
+		String headerName,
+		int quarterOffset
 	) {
+	}
+
+	private record MetricKey(Long metricId, Long quarterId, MetricValueType valueType) {
 	}
 }

@@ -9,6 +9,9 @@ public record CompanyMetricValueCommand(
 	String stockCode,
 	String metricCode,
 	int quarterOffset,
-	BigDecimal metricValue
+	BigDecimal metricValue,
+	int rowIndex,
+	int colIndex,
+	String headerName
 ) {
 }

@@ -30,11 +30,14 @@ class ExcelMetricParserTest {
 					&& "ROA".equals(command.metricCode())
 					&& command.quarterOffset() == 0
 					&& command.metricValue() != null
+					&& command.rowIndex() > 1
+					&& command.colIndex() > 1
 			);
 			assertThat(commands).anyMatch(command ->
 				"20".equals(command.stockCode())
 					&& "OpMargin".equals(command.metricCode())
 					&& command.quarterOffset() == -3
+					&& "매출액영업이익률_분기-3".equals(command.headerName())
 			);
 		}
 	}
