@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-29 | 작업: 엑셀 지표 파서 추가 | 결과: input_demo.xlsx 헤더 매핑 파서 구현 및 테스트 추가 | 이슈: 없음
 - 2026-01-29 | 작업: 보고서 지표 적재 서비스 1단계 | 결과: 보고서/분기 생성 메서드 추가 및 적재 서비스/테스트 구현 | 이슈: 없음
 - 2026-01-29 | 작업: 분기 유틸/리포지토리 추가 | 결과: QuarterCalculator 및 보고서/분기/지표 리포지토리 추가, 분기 계산 테스트 작성 | 이슈: 없음
 - 2026-01-29 | 작업: DART 응답 버퍼 상향 설정 | 결과: WebClient maxInMemorySize 50MB 기본값 및 프로퍼티(dart.api.max-buffer-size) 추가 | 이슈: 없음
