@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-29 | 작업: DART 기업 동기화 배치 스캐폴딩 | 결과: Batch 의존성 추가, DART 설정/배치 Job·Step·Reader/Processor/Writer 스켈레톤 구성, 자동 실행 비활성화 | 이슈: 없음
 - 2026-01-29 | 작업: DART 기업 목록 동기화 요구사항 정리 | 결과: 초기 적재 후 변경분 갱신, 스케줄 기본 OFF, 관리자 API 트리거, DART_API_KEY 확정 | 이슈: 없음
 - 2026-01-29 | 작업: dev MySQL 전환 및 마이그레이션 정리 | 결과: dev datasource를 MySQL로 변경, docker compose에 mysql 추가, H2 마이그레이션 분리(db/migration-h2), metrics 시드 추가 | 이슈: 없음
 - 2026-01-29 | 작업: Auditing 통합 및 테스트 정합 | 결과: BaseEntity에 createdBy/updatedBy 통합, SecurityAuditorAware 추가, userId 클레임 추가 및 엔티티/서비스/테스트 정리 | 이슈: MockBean deprecated 경고 지속
