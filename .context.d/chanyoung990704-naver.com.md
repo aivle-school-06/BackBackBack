@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-29 | 작업: DART 기업 동기화 테스트 추가 | 결과: Reader ZIP/XML 파싱 테스트 및 Processor 정규화 테스트 추가 | 이슈: 없음
 - 2026-01-29 | 작업: DART 배치 운영 설정 보강 | 결과: WebClient 타임아웃/재시도 설정, Batch 이력 테이블 마이그레이션 추가 | 이슈: 없음
 - 2026-01-29 | 작업: DART 기업 동기화 수동 실행/스케줄 구성 | 결과: 관리자 API, Job 실행 서비스, 스케줄러 토글 및 보안 경로 추가 | 이슈: 없음
 - 2026-01-29 | 작업: DART 기업 동기화 Reader/Writer 구현 | 결과: ZIP/XML 파싱 Reader, 변경분 기준 업서트 Writer 및 JDBC 저장소 추가 | 이슈: 없음
