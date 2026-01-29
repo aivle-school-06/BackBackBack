@@ -1,0 +1,765 @@
+openapi: 3.0.3
+info:
+  title: SENTINEL PoC API
+  version: 0.1.0
+servers:
+  - url: /api
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Dashboard
+  - name: Partners
+  - name: Decision
+
+paths:
+  /dashboard/summary:
+    get:
+      tags: [Dashboard]
+      summary: 대시보드 KPI 4종 요약
+      parameters:
+        - $ref: '#/components/parameters/RangeParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseDashboardSummary'
+
+  /dashboard/performance-trend:
+    get:
+      tags: [Dashboard]
+      summary: 파트너 성과 추이(종합 점수) 시계열
+      parameters:
+        - $ref: '#/components/parameters/RangeParam'
+        - in: query
+          name: metric
+          schema:
+            type: string
+            default: overallScore
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseTimeSeries'
+
+  /dashboard/risk-distribution:
+    get:
+      tags: [Dashboard]
+      summary: 위험 분포(도넛)
+      parameters:
+        - $ref: '#/components/parameters/RangeParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseRiskDistribution'
+
+  /partners:
+    get:
+      tags: [Partners]
+      summary: 협력사 목록(검색/필터/페이지)
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: sector
+          schema: { type: string }
+        - in: query
+          name: risk
+          schema:
+            type: string
+            enum: [SAFE, WARN, RISK]
+        - in: query
+          name: page
+          schema: { type: integer, default: 1, minimum: 1 }
+        - in: query
+          name: size
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+        - in: query
+          name: sort
+          schema: { type: string, default: "risk,desc" }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponsePartnerList'
+
+  /partners/{partnerId}:
+    get:
+      tags: [Partners]
+      summary: 협력사 상세(헤더/기본정보)
+      parameters:
+        - $ref: '#/components/parameters/PartnerId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponsePartnerDetail'
+
+  /partners/{partnerId}/kpi-summary:
+    get:
+      tags: [Partners]
+      summary: 협력사 핵심 KPI 카드 3종(tooltip 포함)
+      parameters:
+        - $ref: '#/components/parameters/PartnerId'
+        - $ref: '#/components/parameters/RangeParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponsePartnerKpiSummary'
+
+  /partners/{partnerId}/signals:
+    get:
+      tags: [Partners]
+      summary: 보조 지표 신호등 리스트(tooltip 포함)
+      parameters:
+        - $ref: '#/components/parameters/PartnerId'
+        - $ref: '#/components/parameters/RangeParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponsePartnerSignals'
+
+  /partners/{partnerId}/forecast:
+    get:
+      tags: [Partners]
+      summary: 시계열 건강도 예측 그래프
+      parameters:
+        - $ref: '#/components/parameters/PartnerId'
+        - in: query
+          name: horizon
+          schema:
+            type: string
+            enum: [6m, 12m]
+            default: 6m
+        - in: query
+          name: granularity
+          schema:
+            type: string
+            enum: [month, week]
+            default: month
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseForecast'
+
+  /notices:
+    get:
+      tags: [Decision]
+      summary: 공지사항 목록
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1, minimum: 1 }
+        - in: query
+          name: size
+          schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseNoticeList'
+    post:
+      tags: [Decision]
+      summary: 공지사항 작성(ADMIN)
+      security: [ bearerAuth: [] ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NoticeUpsertRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResponseId' }
+
+  /notices/{noticeId}:
+    get:
+      tags: [Decision]
+      summary: 공지사항 상세
+      parameters:
+        - in: path
+          name: noticeId
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResponseNoticeDetail' }
+    patch:
+      tags: [Decision]
+      summary: 공지사항 수정(ADMIN)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NoticeUpsertRequest' }
+      parameters:
+        - in: path
+          name: noticeId
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResponseId' }
+    delete:
+      tags: [Decision]
+      summary: 공지사항 삭제(ADMIN)
+      parameters:
+        - in: path
+          name: noticeId
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResponseId' }
+
+  /qna:
+    get:
+      tags: [Decision]
+      summary: Q&A 목록
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [OPEN, ANSWERED]
+        - in: query
+          name: page
+          schema: { type: integer, default: 1, minimum: 1 }
+        - in: query
+          name: size
+          schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResponseQnaList' }
+    post:
+      tags: [Decision]
+      summary: Q&A 작성
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QnaCreateRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResponseId' }
+
+  /qna/{qnaId}:
+    get:
+      tags: [Decision]
+      summary: Q&A 상세 + 댓글(답변)
+      parameters:
+        - in: path
+          name: qnaId
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResponseQnaDetail' }
+
+  /qna/{qnaId}/comments:
+    post:
+      tags: [Decision]
+      summary: Q&A 댓글/답변 등록
+      parameters:
+        - in: path
+          name: qnaId
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QnaCommentRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResponseId' }
+
+  /qna/{qnaId}/status:
+    patch:
+      tags: [Decision]
+      summary: Q&A 상태 변경(답변완료 처리, ADMIN)
+      parameters:
+        - in: path
+          name: qnaId
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QnaStatusRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResponseId' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PartnerId:
+      in: path
+      name: partnerId
+      required: true
+      schema: { type: string }
+    RangeParam:
+      in: query
+      name: range
+      required: false
+      schema:
+        type: string
+        enum: [7d, 30d, 90d]
+        default: 30d
+
+  schemas:
+    # ---------- Envelope ----------
+    ApiResponseDashboardSummary:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/DashboardSummaryResponse' }
+        error: { nullable: true }
+    ApiResponseTimeSeries:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/TimeSeriesResponse' }
+        error: { nullable: true }
+    ApiResponseRiskDistribution:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/RiskDistributionResponse' }
+        error: { nullable: true }
+    ApiResponsePartnerList:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/PartnerListResponse' }
+        error: { nullable: true }
+    ApiResponsePartnerDetail:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/PartnerDetailResponse' }
+        error: { nullable: true }
+    ApiResponsePartnerKpiSummary:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/PartnerKpiSummaryResponse' }
+        error: { nullable: true }
+    ApiResponsePartnerSignals:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/PartnerSignalsResponse' }
+        error: { nullable: true }
+    ApiResponseForecast:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/ForecastResponse' }
+        error: { nullable: true }
+    ApiResponseNoticeList:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/NoticeListResponse' }
+        error: { nullable: true }
+    ApiResponseNoticeDetail:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/NoticeDetailResponse' }
+        error: { nullable: true }
+    ApiResponseQnaList:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/QnaListResponse' }
+        error: { nullable: true }
+    ApiResponseQnaDetail:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/QnaDetailResponse' }
+        error: { nullable: true }
+    ApiResponseId:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data:
+          type: object
+          properties:
+            id: { oneOf: [{ type: integer }, { type: string }] }
+        error: { nullable: true }
+
+    # ---------- Common DTO ----------
+    TooltipDto:
+      type: object
+      properties:
+        description: { type: string }
+        interpretation: { type: string, nullable: true }
+        actionHint: { type: string, nullable: true }
+
+    DeltaDto:
+      type: object
+      properties:
+        value: { type: number }
+        unit: { type: string, nullable: true }
+        direction:
+          type: string
+          enum: [UP, DOWN, FLAT]
+        label: { type: string, nullable: true }
+
+    KpiCardDto:
+      type: object
+      properties:
+        key: { type: string }
+        title: { type: string }
+        value: {}
+        unit: { type: string, nullable: true }
+        tone:
+          type: string
+          enum: [DEFAULT, GOOD, WARN, RISK]
+        delta:
+          allOf:
+            - $ref: '#/components/schemas/DeltaDto'
+          nullable: true
+        badge:
+          type: object
+          nullable: true
+          properties:
+            label: { type: string }
+            subLabel: { type: string, nullable: true }
+        tooltip:
+          allOf:
+            - $ref: '#/components/schemas/TooltipDto'
+          nullable: true
+
+    SectorDto:
+      type: object
+      properties:
+        key: { type: string }
+        label: { type: string }
+
+    UserRefDto:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        role:
+          type: string
+          nullable: true
+          enum: [USER, ADMIN]
+
+    # ---------- Dashboard ----------
+    DashboardSummaryResponse:
+      type: object
+      properties:
+        range: { type: string, example: "30d" }
+        kpis:
+          type: array
+          items: { $ref: '#/components/schemas/KpiCardDto' }
+
+    TimeSeriesPoint:
+      type: object
+      properties:
+        x: { type: string, description: ISO date or label }
+        y: { type: number }
+
+    TimeSeriesSeries:
+      type: object
+      properties:
+        name: { type: string }
+        points:
+          type: array
+          items: { $ref: '#/components/schemas/TimeSeriesPoint' }
+
+    TimeSeriesResponse:
+      type: object
+      properties:
+        range: { type: string }
+        metric: { type: string }
+        series:
+          type: array
+          items: { $ref: '#/components/schemas/TimeSeriesSeries' }
+
+    RiskSegment:
+      type: object
+      properties:
+        key: { type: string, enum: [SAFE, WARN, RISK] }
+        label: { type: string }
+        count: { type: integer }
+        ratio: { type: number, description: 0~1 }
+
+    RiskDistributionResponse:
+      type: object
+      properties:
+        range: { type: string }
+        segments:
+          type: array
+          items: { $ref: '#/components/schemas/RiskSegment' }
+        summary:
+          type: object
+          properties:
+            avgRiskLevel: { type: string, enum: [LOW, MID, HIGH] }
+            topSector:
+              $ref: '#/components/schemas/SectorDto'
+
+    # ---------- Partners ----------
+    PartnerKpiMini:
+      type: object
+      properties:
+        networkHealth: { type: number }
+        annualRevenue: { type: number }
+        contractProgress: { type: number }
+
+    PartnerListItem:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        sector: { $ref: '#/components/schemas/SectorDto' }
+        overallScore: { type: number }
+        riskLevel: { type: string, enum: [SAFE, WARN, RISK] }
+        lastUpdatedAt: { type: string }
+        kpi: { $ref: '#/components/schemas/PartnerKpiMini' }
+
+    PartnerListResponse:
+      type: object
+      properties:
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/PartnerListItem' }
+
+    PartnerDetailResponse:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        sector: { $ref: '#/components/schemas/SectorDto' }
+        overallScore: { type: number }
+        riskLevel: { type: string, enum: [SAFE, WARN, RISK] }
+        tags:
+          type: array
+          items: { type: string }
+        updatedAt: { type: string }
+
+    PartnerKpiSummaryResponse:
+      type: object
+      properties:
+        partnerId: { type: string }
+        range: { type: string }
+        kpis:
+          type: array
+          items: { $ref: '#/components/schemas/KpiCardDto' }
+
+    SignalItem:
+      type: object
+      properties:
+        key: { type: string }
+        label: { type: string }
+        status: { type: string, enum: [GOOD, WARN, RISK] }
+        value: { type: number, nullable: true }
+        unit: { type: string, nullable: true }
+        tooltip: { $ref: '#/components/schemas/TooltipDto' }
+
+    PartnerSignalsResponse:
+      type: object
+      properties:
+        partnerId: { type: string }
+        range: { type: string }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/SignalItem' }
+
+    ForecastPoint:
+      type: object
+      properties:
+        x: { type: string }
+        y: { type: number }
+        type: { type: string, enum: [ACTUAL, PRED] }
+
+    ForecastResponse:
+      type: object
+      properties:
+        partnerId: { type: string }
+        horizon: { type: string }
+        series:
+          type: array
+          items: { $ref: '#/components/schemas/ForecastPoint' }
+        modelInfo:
+          type: object
+          properties:
+            name: { type: string }
+            updatedAt: { type: string }
+
+    # ---------- Decision Room ----------
+    NoticeUpsertRequest:
+      type: object
+      required: [title, content]
+      properties:
+        title: { type: string }
+        content: { type: string }
+        pinned: { type: boolean, default: false }
+
+    NoticeListItem:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        pinned: { type: boolean }
+        createdAt: { type: string }
+        author: { $ref: '#/components/schemas/UserRefDto' }
+
+    NoticeListResponse:
+      type: object
+      properties:
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/NoticeListItem' }
+
+    NoticeDetailResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        content: { type: string }
+        pinned: { type: boolean }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+        author: { $ref: '#/components/schemas/UserRefDto' }
+
+    QnaCreateRequest:
+      type: object
+      required: [title, content]
+      properties:
+        title: { type: string }
+        content: { type: string }
+        partnerId: { type: string, nullable: true }
+
+    QnaCommentRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string }
+
+    QnaStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [OPEN, ANSWERED] }
+
+    QnaListItem:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        status: { type: string, enum: [OPEN, ANSWERED] }
+        commentCount: { type: integer }
+        createdAt: { type: string }
+        author: { $ref: '#/components/schemas/UserRefDto' }
+
+    QnaListResponse:
+      type: object
+      properties:
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/QnaListItem' }
+
+    QnaComment:
+      type: object
+      properties:
+        id: { type: integer }
+        content: { type: string }
+        createdAt: { type: string }
+        author: { $ref: '#/components/schemas/UserRefDto' }
+
+    PartnerRef:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+
+    QnaDetailResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        content: { type: string }
+        status: { type: string, enum: [OPEN, ANSWERED] }
+        partner: { $ref: '#/components/schemas/PartnerRef' }
+        createdAt: { type: string }
+        author: { $ref: '#/components/schemas/UserRefDto' }
+        comments:
+          type: array
+          items: { $ref: '#/components/schemas/QnaComment' }

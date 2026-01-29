@@ -16,6 +16,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,8 +49,8 @@ public class PostsEntity extends BaseEntity {
 	@Column(name = "content", nullable = false, columnDefinition = "LONGTEXT")
 	private String content;
 
-	@Column(name = "view_count", nullable = false)
-	private int viewCount = 0;
+	@OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
+	private PostViewCountsEntity viewCountEntity;
 
 	@Column(name = "is_pinned", nullable = false)
 	private boolean isPinned = false;
@@ -57,12 +58,6 @@ public class PostsEntity extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 20)
 	private PostStatus status = PostStatus.PUBLISHED;
-
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
 
 	@PrePersist
 	private void prePersist() {
@@ -80,8 +75,7 @@ public class PostsEntity extends BaseEntity {
 		String title,
 		String content,
 		boolean isPinned,
-		PostStatus status,
-		Long actorId
+		PostStatus status
 	) {
 		PostsEntity post = new PostsEntity();
 		post.user = user;
@@ -90,26 +84,29 @@ public class PostsEntity extends BaseEntity {
 		post.content = content;
 		post.isPinned = isPinned;
 		post.status = status != null ? status : PostStatus.PUBLISHED;
-		post.createdBy = actorId;
-		post.updatedBy = actorId;
 		return post;
 	}
 
 	/**
 	 * 게시글 수정.
 	 */
-	public void update(String title, String content, CategoriesEntity category, Long actorId) {
+	public void update(String title, String content, CategoriesEntity category) {
 		this.title = title;
 		this.content = content;
 		this.category = category;
-		this.updatedBy = actorId;
 	}
 
 	/**
 	 * 게시글 소프트 삭제.
 	 */
-	public void markDeleted(Long actorId) {
+	public void markDeleted() {
 		delete();
-		this.updatedBy = actorId;
+	}
+
+	/**
+	 * 조회수 조회 (없으면 0 반환).
+	 */
+	public int getViewCount() {
+		return viewCountEntity != null ? viewCountEntity.getViewCount() : 0;
 	}
 }

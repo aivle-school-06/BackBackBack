@@ -3,10 +3,13 @@ package com.aivle.project.file.service;
 import com.aivle.project.common.error.CommonErrorCode;
 import com.aivle.project.common.error.CommonException;
 import com.aivle.project.file.dto.FileResponse;
+import com.aivle.project.file.entity.FileUsageType;
 import com.aivle.project.file.entity.FilesEntity;
+import com.aivle.project.file.entity.PostFilesEntity;
 import com.aivle.project.file.exception.FileErrorCode;
 import com.aivle.project.file.exception.FileException;
 import com.aivle.project.file.repository.FilesRepository;
+import com.aivle.project.file.repository.PostFilesRepository;
 import com.aivle.project.file.storage.FileStorageService;
 import com.aivle.project.file.storage.StoredFile;
 import com.aivle.project.file.validator.FileValidator;
@@ -31,6 +34,7 @@ public class FileService {
 	private final FileStorageService fileStorageService;
 	private final FileValidator fileValidator;
 	private final FilesRepository filesRepository;
+	private final PostFilesRepository postFilesRepository;
 	private final PostsRepository postsRepository;
 
 	public List<FileResponse> upload(Long postId, UserEntity user, List<MultipartFile> files) {
@@ -45,15 +49,15 @@ public class FileService {
 		for (MultipartFile file : files) {
 			StoredFile stored = fileStorageService.store(file, keyPrefix);
 			FilesEntity entity = FilesEntity.create(
-				post,
+				FileUsageType.POST_ATTACHMENT,
 				stored.storageUrl(),
 				stored.originalFilename(),
 				stored.fileSize(),
-				stored.contentType(),
-				userId
+				stored.contentType()
 			);
 			FilesEntity saved = filesRepository.save(entity);
-			responses.add(FileResponse.from(saved));
+			postFilesRepository.save(PostFilesEntity.create(post, saved));
+			responses.add(FileResponse.from(post.getId(), saved));
 		}
 
 		return responses;
@@ -64,20 +68,21 @@ public class FileService {
 		PostsEntity post = findPost(postId);
 		Long userId = requireUserId(user);
 		validateOwner(post, userId);
-		return filesRepository.findAllByPostIdAndDeletedAtIsNullOrderByCreatedAtAsc(postId).stream()
-			.map(FileResponse::from)
+		return postFilesRepository.findAllActiveByPostIdOrderByCreatedAtAsc(postId).stream()
+			.map(mapping -> FileResponse.from(postId, mapping.getFile()))
 			.toList();
 	}
 
 	@Transactional(readOnly = true)
 	public FilesEntity getFile(Long fileId, UserEntity user) {
-		FilesEntity file = filesRepository.findById(fileId)
+		PostFilesEntity mapping = postFilesRepository.findByFileId(fileId)
 			.orElseThrow(() -> new FileException(FileErrorCode.FILE_404_NOT_FOUND));
+		FilesEntity file = mapping.getFile();
 		if (file.isDeleted()) {
 			throw new FileException(FileErrorCode.FILE_404_NOT_FOUND);
 		}
 		Long userId = requireUserId(user);
-		validateOwner(file.getPost(), userId);
+		validateOwner(mapping.getPost(), userId);
 		return file;
 	}
 

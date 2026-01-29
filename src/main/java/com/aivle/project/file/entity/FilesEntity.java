@@ -1,15 +1,13 @@
 package com.aivle.project.file.entity;
 
 import com.aivle.project.common.entity.BaseEntity;
-import com.aivle.project.post.entity.PostsEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,9 +26,9 @@ public class FilesEntity extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "post_id", nullable = false)
-	private PostsEntity post;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "usage_type", nullable = false, length = 20)
+	private FileUsageType usageType;
 
 	@Column(name = "storage_url", nullable = false, length = 500)
 	private String storageUrl;
@@ -44,28 +42,19 @@ public class FilesEntity extends BaseEntity {
 	@Column(name = "content_type", nullable = false, length = 100)
 	private String contentType;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
-
 	public static FilesEntity create(
-		PostsEntity post,
+		FileUsageType usageType,
 		String storageUrl,
 		String originalFilename,
 		long fileSize,
-		String contentType,
-		Long actorId
+		String contentType
 	) {
 		FilesEntity file = new FilesEntity();
-		file.post = post;
+		file.usageType = usageType;
 		file.storageUrl = storageUrl;
 		file.originalFilename = originalFilename;
 		file.fileSize = fileSize;
 		file.contentType = contentType;
-		file.createdBy = actorId;
-		file.updatedBy = actorId;
 		return file;
 	}
 }

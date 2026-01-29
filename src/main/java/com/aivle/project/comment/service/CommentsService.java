@@ -58,8 +58,7 @@ public class CommentsService {
 			parent,
 			request.getContent().trim(),
 			depth,
-			sequence,
-			userId
+			sequence
 		);
 
 		CommentsEntity saved = commentsRepository.save(comment);
@@ -71,7 +70,7 @@ public class CommentsService {
 		CommentsEntity comment = findComment(commentId);
 		validateOwner(comment, userId);
 
-		comment.update(request.getContent().trim(), userId);
+		comment.update(request.getContent().trim());
 		return CommentResponse.from(comment);
 	}
 
@@ -79,7 +78,7 @@ public class CommentsService {
 		validateUserId(userId);
 		CommentsEntity comment = findComment(commentId);
 		validateOwner(comment, userId);
-		comment.markDeleted(userId);
+		comment.markDeleted();
 	}
 
 	private CommentsEntity findComment(Long commentId) {

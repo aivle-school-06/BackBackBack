@@ -24,10 +24,10 @@ public record FileResponse(
 	@Schema(description = "업로드 일시", example = "2026-01-25T12:34:56")
 	LocalDateTime createdAt
 ) {
-	public static FileResponse from(FilesEntity entity) {
+	public static FileResponse from(Long postId, FilesEntity entity) {
 		return new FileResponse(
 			entity.getId(),
-			entity.getPost().getId(),
+			postId,
 			entity.getStorageUrl(),
 			entity.getOriginalFilename(),
 			entity.getFileSize(),

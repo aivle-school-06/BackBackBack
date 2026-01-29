@@ -24,8 +24,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 class JwtTokenServiceTest {
 
 	@Test
-	@DisplayName("Access Token 생성: ROLE_ 접두사 제거 및 Claims(email, deviceId 등) 설정 검증")
-	void createAccessToken_shouldStripRolePrefixAndSetClaims() {
+	@DisplayName("Access Token 생성: ROLE_ 포함 권한과 Claims(email, deviceId 등) 설정 검증")
+	void createAccessToken_shouldIncludeRolePrefixAndSetClaims() {
 		// Given: 테스트를 위한 속성 및 Mock 설정
 		JwtProperties properties = new JwtProperties();
 		properties.setIssuer("project-local");
@@ -40,6 +40,7 @@ class JwtTokenServiceTest {
 		// UserDetails Mock 설정
 		CustomUserDetails userDetails = mock(CustomUserDetails.class);
 		UUID uuid = UUID.randomUUID();
+		when(userDetails.getId()).thenReturn(1L);
 		when(userDetails.getUuid()).thenReturn(uuid);
 		when(userDetails.getUsername()).thenReturn("user@example.com");
 
@@ -60,12 +61,13 @@ class JwtTokenServiceTest {
 		// Issuer("iss") 검증 - 편의 메서드 대신 Claims Map에서 직접 조회하여 검증
 		assertThat(claims.getClaims().get("iss")).isEqualTo("project-local");
 		assertThat(claims.getSubject()).isEqualTo(uuid.toString());
+		assertThat(claims.getClaims().get("userId")).isEqualTo(1L);
 		assertThat(claims.getClaims().get("email")).isEqualTo("user@example.com");
 
-		// 권한 목록에서 'ROLE_' 접두사가 제거되었는지 확인
+		// 권한 목록에서 ROLE_ 접두사가 유지되는지 확인
 		@SuppressWarnings("unchecked")
 		List<String> roles = (List<String>) claims.getClaims().get("roles");
-		assertThat(roles).containsExactlyInAnyOrder("USER", "ADMIN");
+		assertThat(roles).containsExactlyInAnyOrder("ROLE_USER", "ROLE_ADMIN");
 
 		assertThat(claims.getClaims().get("deviceId")).isEqualTo("device-1");
 		assertThat(encoder.getHeader().getKeyId()).isEqualTo("kid-1");

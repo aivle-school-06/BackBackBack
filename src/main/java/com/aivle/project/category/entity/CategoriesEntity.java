@@ -36,12 +36,6 @@ public class CategoriesEntity extends BaseEntity {
 	@Column(name = "is_active", nullable = false)
 	private boolean isActive = true;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
-
 	/**
 	 * 카테고리 생성.
 	 */
@@ -49,16 +43,13 @@ public class CategoriesEntity extends BaseEntity {
 		String name,
 		String description,
 		int sortOrder,
-		boolean isActive,
-		Long actorId
+		boolean isActive
 	) {
 		CategoriesEntity category = new CategoriesEntity();
 		category.name = name;
 		category.description = description;
 		category.sortOrder = sortOrder;
 		category.isActive = isActive;
-		category.createdBy = actorId;
-		category.updatedBy = actorId;
 		return category;
 	}
 }

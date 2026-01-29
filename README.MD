@@ -32,3 +32,7 @@ export H2_CONSOLE_PATH=/h2-console
 
 ./gradlew bootRun
 ```
+
+## ERD / DB 스키마
+- 현재 적용된 ERD 요약: `ERD.md`
+- DDL 원본(Flyway): `src/main/resources/db/migration/V1__init.sql`

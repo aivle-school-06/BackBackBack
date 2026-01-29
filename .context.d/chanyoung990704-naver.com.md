@@ -6,6 +6,15 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-29 | 작업: Auditing 통합 및 테스트 정합 | 결과: BaseEntity에 createdBy/updatedBy 통합, SecurityAuditorAware 추가, userId 클레임 추가 및 엔티티/서비스/테스트 정리 | 이슈: MockBean deprecated 경고 지속
+- 2026-01-28 | 작업: dev Auth Console 호환성 보강 | 결과: /auth/logout, /auth/logout-all 미구현 시 안내 및 버튼 비활성화 처리 | 이슈: 없음
+- 2026-01-28 | 작업: ERD 문서 정리 | 결과: ERD.md 추가 및 README에 스키마 안내 섹션 추가 | 이슈: 없음
+- 2026-01-28 | 작업: UserRoleRepository 컴파일 오류 수정 | 결과: 잘못된 \\t 문자 제거로 빌드 복구, 전체 테스트 통과 | 이슈: 없음
+- 2026-01-28 | 작업: 파일/인증 테스트 정합화 | 결과: session 키 변경 및 post_files 매핑 기반 조회로 통합 테스트 보정, 테스트 설정에 TestSecurityConfig 적용 | 이슈: 없음
+- 2026-01-28 | 작업: H2 마이그레이션/테스트 프로파일 정리 | 결과: H2 전용 Flyway 스키마 추가, dev/test DB URL 및 Flyway 경로 정비, CompaniesEntity CHAR 컬럼 정합 | 이슈: 없음
+- 2026-01-28 | 작업: 테스트 실패 원인 수정(카테고리 중복/테스트 JWT 키) | 결과: CommentIntegrationTest 카테고리 이름 고유화, EmailVerificationServiceTest에 TestSecurityConfig 적용 | 이슈: MockBean deprecated 경고 확인
+- 2026-01-28 | 작업: Flyway 도입 + ERD 정합화 1~2단계 | 결과: V1 초기 마이그레이션/ddl-auto validate 적용, ROLE_ 통일/refresh_tokens·files·조회수 분리 및 신규 엔티티 추가, 테스트 보정 | 이슈: 없음
+- 2026-01-28 | 작업: SENTINEL PoC OpenAPI 스펙 Swagger UI 연결 | 결과: 정적 YAML 제공 및 Swagger UI 다중 문서 목록 추가 | 이슈: 없음
 - 2026-01-27 | 작업: SecurityConfig 정적 리소스 허용 및 CSP 헤더 추가 | 결과: favicon/정적 경로 permitAll, Turnstile 도메인 포함 CSP를 Report-Only로 설정 | 이슈: 없음
 - 2026-01-27 | 작업: Turnstile 디버그 로그 강화 | 결과: 검증 요청/응답 상세 로그 추가 및 dev에서 debug 활성화 | 이슈: 없음
 - 2026-01-27 | 작업: dev Turnstile 콘솔/회원가입 위젯 추가 및 검증 API 연결 | 결과: auth/turnstile 콘솔에서 토큰 발급·검증·회원가입까지 확인 가능, dev 키 기본값 제거 | 이슈: 없음

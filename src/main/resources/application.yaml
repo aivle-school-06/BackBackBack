@@ -12,6 +12,8 @@ spring:
         format_sql: true # SQL 쿼리 포맷팅 (개발 환경에서 유용)
         highlight_sql: true # SQL 쿼리 하이라이팅 (개발 환경에서 유용)
     show-sql: true # 콘솔에 SQL 쿼리 출력 (개발 환경에서 유용)
+  flyway:
+    enabled: true
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -41,6 +43,12 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     customCssUrl: /swagger-ui/custom.css
+    urls:
+      - name: project
+        url: /api-docs
+      - name: sentinel-poc
+        url: /openapi/SENTINEL_PoC_API.yaml
+    urlsPrimaryName: project
 
 app:
   api:

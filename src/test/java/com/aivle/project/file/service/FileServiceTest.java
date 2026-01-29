@@ -14,6 +14,7 @@ import com.aivle.project.common.error.CommonException;
 import com.aivle.project.file.dto.FileResponse;
 import com.aivle.project.file.entity.FilesEntity;
 import com.aivle.project.file.repository.FilesRepository;
+import com.aivle.project.file.repository.PostFilesRepository;
 import com.aivle.project.file.storage.FileStorageService;
 import com.aivle.project.file.storage.StoredFile;
 import com.aivle.project.file.validator.FileValidator;
@@ -51,6 +52,9 @@ class FileServiceTest {
 	private FilesRepository filesRepository;
 
 	@Mock
+	private PostFilesRepository postFilesRepository;
+
+	@Mock
 	private PostsRepository postsRepository;
 
 	@Test
@@ -86,6 +90,7 @@ class FileServiceTest {
 			ReflectionTestUtils.setField(entity, "id", sequence.getAndIncrement());
 			return entity;
 		});
+		given(postFilesRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
 
 		// when
 		List<FileResponse> responses = fileService.upload(postId, user, files);
@@ -116,7 +121,7 @@ class FileServiceTest {
 		// when & then
 		assertThatThrownBy(() -> fileService.upload(postId, other, files))
 			.isInstanceOf(CommonException.class);
-		verifyNoInteractions(fileValidator, fileStorageService, filesRepository);
+		verifyNoInteractions(fileValidator, fileStorageService, filesRepository, postFilesRepository);
 	}
 
 	@Test
@@ -134,7 +139,7 @@ class FileServiceTest {
 		// when & then
 		assertThatThrownBy(() -> fileService.upload(postId, user, files))
 			.isInstanceOf(CommonException.class);
-		verifyNoInteractions(fileValidator, fileStorageService, filesRepository);
+		verifyNoInteractions(fileValidator, fileStorageService, filesRepository, postFilesRepository);
 	}
 
 	private UserEntity newUser(Long id, UUID uuid) {

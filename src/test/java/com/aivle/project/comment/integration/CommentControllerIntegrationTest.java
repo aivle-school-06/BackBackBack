@@ -191,7 +191,7 @@ class CommentControllerIntegrationTest {
 	}
 
 	private PostsEntity persistPost(UserEntity user, CategoriesEntity category, String title, String content) {
-		PostsEntity post = PostsEntity.create(user, category, title, content, false, PostStatus.PUBLISHED, user.getId());
+		PostsEntity post = PostsEntity.create(user, category, title, content, false, PostStatus.PUBLISHED);
 		entityManager.persist(post);
 		entityManager.flush();
 		return post;

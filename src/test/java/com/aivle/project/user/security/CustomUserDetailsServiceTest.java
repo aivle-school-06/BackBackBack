@@ -51,7 +51,7 @@ class CustomUserDetailsServiceTest {
 		UserEntity user = createUser(email, UserStatus.ACTIVE);
 		userRepository.save(user);
 
-		RoleEntity role = new RoleEntity(RoleName.USER, "user role");
+		RoleEntity role = new RoleEntity(RoleName.ROLE_USER, "user role");
 		entityManager.persist(role);
 
 		userRoleRepository.save(new UserRoleEntity(user, role));

@@ -44,7 +44,7 @@ public class CustomUserDetails implements UserDetails {
 	public static CustomUserDetails from(UserEntity user, Collection<RoleName> roles) {
 		List<GrantedAuthority> authorities = roles.stream()
 			.distinct()
-			.<GrantedAuthority>map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+			.<GrantedAuthority>map(role -> new SimpleGrantedAuthority(role.name()))
 			.toList();
 
 		return new CustomUserDetails(

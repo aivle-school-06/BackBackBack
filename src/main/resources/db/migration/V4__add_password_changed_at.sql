@@ -1,2 +1,1 @@
-ALTER TABLE users ADD COLUMN password_changed_at DATETIME;
-UPDATE users SET password_changed_at = created_at WHERE password_changed_at IS NULL;
+-- no-op: V1__init.sql에 통합되었습니다.

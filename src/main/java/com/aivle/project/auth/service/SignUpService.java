@@ -56,20 +56,20 @@ public class SignUpService {
 			encodedPassword,
 			request.getName(),
 			request.getPhone(),
-			RoleName.USER
+			RoleName.ROLE_USER
 		);
 
 		if (skipEmailVerification) {
 			userDomainService.activateUser(user.getId());
 			user.setStatus(UserStatus.ACTIVE);
 			log.info("Signup successful for email: {}, email verification skipped", request.getEmail());
-			return authMapper.toSignupResponse(user, RoleName.USER);
+			return authMapper.toSignupResponse(user, RoleName.ROLE_USER);
 		}
 
 		// 이메일 인증 토큰 생성 및 전송
 		emailVerificationService.sendVerificationEmail(user, request.getEmail());
 
 		log.info("Signup successful for email: {}, awaiting email verification", request.getEmail());
-		return authMapper.toSignupResponse(user, RoleName.USER);
+		return authMapper.toSignupResponse(user, RoleName.ROLE_USER);
 	}
 }

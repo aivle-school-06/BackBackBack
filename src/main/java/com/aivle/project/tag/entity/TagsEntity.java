@@ -27,9 +27,4 @@ public class TagsEntity extends BaseEntity {
 	@Column(name = "name", nullable = false, length = 50)
 	private String name;
 
-	@Column(name = "created_by")
-	private Long createdBy;
-
-	@Column(name = "updated_by")
-	private Long updatedBy;
 }

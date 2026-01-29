@@ -48,8 +48,7 @@ public class RefreshTokenService {
 
 		RefreshTokenCache cache = new RefreshTokenCache(
 			refreshToken,
-			userDetails.getUuid().toString(),
-			userDetails.getUsername(),
+			userDetails.getId(),
 			normalizedDeviceId,
 			deviceInfo,
 			ipAddress,
@@ -115,7 +114,7 @@ public class RefreshTokenService {
 	}
 
 	private RefreshTokenCache loadFromDatabase(String refreshToken) {
-		RefreshTokenEntity entity = refreshTokenRepository.findByToken(refreshToken)
+		RefreshTokenEntity entity = refreshTokenRepository.findByTokenValue(refreshToken)
 			.orElseThrow(() -> new AuthException(AuthErrorCode.INVALID_REFRESH_TOKEN));
 		if (entity.isRevoked()) {
 			throw new AuthException(AuthErrorCode.INVALID_REFRESH_TOKEN);
@@ -127,36 +126,29 @@ public class RefreshTokenService {
 
 		long issuedAt = toEpochSeconds(entity.getCreatedAt());
 		long expiresAtEpoch = toEpochSeconds(entity.getExpiresAt());
-		long lastUsedAt = entity.getLastUsedAt() != null
-			? toEpochSeconds(entity.getLastUsedAt())
-			: issuedAt;
-
-		entity.updateLastUsedAt();
-		refreshTokenRepository.save(entity);
 
 		RefreshTokenCache cache = new RefreshTokenCache(
-			entity.getToken(),
+			entity.getTokenValue(),
 			entity.getUserId(),
-			entity.getEmail(),
-			entity.getDeviceId(),
+			DEFAULT_DEVICE_ID,
 			entity.getDeviceInfo(),
 			entity.getIpAddress(),
 			issuedAt,
 			expiresAtEpoch,
-			lastUsedAt
+			issuedAt
 		);
 		storeRedis(cache);
 		storeSession(cache.userId(), cache.token());
 		return cache;
 	}
 
-	private void revokeRedis(String refreshToken, String userId) {
+	private void revokeRedis(String refreshToken, Long userId) {
 		redisTemplate.delete(redisKey(refreshToken));
 		redisTemplate.opsForSet().remove(sessionKey(userId), refreshToken);
 	}
 
 	private void revokeEntity(String refreshToken) {
-		refreshTokenRepository.findByToken(refreshToken).ifPresent(entity -> {
+		refreshTokenRepository.findByTokenValue(refreshToken).ifPresent(entity -> {
 			entity.revoke();
 			refreshTokenRepository.save(entity);
 		});
@@ -165,10 +157,8 @@ public class RefreshTokenService {
 	private void storeEntity(RefreshTokenCache cache) {
 		LocalDateTime expiresAt = LocalDateTime.ofInstant(Instant.ofEpochSecond(cache.expiresAt()), ZoneOffset.UTC);
 		RefreshTokenEntity entity = new RefreshTokenEntity(
-			cache.token(),
 			cache.userId(),
-			cache.email(),
-			cache.deviceId(),
+			cache.token(),
 			cache.deviceInfo(),
 			cache.ipAddress(),
 			expiresAt
@@ -176,7 +166,7 @@ public class RefreshTokenService {
 		refreshTokenRepository.save(entity);
 	}
 
-	private void storeSession(String userId, String refreshToken) {
+	private void storeSession(Long userId, String refreshToken) {
 		redisTemplate.opsForSet().add(sessionKey(userId), refreshToken);
 	}
 
@@ -184,8 +174,8 @@ public class RefreshTokenService {
 		return String.format(REFRESH_TOKEN_KEY, refreshToken);
 	}
 
-	private String sessionKey(String userId) {
-		return String.format(SESSION_KEY, userId);
+	private String sessionKey(Long userId) {
+		return String.format(SESSION_KEY, String.valueOf(userId));
 	}
 
 	private String normalizeDeviceId(String deviceId) {

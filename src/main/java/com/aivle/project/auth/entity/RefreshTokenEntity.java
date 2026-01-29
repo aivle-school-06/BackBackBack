@@ -1,6 +1,5 @@
 package com.aivle.project.auth.entity;
 
-import com.aivle.project.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +10,8 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * refresh_tokens 테이블 엔티티.
@@ -19,25 +20,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "refresh_tokens")
-public class RefreshTokenEntity extends BaseEntity {
+public class RefreshTokenEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "token", nullable = false, length = 500, unique = true)
-	private String token;
+	@Column(name = "user_id", nullable = false)
+	private Long userId;
 
-	@Column(name = "user_id", nullable = false, length = 36)
-	private String userId;
+	@Column(name = "token_value", nullable = false, length = 512, unique = true)
+	private String tokenValue;
 
-	@Column(name = "email", nullable = false, length = 100)
-	private String email;
-
-	@Column(name = "device_id", nullable = false, length = 100)
-	private String deviceId;
-
-	@Column(name = "device_info", length = 200)
+	@Column(name = "device_info", length = 500)
 	private String deviceInfo;
 
 	@Column(name = "ip_address", length = 45)
@@ -46,33 +41,30 @@ public class RefreshTokenEntity extends BaseEntity {
 	@Column(name = "expires_at", nullable = false)
 	private LocalDateTime expiresAt;
 
-	@Column(name = "revoked", nullable = false)
+	@Column(name = "is_revoked", nullable = false)
 	private boolean revoked;
 
-	@Column(name = "revoked_at")
-	private LocalDateTime revokedAt;
+	@CreationTimestamp
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 
-	@Column(name = "last_used_at")
-	private LocalDateTime lastUsedAt;
+	@UpdateTimestamp
+	@Column(name = "updated_at", nullable = false)
+	private LocalDateTime updatedAt;
 
 	public RefreshTokenEntity(
-		String token,
-		String userId,
-		String email,
-		String deviceId,
+		Long userId,
+		String tokenValue,
 		String deviceInfo,
 		String ipAddress,
 		LocalDateTime expiresAt
 	) {
-		this.token = token;
 		this.userId = userId;
-		this.email = email;
-		this.deviceId = deviceId;
+		this.tokenValue = tokenValue;
 		this.deviceInfo = deviceInfo;
 		this.ipAddress = ipAddress;
 		this.expiresAt = expiresAt;
 		this.revoked = false;
-		this.lastUsedAt = LocalDateTime.now();
 	}
 
 	public void revoke() {
@@ -80,10 +72,5 @@ public class RefreshTokenEntity extends BaseEntity {
 			return;
 		}
 		revoked = true;
-		revokedAt = LocalDateTime.now();
-	}
-
-	public void updateLastUsedAt() {
-		lastUsedAt = LocalDateTime.now();
 	}
 }

@@ -41,7 +41,7 @@ class CommentIntegrationTest {
 		// given: 사용자/카테고리/게시글을 준비
 		UserEntity writer = persistUser("writer@test.com", "작성자");
 		UserEntity commenter = persistUser("commenter@test.com", "댓글러");
-		CategoriesEntity category = persistCategory("자유게시판");
+		CategoriesEntity category = persistCategory("자유게시판-통합-테스트");
 		PostsEntity post = persistPost(writer, category, "통합 테스트 제목", "내용입니다");
 
 		// when: 댓글과 대댓글을 작성
@@ -78,7 +78,7 @@ class CommentIntegrationTest {
 		// given: 사용자/카테고리/게시글을 준비
 		UserEntity writer = persistUser("writer-multi@test.com", "작성자");
 		UserEntity commenter = persistUser("commenter-multi@test.com", "댓글러");
-		CategoriesEntity category = persistCategory("자유게시판");
+		CategoriesEntity category = persistCategory("자유게시판-다중-테스트");
 		PostsEntity post = persistPost(writer, category, "다중 대댓글", "내용입니다");
 
 		CommentCreateRequest parentRequest = new CommentCreateRequest();
@@ -131,8 +131,7 @@ class CommentIntegrationTest {
 			title,
 			content,
 			false,
-			PostStatus.PUBLISHED,
-			user.getId()
+			PostStatus.PUBLISHED
 		);
 		entityManager.persist(post);
 		entityManager.flush();

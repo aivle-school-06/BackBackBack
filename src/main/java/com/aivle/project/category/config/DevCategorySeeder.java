@@ -26,10 +26,10 @@ public class DevCategorySeeder implements ApplicationRunner {
 		}
 
 		List<CategoriesEntity> categories = List.of(
-			CategoriesEntity.create("자유게시판", "자유롭게 이야기해요", 1, true, null),
-			CategoriesEntity.create("공지사항", "서비스 공지와 업데이트", 2, true, null),
-			CategoriesEntity.create("Q&A", "질문과 답변을 공유해요", 3, true, null),
-			CategoriesEntity.create("후기", "사용 경험을 나눠요", 4, true, null)
+			CategoriesEntity.create("자유게시판", "자유롭게 이야기해요", 1, true),
+			CategoriesEntity.create("공지사항", "서비스 공지와 업데이트", 2, true),
+			CategoriesEntity.create("Q&A", "질문과 답변을 공유해요", 3, true),
+			CategoriesEntity.create("후기", "사용 경험을 나눠요", 4, true)
 		);
 		categoriesRepository.saveAll(categories);
 	}

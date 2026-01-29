@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity, Long> {
 
-	Optional<RefreshTokenEntity> findByToken(String token);
+	Optional<RefreshTokenEntity> findByTokenValue(String tokenValue);
 
-	List<RefreshTokenEntity> findAllByUserIdAndRevokedFalse(String userId);
+	List<RefreshTokenEntity> findAllByUserIdAndRevokedFalse(Long userId);
 }

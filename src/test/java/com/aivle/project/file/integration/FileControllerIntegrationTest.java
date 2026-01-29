@@ -8,7 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.aivle.project.category.entity.CategoriesEntity;
 import com.aivle.project.common.config.TestSecurityConfig;
 import com.aivle.project.file.entity.FilesEntity;
-import com.aivle.project.file.repository.FilesRepository;
+import com.aivle.project.file.entity.PostFilesEntity;
+import com.aivle.project.file.repository.PostFilesRepository;
 import com.aivle.project.post.entity.PostStatus;
 import com.aivle.project.post.entity.PostsEntity;
 import com.aivle.project.user.entity.UserEntity;
@@ -48,7 +49,7 @@ class FileControllerIntegrationTest {
 	private MockMvc mockMvc;
 
 	@Autowired
-	private FilesRepository filesRepository;
+	private PostFilesRepository postFilesRepository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -87,10 +88,11 @@ class FileControllerIntegrationTest {
 			.andExpect(status().isCreated());
 
 		// then
-		List<FilesEntity> saved = filesRepository.findAllByPostIdAndDeletedAtIsNullOrderByCreatedAtAsc(post.getId());
+		List<PostFilesEntity> saved = postFilesRepository.findAllActiveByPostIdOrderByCreatedAtAsc(post.getId());
 		assertThat(saved).hasSize(2);
 
-		for (FilesEntity file : saved) {
+		for (PostFilesEntity mapping : saved) {
+			FilesEntity file = mapping.getFile();
 			Path storedPath = Path.of(file.getStorageUrl().replace("/", java.io.File.separator));
 			assertThat(Files.exists(storedPath)).isTrue();
 		}
@@ -122,8 +124,7 @@ class FileControllerIntegrationTest {
 			title,
 			content,
 			false,
-			PostStatus.PUBLISHED,
-			user.getId()
+			PostStatus.PUBLISHED
 		);
 		entityManager.persist(post);
 		entityManager.flush();

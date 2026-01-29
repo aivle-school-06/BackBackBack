@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,8 +33,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenServiceTest {
 
-	private static final String USER_ID = "user-uuid";
-	private static final String EMAIL = "user@example.com";
+	private static final Long USER_ID = 1L;
 
 	@Mock
 	private StringRedisTemplate redisTemplate;
@@ -73,8 +71,7 @@ class RefreshTokenServiceTest {
 	void storeToken_shouldPersistToRedisAndDatabase() throws Exception {
 		// given: 사용자 정보와 만료 시간 설정을 준비
 		CustomUserDetails userDetails = mock(CustomUserDetails.class);
-		when(userDetails.getUuid()).thenReturn(UUID.randomUUID());
-		when(userDetails.getUsername()).thenReturn(EMAIL);
+		when(userDetails.getId()).thenReturn(USER_ID);
 		when(jwtTokenService.getRefreshTokenExpirationSeconds()).thenReturn(600L);
 
 		// when: 리프레시 토큰을 저장
@@ -84,13 +81,13 @@ class RefreshTokenServiceTest {
 		verify(valueOperations).set(eq("refresh:rt-1"), valueCaptor.capture(), durationCaptor.capture());
 		RefreshTokenCache cache = new ObjectMapper().readValue(valueCaptor.getValue(), RefreshTokenCache.class);
 		assertThat(cache.token()).isEqualTo("rt-1");
-		assertThat(cache.email()).isEqualTo(EMAIL);
+		assertThat(cache.userId()).isEqualTo(USER_ID);
 		assertThat(durationCaptor.getValue().getSeconds()).isPositive();
 
 		ArgumentCaptor<RefreshTokenEntity> entityCaptor = ArgumentCaptor.forClass(RefreshTokenEntity.class);
 		verify(refreshTokenRepository).save(entityCaptor.capture());
-		assertThat(entityCaptor.getValue().getToken()).isEqualTo("rt-1");
-		assertThat(entityCaptor.getValue().getEmail()).isEqualTo(EMAIL);
+		assertThat(entityCaptor.getValue().getTokenValue()).isEqualTo("rt-1");
+		assertThat(entityCaptor.getValue().getUserId()).isEqualTo(USER_ID);
 	}
 
 	@Test
@@ -98,21 +95,21 @@ class RefreshTokenServiceTest {
 	void loadValidToken_shouldFallbackToDatabaseAndRehydrateCache() {
 		// given: Redis 미스와 DB에 존재하는 토큰 상태를 준비
 		LocalDateTime expiresAt = LocalDateTime.now().plusDays(1);
-		RefreshTokenEntity entity = new RefreshTokenEntity("rt-2", USER_ID, EMAIL, "device-2", "android", "127.0.0.1", expiresAt);
+		RefreshTokenEntity entity = new RefreshTokenEntity(USER_ID, "rt-2", "android", "127.0.0.1", expiresAt);
 		ReflectionTestUtils.setField(entity, "createdAt", LocalDateTime.now().minusMinutes(5));
 
 		when(valueOperations.get("refresh:rt-2")).thenReturn(null);
-		when(refreshTokenRepository.findByToken("rt-2")).thenReturn(Optional.of(entity));
+		when(refreshTokenRepository.findByTokenValue("rt-2")).thenReturn(Optional.of(entity));
 
 		// when: 유효한 토큰을 조회
 		RefreshTokenCache cache = refreshTokenService.loadValidToken("rt-2");
 
-		// then: 캐시가 재구성되고 DB 업데이트가 수행된다
+		// then: 캐시가 재구성된다
 		assertThat(cache.token()).isEqualTo("rt-2");
-		assertThat(cache.email()).isEqualTo(EMAIL);
+		assertThat(cache.userId()).isEqualTo(USER_ID);
+		assertThat(cache.deviceId()).isEqualTo("default");
 		verify(valueOperations).set(eq("refresh:rt-2"), any(String.class), any(Duration.class));
 		verify(setOperations).add("sessions:" + USER_ID, "rt-2");
-		verify(refreshTokenRepository, atLeastOnce()).save(entity);
 	}
 
 	@Test
@@ -122,7 +119,6 @@ class RefreshTokenServiceTest {
 		RefreshTokenCache existing = new RefreshTokenCache(
 			"rt-old",
 			USER_ID,
-			EMAIL,
 			"device-3",
 			"ios",
 			"127.0.0.1",
@@ -134,8 +130,8 @@ class RefreshTokenServiceTest {
 		when(valueOperations.get("refresh:rt-old")).thenReturn(json);
 		when(jwtTokenService.getRefreshTokenExpirationSeconds()).thenReturn(600L);
 
-		RefreshTokenEntity entity = new RefreshTokenEntity("rt-old", USER_ID, EMAIL, "device-3", "ios", "127.0.0.1", LocalDateTime.now().plusDays(1));
-		when(refreshTokenRepository.findByToken("rt-old")).thenReturn(Optional.of(entity));
+		RefreshTokenEntity entity = new RefreshTokenEntity(USER_ID, "rt-old", "ios", "127.0.0.1", LocalDateTime.now().plusDays(1));
+		when(refreshTokenRepository.findByTokenValue("rt-old")).thenReturn(Optional.of(entity));
 
 		// when: 리프레시 토큰을 회전
 		refreshTokenService.rotateToken("rt-old", "rt-new");

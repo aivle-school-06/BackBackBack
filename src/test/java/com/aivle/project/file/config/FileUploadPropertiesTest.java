@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Import;
+import com.aivle.project.common.config.TestSecurityConfig;
 
 @SpringBootTest(properties = {
 	"app.file.upload.max-size=12345",
@@ -20,6 +22,7 @@ import org.springframework.core.env.Environment;
 	"spring.servlet.multipart.max-file-size=2MB",
 	"spring.servlet.multipart.max-request-size=3MB"
 })
+@Import(TestSecurityConfig.class)
 class FileUploadPropertiesTest {
 
 	@Autowired

@@ -1,5 +1,6 @@
 package com.aivle.project.user.service;
 
+import com.aivle.project.common.config.TestSecurityConfig;
 import com.aivle.project.user.entity.EmailVerificationEntity;
 import com.aivle.project.user.entity.UserEntity;
 import com.aivle.project.user.entity.UserStatus;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@Import(TestSecurityConfig.class)
 @DisplayName("이메일 인증 서비스 테스트")
 class EmailVerificationServiceTest {
 
