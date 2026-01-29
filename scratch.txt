@@ -1,0 +1,40 @@
+오류 원인 보고서
+
+1. 개요
+- 발생 위치: company_report_metric_values 저장 시점
+- 오류 유형: 무결성 제약 위반(Unique Key 중복)
+
+2. 증상
+- 애플리케이션 실행/업로드 처리 중 아래 오류 발생
+  - Duplicate entry '5-1-1-ACTUAL' for key 'company_report_metric_values.uk_metric_value_type'
+
+3. 근본 원인(Root Cause)
+- company_report_metric_values 테이블의 유니크 키(uk_metric_value_type)는
+  (report_version_id, metric_id, quarter_id, value_type) 조합이 중복될 수 없도록 제한합니다.
+- 동일 report_version_id에 대해 동일 metric_id + quarter_id + value_type 조합이
+  한 번 이상 insert 되면서 중복 충돌이 발생했습니다.
+- 즉, **동일 회사/동일 버전에서 같은 지표·분기 값이 중복으로 저장 시도됨**이 핵심 원인입니다.
+
+4. 증거(로그/스택트레이스)
+- org.hibernate.exception.ConstraintViolationException
+  - could not execute statement [Duplicate entry '5-1-1-ACTUAL' for key 'company_report_metric_values.uk_metric_value_type']
+  - insert into company_report_metric_values (...)
+- Caused by: java.sql.SQLIntegrityConstraintViolationException
+  - Duplicate entry '5-1-1-ACTUAL' for key 'company_report_metric_values.uk_metric_value_type'
+
+5. 원인 상세(가능성 높은 시나리오)
+- 엑셀 내 동일 stock_code가 중복 행으로 존재하거나,
+  동일 지표/분기 컬럼이 중복 헤더로 존재하여
+  같은 회사/분기/지표가 반복적으로 커맨드에 포함됨.
+- 또는 동일 회사에 대해 동일 버전으로 중복 저장을 시도하도록
+  서비스 로직에서 중복 제거가 되지 않음.
+
+6. 해결 방안(권장)
+- 저장 직전에 (metric_id, quarter_id, value_type) 기준으로 중복 제거 후 저장
+- 또는 DB에 upsert(merge/insert on duplicate key update) 적용
+- 엑셀 파서에서 동일 헤더/중복 행 여부를 사전 검증 후 스킵 처리
+
+7. 재발 방지/추가 확인
+- 업로드 대상 엑셀에서 동일 기업(stock_code) 행이 중복되는지 확인
+- 지표 헤더 중복 여부 확인
+- 적재 서비스에 중복 방지 로직 및 로그 추가
