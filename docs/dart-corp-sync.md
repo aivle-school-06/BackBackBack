@@ -41,6 +41,7 @@
 - `dart.http.response-timeout-ms` (기본 10000)
 - `dart.http.retry-count` (기본 2)
 - `dart.http.retry-backoff-ms` (기본 1000)
+- `dart.api.max-buffer-size` (기본 50MB)
 
 ### 5.5 배치 이력 테이블
 - Flyway `V6__batch_schema.sql`로 배치 메타 테이블을 생성한다.

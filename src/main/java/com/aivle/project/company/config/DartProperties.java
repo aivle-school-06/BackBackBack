@@ -18,6 +18,7 @@ public class DartProperties {
 	private String apiKey;
 
 	private final CorpSync corpSync = new CorpSync();
+	private final Api api = new Api();
 	private final Http http = new Http();
 
 	@Getter
@@ -70,5 +71,16 @@ public class DartProperties {
 		 * 재시도 대기 시간 (ms).
 		 */
 		private int retryBackoffMs = 1000;
+	}
+
+	@Getter
+	@Setter
+	public static class Api {
+
+		/**
+		 * 응답 버퍼 최대 크기.
+		 */
+		private org.springframework.util.unit.DataSize maxBufferSize =
+			org.springframework.util.unit.DataSize.ofMegabytes(50);
 	}
 }

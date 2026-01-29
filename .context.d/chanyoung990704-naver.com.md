@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-29 | 작업: DART 응답 버퍼 상향 설정 | 결과: WebClient maxInMemorySize 50MB 기본값 및 프로퍼티(dart.api.max-buffer-size) 추가 | 이슈: 없음
 - 2026-01-29 | 작업: API 콘솔에 DART 동기화 버튼 추가 | 결과: /admin/dart/corp-sync 호출 버튼 및 로그 출력 추가 | 이슈: 없음
 - 2026-01-29 | 작업: dev 관리자 회원가입 옵션 추가 | 결과: auth-console에 관리자 체크박스 추가, SignupRequest/SignUpService에 dev 전용 ROLE_ADMIN 처리 | 이슈: 없음
 - 2026-01-29 | 작업: 기업 동기화 JDBC 조회 컴파일 오류 수정 | 결과: NamedParameterJdbcTemplate query 모호성 해소 | 이슈: 없음
