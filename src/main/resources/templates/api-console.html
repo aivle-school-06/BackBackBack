@@ -336,6 +336,28 @@
 				<p class="footer-note">관리자 토큰(ROLE_ADMIN) 필요. POST /admin/reports/metrics/import</p>
 			</div>
 
+			<div class="card" style="animation-delay: 0.075s;">
+				<h2>보고서 지표 조회(분기별)</h2>
+				<div class="row">
+					<div>
+						<label for="report-stock-code">stockCode</label>
+						<input id="report-stock-code" type="text" placeholder="000020">
+					</div>
+					<div>
+						<label for="report-from-quarter-key">fromQuarterKey</label>
+						<input id="report-from-quarter-key" type="number" placeholder="20244">
+					</div>
+					<div>
+						<label for="report-to-quarter-key">toQuarterKey</label>
+						<input id="report-to-quarter-key" type="number" placeholder="20253">
+					</div>
+				</div>
+				<div class="actions">
+					<button class="secondary" type="button" id="report-grouped-query">조회 실행</button>
+				</div>
+				<p class="footer-note">관리자 토큰(ROLE_ADMIN) 필요. GET /admin/reports/metrics/grouped</p>
+			</div>
+
 			<div class="card" style="animation-delay: 0.08s;">
 				<h2>게시글 목록</h2>
 				<div class="row">
@@ -680,6 +702,29 @@
 					method: "POST",
 					body: formData
 				});
+				const data = await response.json();
+				setLog({ status: response.status, data });
+			} catch (e) {
+				setLog({ error: e.message });
+			}
+		});
+
+		document.getElementById("report-grouped-query")?.addEventListener("click", async () => {
+			const stockCode = readText("report-stock-code");
+			const fromQuarterKey = readNumber("report-from-quarter-key", null);
+			const toQuarterKey = readNumber("report-to-quarter-key", null);
+			if (!stockCode) {
+				setLog("stockCode를 입력해주세요.");
+				return;
+			}
+			if (!fromQuarterKey || !toQuarterKey) {
+				setLog("fromQuarterKey와 toQuarterKey를 입력해주세요.");
+				return;
+			}
+
+			try {
+				const url = `/admin/reports/metrics/grouped?stockCode=${encodeURIComponent(stockCode)}&fromQuarterKey=${fromQuarterKey}&toQuarterKey=${toQuarterKey}`;
+				const response = await apiFetch(url);
 				const data = await response.json();
 				setLog({ status: response.status, data });
 			} catch (e) {
