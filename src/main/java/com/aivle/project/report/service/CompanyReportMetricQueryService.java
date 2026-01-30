@@ -1,11 +1,15 @@
 package com.aivle.project.report.service;
 
 import com.aivle.project.quarter.support.QuarterCalculator;
+import com.aivle.project.metric.entity.MetricValueType;
+import com.aivle.project.report.dto.ReportLatestPredictResponse;
 import com.aivle.project.report.dto.ReportMetricGroupedResponse;
 import com.aivle.project.report.dto.ReportMetricItemDto;
 import com.aivle.project.report.dto.ReportMetricQuarterGroupDto;
 import com.aivle.project.report.dto.ReportMetricRowDto;
 import com.aivle.project.report.dto.ReportMetricRowProjection;
+import com.aivle.project.report.dto.ReportPredictMetricItemDto;
+import com.aivle.project.report.dto.ReportPredictMetricRowProjection;
 import com.aivle.project.report.repository.CompanyReportMetricValuesRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -81,6 +85,44 @@ public class CompanyReportMetricQueryService {
 			fromQuarterKey,
 			toQuarterKey,
 			new ArrayList<>(grouped.values())
+		);
+	}
+
+	public ReportLatestPredictResponse fetchLatestPredictMetrics(String stockCode, int quarterKey) {
+		String normalizedStockCode = normalizeStockCode(stockCode);
+		if (normalizedStockCode.isBlank()) {
+			throw new IllegalArgumentException("stockCode가 비어 있습니다.");
+		}
+		validateQuarterKey(quarterKey);
+
+		List<ReportPredictMetricRowProjection> rows = companyReportMetricValuesRepository
+			.findLatestMetricsByStockCodeAndQuarterKeyAndType(normalizedStockCode, quarterKey, MetricValueType.PREDICTED);
+		if (rows.isEmpty()) {
+			return ReportLatestPredictResponse.empty(normalizedStockCode, quarterKey);
+		}
+
+		ReportPredictMetricRowProjection first = rows.get(0);
+		String downloadUrl = first.getPdfFileId() != null ? "/admin/reports/files/" + first.getPdfFileId() : null;
+		List<ReportPredictMetricItemDto> metrics = rows.stream()
+			.map(row -> new ReportPredictMetricItemDto(
+				row.getMetricCode(),
+				row.getMetricNameKo(),
+				row.getMetricValue(),
+				row.getQuarterKey()
+			))
+			.toList();
+
+		return new ReportLatestPredictResponse(
+			first.getCorpName(),
+			first.getStockCode(),
+			quarterKey,
+			first.getVersionNo(),
+			first.getGeneratedAt(),
+			first.getPdfFileId(),
+			first.getPdfFileName(),
+			first.getPdfContentType(),
+			downloadUrl,
+			metrics
 		);
 	}
 
