@@ -6,6 +6,9 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-30 | 작업: 보고서 그룹/예측 응답 매퍼 적용 | 결과: ReportMapper에 그룹/예측 응답 매핑 추가 및 테스트 보강 | 이슈: 없음
+- 2026-01-30 | 작업: DART 동기화 응답 매핑 MapStruct 전환 | 결과: JobExecution → DartCorpSyncResponse 매퍼 추가 | 이슈: 없음
+- 2026-01-30 | 작업: DTO 매핑 MapStruct 전환 주석 보강 | 결과: mapper 전반 매핑 규칙 설명 주석 추가 및 테스트 통과 | 이슈: 없음
 - 2026-01-30 | 작업: 배치 런타임 의존성 보강 | 결과: spring-batch-core 추가로 ItemProcessor 클래스 로딩 실패 방지 | 이슈: 없음
 - 2026-01-30 | 작업: 테스트 프로파일/데이터 의존성 정리 | 결과: PostsRepositoryTest 등에서 test 프로파일 적용, 엑셀 파서 테스트는 메모리 워크북으로 전환 | 이슈: 없음
 - 2026-01-30 | 작업: 예측 보고서 콘솔 토큰 로딩 수정 | 결과: auth-console.tokens 기반으로 관리자 API 호출 가능 | 이슈: 없음

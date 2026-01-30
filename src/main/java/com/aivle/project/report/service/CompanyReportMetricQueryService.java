@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 public class CompanyReportMetricQueryService {
 
 	private final CompanyReportMetricValuesRepository companyReportMetricValuesRepository;
+	private final com.aivle.project.report.mapper.ReportMapper reportMapper;
 
 	public List<ReportMetricRowDto> fetchLatestMetrics(String stockCode, int fromQuarterKey, int toQuarterKey) {
 		String normalizedStockCode = normalizeStockCode(stockCode);
@@ -50,7 +51,7 @@ public class CompanyReportMetricQueryService {
 			rows.size()
 		);
 		return rows.stream()
-			.map(ReportMetricRowDto::from)
+			.map(reportMapper::toRowDto)
 			.toList();
 	}
 
@@ -64,12 +65,7 @@ public class CompanyReportMetricQueryService {
 		Map<Integer, ReportMetricQuarterGroupDto> grouped = new LinkedHashMap<>();
 		Map<Integer, List<ReportMetricItemDto>> items = new LinkedHashMap<>();
 		for (ReportMetricRowDto row : rows) {
-			items.computeIfAbsent(row.quarterKey(), key -> new ArrayList<>()).add(new ReportMetricItemDto(
-				row.metricCode(),
-				row.metricNameKo(),
-				row.metricValue(),
-				row.valueType()
-			));
+			items.computeIfAbsent(row.quarterKey(), key -> new ArrayList<>()).add(reportMapper.toItemDto(row));
 			grouped.putIfAbsent(row.quarterKey(), new ReportMetricQuarterGroupDto(
 				row.quarterKey(),
 				row.versionNo(),
@@ -79,7 +75,7 @@ public class CompanyReportMetricQueryService {
 		}
 
 		ReportMetricRowDto first = rows.get(0);
-		return new ReportMetricGroupedResponse(
+		return reportMapper.toGroupedResponse(
 			first.corpName(),
 			first.stockCode(),
 			fromQuarterKey,
@@ -104,15 +100,10 @@ public class CompanyReportMetricQueryService {
 		ReportPredictMetricRowProjection first = rows.get(0);
 		String downloadUrl = first.getPdfFileId() != null ? "/admin/reports/files/" + first.getPdfFileId() : null;
 		List<ReportPredictMetricItemDto> metrics = rows.stream()
-			.map(row -> new ReportPredictMetricItemDto(
-				row.getMetricCode(),
-				row.getMetricNameKo(),
-				row.getMetricValue(),
-				row.getQuarterKey()
-			))
+			.map(reportMapper::toPredictItemDto)
 			.toList();
 
-		return new ReportLatestPredictResponse(
+		return reportMapper.toLatestPredictResponse(
 			first.getCorpName(),
 			first.getStockCode(),
 			quarterKey,
