@@ -1,10 +1,16 @@
 package com.aivle.project.report.service;
 
 import com.aivle.project.quarter.support.QuarterCalculator;
+import com.aivle.project.report.dto.ReportMetricGroupedResponse;
+import com.aivle.project.report.dto.ReportMetricItemDto;
+import com.aivle.project.report.dto.ReportMetricQuarterGroupDto;
 import com.aivle.project.report.dto.ReportMetricRowDto;
 import com.aivle.project.report.dto.ReportMetricRowProjection;
 import com.aivle.project.report.repository.CompanyReportMetricValuesRepository;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,6 +48,40 @@ public class CompanyReportMetricQueryService {
 		return rows.stream()
 			.map(ReportMetricRowDto::from)
 			.toList();
+	}
+
+	public ReportMetricGroupedResponse fetchLatestMetricsGrouped(String stockCode, int fromQuarterKey, int toQuarterKey) {
+		List<ReportMetricRowDto> rows = fetchLatestMetrics(stockCode, fromQuarterKey, toQuarterKey);
+		String normalizedStockCode = normalizeStockCode(stockCode);
+		if (rows.isEmpty()) {
+			return ReportMetricGroupedResponse.empty(normalizedStockCode, fromQuarterKey, toQuarterKey);
+		}
+
+		Map<Integer, ReportMetricQuarterGroupDto> grouped = new LinkedHashMap<>();
+		Map<Integer, List<ReportMetricItemDto>> items = new LinkedHashMap<>();
+		for (ReportMetricRowDto row : rows) {
+			items.computeIfAbsent(row.quarterKey(), key -> new ArrayList<>()).add(new ReportMetricItemDto(
+				row.metricCode(),
+				row.metricNameKo(),
+				row.metricValue(),
+				row.valueType()
+			));
+			grouped.putIfAbsent(row.quarterKey(), new ReportMetricQuarterGroupDto(
+				row.quarterKey(),
+				row.versionNo(),
+				row.generatedAt(),
+				items.get(row.quarterKey())
+			));
+		}
+
+		ReportMetricRowDto first = rows.get(0);
+		return new ReportMetricGroupedResponse(
+			first.corpName(),
+			first.stockCode(),
+			fromQuarterKey,
+			toQuarterKey,
+			new ArrayList<>(grouped.values())
+		);
 	}
 
 	private void validateQuarterKey(int quarterKey) {

@@ -10,6 +10,7 @@ import com.aivle.project.metric.repository.MetricsRepository;
 import com.aivle.project.quarter.entity.QuartersEntity;
 import com.aivle.project.quarter.repository.QuartersRepository;
 import com.aivle.project.report.dto.ReportMetricRowDto;
+import com.aivle.project.report.dto.ReportMetricGroupedResponse;
 import com.aivle.project.report.entity.CompanyReportMetricValuesEntity;
 import com.aivle.project.report.entity.CompanyReportVersionsEntity;
 import com.aivle.project.report.entity.CompanyReportsEntity;
@@ -114,5 +115,73 @@ class CompanyReportMetricQueryServiceTest {
 		assertThat(rows).allMatch(row -> "000020".equals(row.stockCode()));
 		assertThat(rows).extracting(ReportMetricRowDto::quarterKey)
 			.containsExactly(20244, 20253);
+	}
+
+	@Test
+	@DisplayName("분기별로 그룹핑된 지표 응답을 반환한다")
+	void fetchLatestMetricsGrouped() {
+		// given
+		CompaniesEntity company = companiesRepository.save(CompaniesEntity.create(
+			"00000002",
+			"테스트기업2",
+			"TEST_CO2",
+			"000030",
+			LocalDate.of(2025, 1, 1)
+		));
+		QuartersEntity q20244 = quartersRepository.save(QuartersEntity.create(
+			2024,
+			4,
+			20244,
+			LocalDate.of(2024, 10, 1),
+			LocalDate.of(2024, 12, 31)
+		));
+		QuartersEntity q20253 = quartersRepository.save(QuartersEntity.create(
+			2025,
+			3,
+			20253,
+			LocalDate.of(2025, 7, 1),
+			LocalDate.of(2025, 9, 30)
+		));
+		MetricsEntity roa = metricsRepository.findByMetricCode("ROA").orElseThrow();
+		MetricsEntity roe = metricsRepository.findByMetricCode("ROE").orElseThrow();
+
+		CompanyReportsEntity report = companyReportsRepository.save(
+			CompanyReportsEntity.create(company, q20253, null)
+		);
+		CompanyReportVersionsEntity latestVersion = companyReportVersionsRepository.save(
+			CompanyReportVersionsEntity.create(report, 1, LocalDateTime.now(), false, null)
+		);
+
+		companyReportMetricValuesRepository.save(CompanyReportMetricValuesEntity.create(
+			latestVersion,
+			roa,
+			q20244,
+			new BigDecimal("1.11"),
+			MetricValueType.ACTUAL
+		));
+		companyReportMetricValuesRepository.save(CompanyReportMetricValuesEntity.create(
+			latestVersion,
+			roe,
+			q20244,
+			new BigDecimal("2.22"),
+			MetricValueType.ACTUAL
+		));
+		companyReportMetricValuesRepository.save(CompanyReportMetricValuesEntity.create(
+			latestVersion,
+			roa,
+			q20253,
+			new BigDecimal("3.33"),
+			MetricValueType.ACTUAL
+		));
+
+		// when
+		ReportMetricGroupedResponse response = companyReportMetricQueryService
+			.fetchLatestMetricsGrouped("30", 20244, 20253);
+
+		// then
+		assertThat(response.stockCode()).isEqualTo("000030");
+		assertThat(response.quarters()).hasSize(2);
+		assertThat(response.quarters().get(0).metrics()).hasSize(2);
+		assertThat(response.quarters().get(1).metrics()).hasSize(1);
 	}
 }
