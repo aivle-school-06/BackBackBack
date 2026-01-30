@@ -184,13 +184,13 @@
 	</div>
 
 	<script>
-		const sessionKey = "dev-console.state";
+		const storageKey = "auth-console.tokens";
 		const pdfInfo = document.getElementById("pdf-info");
 		const list = document.getElementById("predict-list");
 
 		const loadAccessToken = () => {
 			try {
-				const raw = localStorage.getItem(sessionKey);
+				const raw = localStorage.getItem(storageKey);
 				if (!raw) return "";
 				const data = JSON.parse(raw);
 				return data.accessToken || "";
@@ -255,6 +255,8 @@
 				if (!response.ok || !payload.success) {
 					renderPdfInfo(null);
 					renderMetrics([]);
+					const status = payload?.error?.code ? `${payload.error.code}` : `HTTP ${response.status}`;
+					pdfInfo.innerHTML = `<div class="empty">조회 실패: ${status}</div>`;
 					return;
 				}
 				renderPdfInfo(payload.data);
