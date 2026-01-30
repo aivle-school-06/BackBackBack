@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-30 | 작업: dev/prod DB 환경변수 체계 통일 | 결과: SPRING_DATASOURCE_* 기준으로 dev/prod 설정 정렬 | 이슈: 없음
 - 2026-01-30 | 작업: dev 전용 JPA SQL 로그/Turnstile 기본값 분리 | 결과: 공통 설정에서 dev 옵션 제거 및 prod에 Turnstile 키 요구 | 이슈: 없음
 - 2026-01-30 | 작업: 보고서 그룹/예측 응답 매퍼 적용 | 결과: ReportMapper에 그룹/예측 응답 매핑 추가 및 테스트 보강 | 이슈: 없음
 - 2026-01-30 | 작업: DART 동기화 응답 매핑 MapStruct 전환 | 결과: JobExecution → DartCorpSyncResponse 매퍼 추가 | 이슈: 없음

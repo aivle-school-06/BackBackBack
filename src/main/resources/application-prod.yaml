@@ -16,6 +16,11 @@ app:
       upload-dir: ${UPLOAD_DIR:/var/app/uploads}
 
 spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   servlet:
     multipart:
       max-file-size: ${FILE_MAX_SIZE:10MB}
