@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-31 | 작업: .env.example 환경변수 목록 정리 | 결과: 공통/DB(dev/prod 예시) 변수 한눈에 정리 | 이슈: 없음
 - 2026-01-31 | 작업: prod 이메일 설정 import 추가 | 결과: prod 프로파일에서도 application-email.yml 로딩 | 이슈: 없음
 - 2026-01-30 | 작업: prod 이메일 인증 유지 확인 | 결과: prod 설정에 skip=false 유지, dev는 skip=true로 복구 | 이슈: 없음
 - 2026-01-30 | 작업: env 예시/운영 env 템플릿 정합 | 결과: LOG_PATH/LOG_FILE 추가 및 README 로컬 실행 예시 갱신 | 이슈: 없음
