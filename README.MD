@@ -24,11 +24,11 @@
 
 ```bash
 export SPRING_PROFILES_ACTIVE=dev
-export DEV_DB_URL=jdbc:h2:mem:devdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-export DEV_DB_USERNAME=sa
-export DEV_DB_PASSWORD=
-export H2_CONSOLE_ENABLED=true
-export H2_CONSOLE_PATH=/h2-console
+export SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/bigprj?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+export SPRING_DATASOURCE_USERNAME=bigprj
+export SPRING_DATASOURCE_PASSWORD=bigprj
+export LOG_PATH=./logs
+export LOG_FILE=./logs/project.log
 
 ./gradlew bootRun
 ```
