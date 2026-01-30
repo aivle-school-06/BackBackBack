@@ -274,12 +274,8 @@
 					</div>
 					<div class="row" style="margin-top: 12px;">
 						<div>
-							<label for="signup-name">이름</label>
-							<input id="signup-name" name="name" type="text" placeholder="홍길동" required>
-						</div>
-						<div>
-							<label for="signup-phone">전화번호</label>
-							<input id="signup-phone" name="phone" type="text" placeholder="01012345678">
+							<label for="signup-name">이름 (Username)</label>
+							<input id="signup-name" name="name" type="text" placeholder="user_id" required>
 						</div>
 					</div>
 					<div style="margin-top: 12px;">
@@ -415,9 +411,9 @@
 					return;
 				}
 				state.accessToken = data.accessToken;
-				state.refreshToken = data.refreshToken;
+				state.refreshToken = data.refreshToken || "";
 				state.accessExpiresIn = data.expiresIn;
-				state.refreshExpiresIn = data.refreshExpiresIn;
+				state.refreshExpiresIn = data.refreshExpiresIn || 0;
 				saveState();
 				updateTokenView();
 				setLog({ status: response.status, data });
@@ -436,8 +432,7 @@
 			const payload = {
 				email: document.getElementById("signup-email").value,
 				password: document.getElementById("signup-password").value,
-				name: document.getElementById("signup-name").value,
-				phone: document.getElementById("signup-phone").value,
+				username: document.getElementById("signup-name").value,
 				admin: document.getElementById("signup-admin")?.checked === true,
 				turnstileToken: turnstileToken
 			};
