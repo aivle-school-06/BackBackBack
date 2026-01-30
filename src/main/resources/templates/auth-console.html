@@ -339,6 +339,7 @@
 		const refreshPreview = document.getElementById("refresh-preview");
 		const accessExp = document.getElementById("access-exp");
 		const refreshExp = document.getElementById("refresh-exp");
+		const claimsButton = document.getElementById("claims-btn");
 		const signupTokenField = document.getElementById("signup-turnstile-token");
 		const signupTurnstileReset = document.getElementById("signup-turnstile-reset");
 		const signupSubmitButton = document.querySelector("#signup-form button.primary");
@@ -380,6 +381,16 @@
 			refreshPreview.textContent = state.refreshToken ? state.refreshToken.slice(0, 30) + "..." : "-";
 			accessExp.textContent = state.accessExpiresIn ? state.accessExpiresIn + "s" : "-";
 			refreshExp.textContent = state.refreshExpiresIn ? state.refreshExpiresIn + "s" : "-";
+			updateClaimsButtonState();
+		};
+
+		const updateClaimsButtonState = () => {
+			if (!claimsButton) {
+				return;
+			}
+			const hasAccessToken = Boolean(state.accessToken);
+			claimsButton.disabled = !hasAccessToken;
+			claimsButton.title = hasAccessToken ? "" : "Access 토큰이 필요합니다.";
 		};
 
 		const apiFetch = async (url, options = {}) => {
@@ -529,6 +540,16 @@
 		document.getElementById("claims-btn").addEventListener("click", async () => {
 			try {
 				const response = await apiFetch("/auth/console/claims", { method: "GET" });
+				if (response.status === 401 || response.status === 403) {
+					state.accessToken = "";
+					state.refreshToken = "";
+					state.accessExpiresIn = 0;
+					state.refreshExpiresIn = 0;
+					saveState();
+					updateTokenView();
+					setLog("보호 API 호출에 실패했습니다. 토큰이 만료되었거나 로그아웃 상태입니다.");
+					return;
+				}
 				const data = await response.json();
 				setLog({ status: response.status, data });
 			} catch (error) {
