@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-30 | 작업: API 콘솔 보고서 발행 폼 추가 | 결과: 지표+PDF 발행 API를 콘솔에서 테스트 가능 | 이슈: 없음
 - 2026-01-30 | 작업: 보고서 지표+PDF 발행 API 추가 | 결과: multipart 발행 API 및 테스트 구현 | 이슈: 없음
 - 2026-01-30 | 작업: 보고서 지표+PDF 발행 서비스 추가 | 결과: 예측/실제값 저장 후 PDF 연결 및 published 처리 | 이슈: 없음
 - 2026-01-30 | 작업: API 콘솔 예측값 적재 UI 추가 | 결과: stockCode/quarterKey/metrics 입력 후 예측값 적재 요청 가능 | 이슈: 없음
