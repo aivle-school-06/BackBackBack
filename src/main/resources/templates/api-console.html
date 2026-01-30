@@ -167,6 +167,15 @@
 			border-color: var(--accent-2);
 		}
 
+		.list-empty {
+			padding: 12px;
+			border-radius: 12px;
+			border: 1px dashed var(--line);
+			color: var(--ink-soft);
+			font-size: 13px;
+			text-align: center;
+		}
+
 		button {
 			border: none;
 			padding: 12px 16px;
@@ -773,12 +782,49 @@
 			}
 		});
 
-		document.getElementById("report-company-search")?.addEventListener("click", async () => {
-			const keyword = readText("report-company-keyword");
-			const resultBox = document.getElementById("report-company-results");
+		const companyKeywordInput = document.getElementById("report-company-keyword");
+		const companySearchButton = document.getElementById("report-company-search");
+		const companyResultBox = document.getElementById("report-company-results");
+		let companySearchTimer = null;
+
+		const clearCompanyResults = () => {
+			if (companyResultBox) {
+				companyResultBox.innerHTML = "";
+			}
+		};
+
+		const renderCompanyResults = (items) => {
+			if (!companyResultBox) {
+				return;
+			}
+			companyResultBox.innerHTML = "";
+			if (!items || items.length === 0) {
+				const empty = document.createElement("div");
+				empty.className = "list-empty";
+				empty.textContent = "검색 결과가 없습니다.";
+				companyResultBox.appendChild(empty);
+				return;
+			}
+			items.forEach((item) => {
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "list-item";
+				button.textContent = `${item.corpName} (${item.stockCode || "-"})`;
+				button.addEventListener("click", () => {
+					const stockInput = document.getElementById("report-stock-code");
+					if (stockInput) {
+						stockInput.value = item.stockCode || "";
+					}
+					setLog(`선택됨: ${item.corpName} / ${item.stockCode || "-"}`);
+				});
+				companyResultBox.appendChild(button);
+			});
+		};
+
+		const fetchCompanyResults = async (keyword) => {
 			if (!keyword || keyword.length < 2) {
 				setLog("기업명 검색은 2자 이상 입력해주세요.");
-				if (resultBox) resultBox.innerHTML = "";
+				clearCompanyResults();
 				return;
 			}
 			try {
@@ -787,29 +833,35 @@
 				const payload = await response.json();
 				if (!response.ok || !payload.success) {
 					setLog({ status: response.status, data: payload });
-					if (resultBox) resultBox.innerHTML = "";
+					clearCompanyResults();
 					return;
 				}
-				if (resultBox) {
-					resultBox.innerHTML = "";
-					(payload.data || []).forEach((item) => {
-						const button = document.createElement("button");
-						button.type = "button";
-						button.className = "list-item";
-						button.textContent = `${item.corpName} (${item.stockCode || "-"})`;
-						button.addEventListener("click", () => {
-							const stockInput = document.getElementById("report-stock-code");
-							if (stockInput) {
-								stockInput.value = item.stockCode || "";
-							}
-							setLog(`선택됨: ${item.corpName} / ${item.stockCode || "-"}`);
-						});
-						resultBox.appendChild(button);
-					});
-				}
+				renderCompanyResults(payload.data || []);
 			} catch (e) {
 				setLog({ error: e.message });
 			}
+		};
+
+		const scheduleCompanySearch = (keyword) => {
+			if (companySearchTimer) {
+				clearTimeout(companySearchTimer);
+			}
+			if (!keyword || keyword.trim().length < 2) {
+				clearCompanyResults();
+				return;
+			}
+			companySearchTimer = setTimeout(() => {
+				fetchCompanyResults(keyword.trim());
+			}, 300);
+		};
+
+		companyKeywordInput?.addEventListener("input", (event) => {
+			scheduleCompanySearch(event.target.value);
+		});
+
+		companySearchButton?.addEventListener("click", () => {
+			const keyword = readText("report-company-keyword");
+			fetchCompanyResults(keyword.trim());
 		});
 
 		document.getElementById("list-posts")?.addEventListener("click", async () => {
