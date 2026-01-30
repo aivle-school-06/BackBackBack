@@ -136,6 +136,37 @@
 			margin-top: 14px;
 		}
 
+		.inline-actions {
+			display: flex;
+			gap: 8px;
+			align-items: center;
+		}
+
+		.inline-actions input {
+			flex: 1;
+		}
+
+		.list {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			margin-top: 12px;
+		}
+
+		.list-item {
+			text-align: left;
+			padding: 10px 12px;
+			border-radius: 12px;
+			border: 1px solid var(--line);
+			background: #ffffff;
+			font-size: 13px;
+			cursor: pointer;
+		}
+
+		.list-item:hover {
+			border-color: var(--accent-2);
+		}
+
 		button {
 			border: none;
 			padding: 12px 16px;
@@ -339,6 +370,16 @@
 			<div class="card" style="animation-delay: 0.075s;">
 				<h2>보고서 지표 조회(분기별)</h2>
 				<div class="row">
+					<div>
+						<label for="report-company-keyword">기업명 검색</label>
+						<div class="inline-actions">
+							<input id="report-company-keyword" type="text" placeholder="기업명/영문명">
+							<button class="ghost" type="button" id="report-company-search">검색</button>
+						</div>
+					</div>
+				</div>
+				<div class="list" id="report-company-results" aria-live="polite"></div>
+				<div class="row" style="margin-top: 12px;">
 					<div>
 						<label for="report-stock-code">stockCode</label>
 						<input id="report-stock-code" type="text" placeholder="000020">
@@ -727,6 +768,45 @@
 				const response = await apiFetch(url);
 				const data = await response.json();
 				setLog({ status: response.status, data });
+			} catch (e) {
+				setLog({ error: e.message });
+			}
+		});
+
+		document.getElementById("report-company-search")?.addEventListener("click", async () => {
+			const keyword = readText("report-company-keyword");
+			const resultBox = document.getElementById("report-company-results");
+			if (!keyword || keyword.length < 2) {
+				setLog("기업명 검색은 2자 이상 입력해주세요.");
+				if (resultBox) resultBox.innerHTML = "";
+				return;
+			}
+			try {
+				const url = `/admin/companies/search?keyword=${encodeURIComponent(keyword)}`;
+				const response = await apiFetch(url);
+				const payload = await response.json();
+				if (!response.ok || !payload.success) {
+					setLog({ status: response.status, data: payload });
+					if (resultBox) resultBox.innerHTML = "";
+					return;
+				}
+				if (resultBox) {
+					resultBox.innerHTML = "";
+					(payload.data || []).forEach((item) => {
+						const button = document.createElement("button");
+						button.type = "button";
+						button.className = "list-item";
+						button.textContent = `${item.corpName} (${item.stockCode || "-"})`;
+						button.addEventListener("click", () => {
+							const stockInput = document.getElementById("report-stock-code");
+							if (stockInput) {
+								stockInput.value = item.stockCode || "";
+							}
+							setLog(`선택됨: ${item.corpName} / ${item.stockCode || "-"}`);
+						});
+						resultBox.appendChild(button);
+					});
+				}
 			} catch (e) {
 				setLog({ error: e.message });
 			}
