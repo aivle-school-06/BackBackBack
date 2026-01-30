@@ -16,6 +16,8 @@ app:
       upload-dir: ${UPLOAD_DIR:/var/app/uploads}
 
 spring:
+  config:
+    import: optional:classpath:application-email.yml
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
