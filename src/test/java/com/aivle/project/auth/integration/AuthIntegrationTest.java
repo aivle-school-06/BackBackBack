@@ -405,6 +405,24 @@ class AuthIntegrationTest {
 		// then: 블랙리스트 확인 (재로그인/토큰사용 시도는 별도 검증 필요하지만 여기선 성공 응답으로 갈음)
 	}
 
+	@Test
+	@DisplayName("전체 로그아웃 후 기존 토큰으로 클레임 조회가 실패한다")
+	void logoutAll_shouldRejectClaims() throws Exception {
+		// given
+		createActiveUserWithRole("logoutall2@test.com", "password", RoleName.ROLE_USER);
+		String accessToken = loginAndGetAccessToken("logoutall2@test.com", "password", "device-1");
+
+		// when: 전체 로그아웃
+		mockMvc.perform(post("/auth/logout-all")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk());
+
+		// then: 기존 토큰으로 클레임 조회 시 실패
+		mockMvc.perform(get("/auth/console/claims")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isUnauthorized());
+	}
+
 	private String loginAndGetAccessToken(String email, String password, String deviceId) throws Exception {
 		LoginRequest request = new LoginRequest();
 		request.setEmail(email);
