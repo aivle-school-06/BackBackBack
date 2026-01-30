@@ -369,6 +369,24 @@ class AuthIntegrationTest {
 		        assertThat(clearedCookie.getMaxAge()).isZero();
 		        assertThat(clearedCookie.getValue()).isEmpty();
 		    }
+
+	@Test
+	@DisplayName("로그아웃 후 기존 토큰으로 클레임 조회가 실패한다")
+	void logout_shouldRejectClaims() throws Exception {
+		// given
+		createActiveUserWithRole("logout-claims@test.com", "password", RoleName.ROLE_USER);
+		String accessToken = loginAndGetAccessToken("logout-claims@test.com", "password", "device-1");
+
+		// when: 로그아웃 요청
+		mockMvc.perform(post("/auth/logout")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk());
+
+		// then: 기존 토큰으로 클레임 조회 시 실패
+		mockMvc.perform(get("/auth/console/claims")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isUnauthorized());
+	}
 		
 		    @Test
 		    @DisplayName("전체 로그아웃 시 블랙리스트가 설정되고 쿠키가 삭제된다")	void logoutAll_shouldBlacklistAndClearCookie() throws Exception {
