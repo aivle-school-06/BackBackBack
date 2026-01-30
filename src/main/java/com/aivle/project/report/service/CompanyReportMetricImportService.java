@@ -256,10 +256,6 @@ public class CompanyReportMetricImportService {
 		if (trimmed.isBlank()) {
 			return "";
 		}
-		boolean hasNonDigit = !trimmed.chars().allMatch(Character::isDigit);
-		if (hasNonDigit) {
-			return trimmed;
-		}
 		if (trimmed.length() < 6) {
 			return "0".repeat(6 - trimmed.length()) + trimmed;
 		}
