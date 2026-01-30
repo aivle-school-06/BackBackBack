@@ -20,6 +20,7 @@ import com.aivle.project.user.entity.RoleName;
 import com.aivle.project.user.entity.UserEntity;
 import com.aivle.project.user.entity.UserRoleEntity;
 import com.aivle.project.user.entity.UserStatus;
+import com.aivle.project.user.repository.RoleRepository;
 import com.aivle.project.user.repository.UserRepository;
 import com.aivle.project.user.repository.UserRoleRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -85,6 +86,9 @@ class AuthIntegrationTest {
 
 	@Autowired
 	private UserRoleRepository userRoleRepository;
+
+	@Autowired
+	private RoleRepository roleRepository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -422,8 +426,10 @@ class AuthIntegrationTest {
 		UserEntity user = newUser(email, rawPassword);
 		userRepository.save(user);
 
-		RoleEntity role = new RoleEntity(roleName, roleName.name().toLowerCase() + " role");
-		entityManager.persist(role);
+		RoleEntity role = roleRepository.findByName(roleName)
+			.orElseGet(() -> roleRepository.save(
+				new RoleEntity(roleName, roleName.name().toLowerCase() + " role")
+			));
 
 		userRoleRepository.save(new UserRoleEntity(user, role));
 		entityManager.flush();

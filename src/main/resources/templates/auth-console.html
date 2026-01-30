@@ -490,6 +490,12 @@
 					setLog("로그인이 필요합니다. Auth Console에서 로그인 후 다시 시도하세요.");
 					return;
 				}
+				state.accessToken = "";
+				state.refreshToken = "";
+				state.accessExpiresIn = 0;
+				state.refreshExpiresIn = 0;
+				saveState();
+				updateTokenView();
 				setLog({ status: response.status, message: "logout" });
 			} catch (error) {
 				setLog({ error: error.message });
@@ -508,6 +514,12 @@
 					setLog("로그인이 필요합니다. Auth Console에서 로그인 후 다시 시도하세요.");
 					return;
 				}
+				state.accessToken = "";
+				state.refreshToken = "";
+				state.accessExpiresIn = 0;
+				state.refreshExpiresIn = 0;
+				saveState();
+				updateTokenView();
 				setLog({ status: response.status, message: "logout-all" });
 			} catch (error) {
 				setLog({ error: error.message });
