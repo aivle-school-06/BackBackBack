@@ -5,8 +5,11 @@ import com.aivle.project.common.error.CommonErrorCode;
 import com.aivle.project.common.error.CommonException;
 import com.aivle.project.report.dto.CompanyMetricValueCommand;
 import com.aivle.project.report.dto.ReportImportResult;
+import com.aivle.project.report.dto.ReportPredictRequest;
+import com.aivle.project.report.dto.ReportPredictResult;
 import com.aivle.project.report.importer.ExcelMetricParser;
 import com.aivle.project.report.service.CompanyReportMetricImportService;
+import com.aivle.project.report.service.CompanyReportMetricPredictService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -33,6 +38,7 @@ public class ReportMetricImportController {
 
 	private final ExcelMetricParser excelMetricParser;
 	private final CompanyReportMetricImportService companyReportMetricImportService;
+	private final CompanyReportMetricPredictService companyReportMetricPredictService;
 
 	@PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Operation(summary = "보고서 지표 엑셀 업로드", description = "관리자용 엑셀 업로드 API")
@@ -52,5 +58,14 @@ public class ReportMetricImportController {
 			log.info("보고서 지표 업로드 실패: {}", ex.getMessage());
 			throw new CommonException(CommonErrorCode.COMMON_400);
 		}
+	}
+
+	@PostMapping(value = "/predict", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "보고서 지표 예측값 적재", description = "관리자용 예측값 적재 API")
+	public ResponseEntity<ApiResponse<ReportPredictResult>> importPredictedMetrics(
+		@Valid @RequestBody ReportPredictRequest request
+	) {
+		ReportPredictResult result = companyReportMetricPredictService.importPredictedMetrics(request);
+		return ResponseEntity.ok(ApiResponse.ok(result));
 	}
 }
