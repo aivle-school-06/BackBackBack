@@ -1,6 +1,8 @@
 package com.aivle.project.metric.repository;
 
 import com.aivle.project.metric.entity.MetricsEntity;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,4 +12,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MetricsRepository extends JpaRepository<MetricsEntity, Long> {
 
 	Optional<MetricsEntity> findByMetricCode(String metricCode);
+
+	List<MetricsEntity> findAllByMetricNameEnIn(Collection<String> metricNameEns);
 }
