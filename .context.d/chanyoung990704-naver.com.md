@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-01-30 | 작업: prod 이메일 인증 유지 확인 | 결과: prod 설정에 skip=false 유지, dev는 skip=true로 복구 | 이슈: 없음
 - 2026-01-30 | 작업: env 예시/운영 env 템플릿 정합 | 결과: LOG_PATH/LOG_FILE 추가 및 README 로컬 실행 예시 갱신 | 이슈: 없음
 - 2026-01-30 | 작업: dev/prod DB 환경변수 체계 통일 | 결과: SPRING_DATASOURCE_* 기준으로 dev/prod 설정 정렬 | 이슈: 없음
 - 2026-01-30 | 작업: dev 전용 JPA SQL 로그/Turnstile 기본값 분리 | 결과: 공통 설정에서 dev 옵션 제거 및 prod에 Turnstile 키 요구 | 이슈: 없음
