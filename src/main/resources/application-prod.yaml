@@ -20,3 +20,7 @@ spring:
     multipart:
       max-file-size: ${FILE_MAX_SIZE:10MB}
       max-request-size: ${REQUEST_MAX_SIZE:20MB}
+
+turnstile:
+  secret-key: ${TURNSTILE_SECRET_KEY}
+  site-key: ${TURNSTILE_SITE_KEY}

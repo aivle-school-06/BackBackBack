@@ -12,6 +12,9 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 100 # In-memory batch fetching for to-many associations
+        format_sql: true # SQL 쿼리 포맷팅 (개발 환경에서 유용)
+        highlight_sql: true # SQL 쿼리 하이라이팅 (개발 환경에서 유용)
+    show-sql: true # 콘솔에 SQL 쿼리 출력 (개발 환경에서 유용)
   flyway:
     locations: classpath:db/migration
   test:
