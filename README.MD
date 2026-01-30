@@ -22,6 +22,35 @@
 - `.env.example`를 참고해 필요한 환경 변수를 주입합니다.
 - Spring Boot는 기본적으로 `.env`를 자동 로딩하지 않으므로, 셸/IDE 실행 설정에서 환경 변수를 지정합니다.
 
+### 필수 환경변수 요약
+
+**공통**
+- `SPRING_PROFILES_ACTIVE`
+- `APP_BASE_URL`
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+- `REDIS_HOST`
+- `REDIS_PORT`
+- `REDIS_PASSWORD`
+- `JWT_ISSUER`
+- `JWT_PRIVATE_KEY_PATH`
+- `JWT_PUBLIC_KEY_PATH`
+- `JWT_CURRENT_KID`
+- `TURNSTILE_SECRET_KEY`
+- `TURNSTILE_SITE_KEY`
+- `LOG_PATH`
+- `LOG_FILE`
+
+**메일 인증**
+- `EMAIL_USERNAME`
+- `EMAIL_PASSWORD`
+
+**S3 업로드 (prod)**
+- `AWS_S3_BUCKET`
+- `AWS_REGION`
+- `AWS_S3_PREFIX`
+
 ```bash
 export SPRING_PROFILES_ACTIVE=dev
 export SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/bigprj?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
