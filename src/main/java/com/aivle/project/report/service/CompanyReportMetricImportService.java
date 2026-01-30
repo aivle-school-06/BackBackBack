@@ -252,14 +252,18 @@ public class CompanyReportMetricImportService {
 		if (stockCode == null) {
 			return "";
 		}
-		String digits = stockCode.replaceAll("\\D", "");
-		if (digits.isBlank()) {
+		String trimmed = stockCode.trim();
+		if (trimmed.isBlank()) {
 			return "";
 		}
-		if (digits.length() < 6) {
-			return "0".repeat(6 - digits.length()) + digits;
+		boolean hasNonDigit = !trimmed.chars().allMatch(Character::isDigit);
+		if (hasNonDigit) {
+			return trimmed;
 		}
-		return digits;
+		if (trimmed.length() < 6) {
+			return "0".repeat(6 - trimmed.length()) + trimmed;
+		}
+		return trimmed;
 	}
 
 	private record MetricValueSeed(
