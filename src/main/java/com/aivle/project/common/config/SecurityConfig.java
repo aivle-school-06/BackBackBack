@@ -88,21 +88,21 @@ public class SecurityConfig {
 					"/swagger-ui.html",
 					"/swagger-ui/**",
 					"/openapi/**",
-					"/auth/login",
-					"/auth/refresh",
-					"/auth/signup",
+					"/api/auth/login",
+					"/api/auth/refresh",
+					"/api/auth/signup",
 					"/api/auth/verify-email",
 					"/api/auth/resend-verification",
 					"/actuator/health",
 					"/actuator/health/**",
 					"/error"
 				).permitAll();
-				authorize.requestMatchers(HttpMethod.GET, "/posts", "/posts/*", "/posts/*/comments", "/categories")
+				authorize.requestMatchers(HttpMethod.GET, "/api/posts", "/api/posts/*", "/api/posts/*/comments", "/api/categories")
 					.permitAll();
 				if (isDevProfile()) {
 					authorize.requestMatchers("/dev/**").permitAll();
 				}
-				authorize.requestMatchers("/admin/**").hasRole("ADMIN");
+				authorize.requestMatchers("/api/admin/**").hasRole("ADMIN");
 				authorize.anyRequest().authenticated();
 			})
 			.headers(headers -> headers.contentSecurityPolicy(csp -> csp
