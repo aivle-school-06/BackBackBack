@@ -1,5 +1,7 @@
 package com.aivle.project.common.config;
 
+import com.aivle.project.auth.service.AccessTokenBlacklistService;
+import com.aivle.project.auth.token.AccessTokenValidator;
 import com.aivle.project.auth.token.JwtKeyProvider;
 import com.aivle.project.auth.token.JwtProperties;
 import com.aivle.project.common.security.RestAccessDeniedHandler;
@@ -53,6 +55,7 @@ public class SecurityConfig {
 	private final JwtProperties jwtProperties;
 	private final RestAuthenticationEntryPoint authenticationEntryPoint;
 	private final RestAccessDeniedHandler accessDeniedHandler;
+	private final AccessTokenBlacklistService accessTokenBlacklistService;
 
 	@Bean
 	public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, JwtAuthenticationConverter jwtAuthenticationConverter)
@@ -82,10 +85,12 @@ public class SecurityConfig {
 					"/api/auth/resend-verification",
 					"/dev/console",
 					"/dev/file-console",
+					"/dev/report-predict-console",
 					"/error"
 				).permitAll()
 				.requestMatchers("/dev/categories").permitAll()
 				.requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
+				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated()
 			)
 			.headers(headers -> headers.contentSecurityPolicy(csp -> csp
@@ -129,7 +134,8 @@ public class SecurityConfig {
 		RSAPublicKey publicKey = jwtKeyProvider.loadPublicKey();
 		NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(publicKey).build();
 		OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefaultWithIssuer(jwtProperties.getIssuer());
-		decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(validator));
+		OAuth2TokenValidator<Jwt> accessTokenValidator = new AccessTokenValidator(accessTokenBlacklistService);
+		decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(validator, accessTokenValidator));
 		return decoder;
 	}
 

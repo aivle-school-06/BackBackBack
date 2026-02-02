@@ -46,4 +46,30 @@ public class CompanyReportVersionsEntity extends BaseEntity {
 	@Column(name = "is_published", nullable = false)
 	private boolean published;
 
+	/**
+	 * 보고서 버전 생성.
+	 */
+	public static CompanyReportVersionsEntity create(
+		CompanyReportsEntity companyReport,
+		int versionNo,
+		LocalDateTime generatedAt,
+		boolean published,
+		FilesEntity pdfFile
+	) {
+		CompanyReportVersionsEntity version = new CompanyReportVersionsEntity();
+		version.companyReport = companyReport;
+		version.versionNo = versionNo;
+		version.generatedAt = generatedAt;
+		version.published = published;
+		version.pdfFile = pdfFile;
+		return version;
+	}
+
+	/**
+	 * PDF를 연결하고 발행 상태로 전환한다.
+	 */
+	public void publishWithPdf(FilesEntity pdfFile) {
+		this.pdfFile = pdfFile;
+		this.published = true;
+	}
 }
