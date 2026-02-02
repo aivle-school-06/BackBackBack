@@ -46,7 +46,7 @@ class CompanySearchControllerTest {
 		));
 
 		// when & then
-		mockMvc.perform(get("/admin/companies/search")
+		mockMvc.perform(get("/api/admin/companies/search")
 				.param("keyword", "테스트")
 				.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
 			.andExpect(status().isOk())

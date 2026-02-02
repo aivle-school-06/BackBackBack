@@ -116,7 +116,7 @@ class ReportMetricQueryControllerTest {
 		));
 
 		// when & then
-		mockMvc.perform(get("/admin/reports/metrics/grouped")
+		mockMvc.perform(get("/api/admin/reports/metrics/grouped")
 				.param("stockCode", "000020")
 				.param("fromQuarterKey", "20244")
 				.param("toQuarterKey", "20253")
@@ -172,7 +172,7 @@ class ReportMetricQueryControllerTest {
 		));
 
 		// when & then
-		mockMvc.perform(get("/admin/reports/metrics/predict-latest")
+		mockMvc.perform(get("/api/admin/reports/metrics/predict-latest")
 				.param("stockCode", "000020")
 				.param("quarterKey", "20253")
 				.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
