@@ -71,9 +71,9 @@ The following table details the status of each API endpoint based on the backend
 
 | Feature | BE Endpoint | FE Implementation | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| **User Login** | `POST /auth/login` | `login()` in `services/auth.ts` | **Blocked by Mock** | The FE code exists but is disabled by `USE_MOCK_AUTH`. |
+| **User Login** | POST /api/auth/login | login() in services/auth.ts | **Blocked by Mock** | The FE code exists but is disabled by `USE_MOCK_AUTH`. |
 | **Get Current User** | `GET /auth/me` | *Not Implemented* | **Missing FE Code** | The FE currently stores the user object from the login response in local storage. It does not call this endpoint. |
-| **User Logout** | `POST /auth/logout` | `logout()` in `services/auth.ts` | **Blocked by Mock** | The FE code exists but is disabled by `USE_MOCK_AUTH`. |
+| **User Logout** | POST /api/auth/logout | logout() in services/auth.ts | **Blocked by Mock** | The FE code exists but is disabled by `USE_MOCK_AUTH`. |
 | **Dashboard Summary** | `GET /dashboard/summary` | `getDashboardSummary()` in `api/companies.ts` | **Blocked by Mock** | The FE code exists but is disabled by `USE_MOCK_API`. |
 | **Search Companies** | `GET /companies/search` | `searchCompanies()` in `api/companies.ts` | **Blocked by Mock** | The FE code exists but is disabled by `USE_MOCK_API`. |
 | **Confirm Company**| `POST /companies/confirm` | `confirmCompany()` in `api/companies.ts` | **Blocked by Mock** | The FE code exists but is disabled by `USE_MOCK_API`. |
@@ -87,4 +87,4 @@ The following table details the status of each API endpoint based on the backend
 
 *   **Access Token:** The FE correctly sends the access token as a `Bearer` token in the `Authorization` header for requests made via `http.ts`.
 *   **Refresh Token:** The BE sends the refresh token as a secure `HttpOnly` cookie. The frontend currently has **no logic** to handle this. For login persistence via refresh tokens to work, API requests (especially to a refresh endpoint) must be configured to include credentials (cookies).
-*   **User Registration:** The FE calls `/api/auth/register`, but this endpoint is **not defined** in the backend's `SENTINEL_PoC_API.yaml` specification. This is a significant gap.
+| **User Registration** | POST /api/auth/signup | signup() in services/auth.ts | **Fixed** | The FE now correctly calls the /api/auth/signup endpoint. |
