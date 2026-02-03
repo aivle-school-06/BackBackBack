@@ -19,6 +19,7 @@ DDL 원본은 아래 Flyway 마이그레이션 파일을 기준으로 관리합�
 ### companies
 - 기업 기본 정보
 - `corp_code`(UK), `stock_code`(UK)
+- `industry_name`: 업종명
 
 ### users
 - 사용자 계정

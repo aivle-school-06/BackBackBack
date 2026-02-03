@@ -34,6 +34,9 @@ public class CompaniesEntity extends BaseEntity {
 	@Column(name = "corp_eng_name", length = 200)
 	private String corpEngName;
 
+	@Column(name = "industry_name", length = 100)
+	private String industryName;
+
 	@Column(name = "stock_code", length = 6, columnDefinition = "CHAR(6)")
 	private String stockCode;
 
