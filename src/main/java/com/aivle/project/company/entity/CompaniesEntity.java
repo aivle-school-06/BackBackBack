@@ -62,4 +62,17 @@ public class CompaniesEntity extends BaseEntity {
 		company.industryCode = industryCode;
 		return company;
 	}
+
+	/**
+	 * 기업 엔티티 생성 (산업 코드 미지정).
+	 */
+	public static CompaniesEntity create(
+		String corpCode,
+		String corpName,
+		String corpEngName,
+		String stockCode,
+		LocalDate modifyDate
+	) {
+		return create(corpCode, corpName, corpEngName, stockCode, modifyDate, null);
+	}
 }
