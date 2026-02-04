@@ -7,6 +7,7 @@ import com.aivle.project.company.repository.CompaniesRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,14 @@ class IndustryRepositoryTest {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	@AfterEach
+	void tearDown() {
+		companiesRepository.deleteAll();
+		industryRepository.deleteAll();
+		entityManager.flush();
+		entityManager.clear();
+	}
 
 	@Test
 	@DisplayName("업종 코드를 통해 업종 정보를 조회한다")
