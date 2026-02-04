@@ -3,7 +3,7 @@
 CREATE TABLE industry_codes (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   industry_code VARCHAR(5) NOT NULL,
-  industry_name VARCHAR(100) NOT NULL,
+  industry_name VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   deleted_at TIMESTAMP,
