@@ -23,7 +23,7 @@ public class IndustryEntity extends BaseEntity {
     @Column(name = "industry_code", nullable = false, length = 5)
     private String industryCode;
 
-    @Column(name = "industry_name", nullable = false, length = 100)
+    @Column(name = "industry_name", length = 100)
     private String industryName;
 
 }
