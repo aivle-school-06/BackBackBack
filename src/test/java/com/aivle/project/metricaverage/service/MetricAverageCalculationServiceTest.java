@@ -145,8 +145,8 @@ class MetricAverageCalculationServiceTest {
 	}
 
 	@Test
-	@DisplayName("company_report의 base 분기와 값의 분기가 달라도 값의 분기 기준으로 집계한다")
-	void calculateByQuarter_whenReportQuarterDiffers_usesValueQuarter() {
+	@DisplayName("company_report 분기와 값의 분기가 다르면 집계에서 제외한다")
+	void calculateByQuarter_whenReportQuarterDiffers_excludesValue() {
 		// given
 		QuartersEntity baseQuarter = quartersRepository.save(QuartersEntity.create(
 			2025, 3, 20253, LocalDate.of(2025, 7, 1), LocalDate.of(2025, 9, 30)
@@ -169,9 +169,7 @@ class MetricAverageCalculationServiceTest {
 		List<MetricAverageResult> results = service.calculateAndUpsertByQuarter(targetQuarter.getId());
 
 		// then
-		assertThat(results).hasSize(1);
-		assertThat(results.get(0).metricId()).isEqualTo(roe.getId());
-		assertThat(results.get(0).avgValue()).isEqualByComparingTo("42.0000");
+		assertThat(results).isEmpty();
 	}
 
 	private CompanyReportVersionsEntity createVersion(CompanyReportsEntity report, int versionNo) {
