@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-06 | 작업: metric_averages 수동/스케줄 저장 경로 추가 | 결과: 관리자 초기 실행 API(`/api/admin/metric-averages/initialize`)와 새벽 3시 스케줄러 추가, dev/prod 스케줄 설정 반영, 컨트롤러/스케줄러 테스트 통과 | 이슈: 없음
 - 2026-02-06 | 작업: metric_averages 저장 정책 분리(기존 데이터 skip) | 결과: 분기/전체 저장 결과 DTO 추가 및 insert-if-missing 서비스 메서드 구현, 관련 서비스 테스트 추가 통과 | 이슈: 없음
 - 2026-02-05 | 작업: Swagger 누락 컨트롤러 전수 보강 | 결과: CompanyWatchlistController에 Tag/Operation/ApiResponses/Parameter/보안요구 추가, DevHome/Favicon 컨트롤러는 @Hidden 처리, 전체 테스트 통과 | 이슈: 없음
 - 2026-02-05 | 작업: 뉴스 datetime 파싱 혼재 포맷 대응 | 결과: News DTO의 날짜 필드를 문자열로 수신하고 서비스에서 offset 포함/미포함을 모두 처리하는 파서(OffsetDateTime→LocalDateTime fallback) 추가, NewsArticleDto 변환 로직도 문자열 날짜 파싱 지원으로 보강, 관련 테스트 통과 | 이슈: 없음
