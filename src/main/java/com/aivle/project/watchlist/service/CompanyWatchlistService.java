@@ -2,6 +2,7 @@ package com.aivle.project.watchlist.service;
 
 import com.aivle.project.company.entity.CompaniesEntity;
 import com.aivle.project.company.repository.CompaniesRepository;
+import com.aivle.project.common.error.CommonException;
 import com.aivle.project.metric.entity.MetricValueType;
 import com.aivle.project.quarter.entity.QuartersEntity;
 import com.aivle.project.quarter.repository.QuartersRepository;
@@ -12,6 +13,7 @@ import com.aivle.project.watchlist.dto.WatchlistDashboardMetricRow;
 import com.aivle.project.watchlist.dto.WatchlistDashboardResponse;
 import com.aivle.project.watchlist.dto.WatchlistDashboardRiskRow;
 import com.aivle.project.watchlist.entity.CompanyWatchlistEntity;
+import com.aivle.project.watchlist.error.WatchlistErrorCode;
 import com.aivle.project.watchlist.repository.CompanyWatchlistRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +33,7 @@ public class CompanyWatchlistService {
 	public void addWatchlist(Long userId, Long companyId, String note) {
 		CompanyWatchlistEntity existing = companyWatchlistRepository.findByUserIdAndCompanyId(userId, companyId).orElse(null);
 		if (existing != null) {
-			existing.restore();
-			existing.updateNote(note);
-			return;
+			throw new CommonException(WatchlistErrorCode.WATCHLIST_DUPLICATE);
 		}
 		UserEntity user = userRepository.getReferenceById(userId);
 		CompaniesEntity company = companiesRepository.getReferenceById(companyId);
@@ -43,9 +43,9 @@ public class CompanyWatchlistService {
 	@Transactional
 	public void removeWatchlist(Long userId, Long companyId) {
 		CompanyWatchlistEntity existing = companyWatchlistRepository.findByUserIdAndCompanyId(userId, companyId)
-			.orElseThrow(() -> new IllegalArgumentException("watchlist가 존재하지 않습니다."));
+			.orElseThrow(() -> new CommonException(WatchlistErrorCode.WATCHLIST_NOT_FOUND));
 		if (!existing.getUser().getId().equals(userId)) {
-			throw new IllegalArgumentException("다른 사용자의 watchlist는 삭제할 수 없습니다.");
+			throw new CommonException(WatchlistErrorCode.WATCHLIST_FORBIDDEN);
 		}
 		existing.delete();
 	}

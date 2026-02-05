@@ -1,10 +1,12 @@
 package com.aivle.project.watchlist.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.aivle.project.company.entity.CompaniesEntity;
 import com.aivle.project.company.repository.CompaniesRepository;
 import com.aivle.project.metric.entity.MetricValueType;
+import com.aivle.project.common.error.CommonException;
 import com.aivle.project.metric.entity.MetricsEntity;
 import com.aivle.project.metric.repository.MetricsRepository;
 import com.aivle.project.metricaverage.repository.MetricAverageRepository;
@@ -28,6 +30,7 @@ import com.aivle.project.user.repository.RoleRepository;
 import com.aivle.project.user.repository.UserRepository;
 import com.aivle.project.user.repository.UserRoleRepository;
 import com.aivle.project.watchlist.dto.WatchlistDashboardResponse;
+import com.aivle.project.watchlist.error.WatchlistErrorCode;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,6 +56,23 @@ class CompanyWatchlistServiceTest {
 	@Autowired CompanyReportMetricValuesRepository metricValuesRepository;
 	@Autowired MetricsRepository metricsRepository;
 	@Autowired RiskScoreSummaryRepository riskScoreSummaryRepository;
+
+	@Test
+	@DisplayName("동일 기업을 중복 저장하면 CONFLICT 예외를 반환한다")
+	void addWatchlistThrowsWhenDuplicate() {
+		// given
+		UserEntity user = userRepository.save(UserEntity.create("dup@test.com", "pw", "dup", null, UserStatus.ACTIVE));
+		RoleEntity role = roleRepository.save(new RoleEntity(RoleName.ROLE_USER, "user"));
+		userRoleRepository.save(new UserRoleEntity(user, role));
+		CompaniesEntity company = companiesRepository.save(CompaniesEntity.create("00000078", "중복기업", "DUP", "778888", LocalDate.now()));
+		service.addWatchlist(user.getId(), company.getId(), "first");
+
+		// when & then
+		assertThatThrownBy(() -> service.addWatchlist(user.getId(), company.getId(), "second"))
+			.isInstanceOf(CommonException.class)
+			.extracting(ex -> ((CommonException) ex).getErrorCode())
+			.isEqualTo(WatchlistErrorCode.WATCHLIST_DUPLICATE);
+	}
 
 	@Test
 	@DisplayName("watchlist 대시보드는 최신 버전 ACTUAL 비위험 지표만 조회한다")
