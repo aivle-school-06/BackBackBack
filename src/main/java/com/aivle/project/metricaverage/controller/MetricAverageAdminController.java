@@ -6,6 +6,7 @@ import com.aivle.project.metricaverage.service.MetricAverageBatchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +28,10 @@ public class MetricAverageAdminController {
 	@PostMapping("/initialize")
 	@Operation(summary = "전체 분기 통계 초기 저장", description = "모든 분기를 순회하며 metric_averages를 없을 때만 저장합니다.")
 	public ResponseEntity<ApiResponse<MetricAverageBatchSaveResult>> initialize() {
-		MetricAverageBatchSaveResult result = metricAverageBatchService.calculateAndInsertMissingAllQuarters();
+		MetricAverageBatchSaveResult result = metricAverageBatchService.calculateAndInsertMissingAllQuarters(
+			"MANUAL",
+			UUID.randomUUID().toString()
+		);
 		return ResponseEntity.ok(ApiResponse.ok(result));
 	}
 }

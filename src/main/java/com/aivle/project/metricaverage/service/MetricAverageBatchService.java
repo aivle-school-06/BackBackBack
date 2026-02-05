@@ -29,7 +29,7 @@ public class MetricAverageBatchService {
 	}
 
 	@Transactional
-	public MetricAverageBatchSaveResult calculateAndInsertMissingAllQuarters() {
+	public MetricAverageBatchSaveResult calculateAndInsertMissingAllQuarters(String triggerType, String executionId) {
 		List<QuartersEntity> quarters = quartersRepository.findAll();
 		int processedQuarterCount = 0;
 		int insertedCount = 0;
@@ -41,6 +41,6 @@ public class MetricAverageBatchService {
 			insertedCount += result.insertedCount();
 			skippedCount += result.skippedCount();
 		}
-		return new MetricAverageBatchSaveResult(processedQuarterCount, insertedCount, skippedCount);
+		return new MetricAverageBatchSaveResult(processedQuarterCount, insertedCount, skippedCount, triggerType, executionId);
 	}
 }

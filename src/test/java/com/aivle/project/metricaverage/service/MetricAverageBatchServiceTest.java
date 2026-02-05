@@ -112,12 +112,17 @@ class MetricAverageBatchServiceTest {
 		));
 
 		// when
-		MetricAverageBatchSaveResult result = metricAverageBatchService.calculateAndInsertMissingAllQuarters();
+		MetricAverageBatchSaveResult result = metricAverageBatchService.calculateAndInsertMissingAllQuarters(
+			"TEST",
+			"exec-test"
+		);
 
 		// then
 		assertThat(result.processedQuarterCount()).isGreaterThanOrEqualTo(2);
 		assertThat(result.insertedCount()).isEqualTo(1);
 		assertThat(result.skippedCount()).isEqualTo(1);
+		assertThat(result.triggerType()).isEqualTo("TEST");
+		assertThat(result.executionId()).isEqualTo("exec-test");
 	}
 
 	private void saveActualMetric(CompaniesEntity company, QuartersEntity quarter, MetricsEntity metric, BigDecimal value) {

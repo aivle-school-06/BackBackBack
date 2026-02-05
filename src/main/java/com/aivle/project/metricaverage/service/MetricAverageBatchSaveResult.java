@@ -6,6 +6,8 @@ package com.aivle.project.metricaverage.service;
 public record MetricAverageBatchSaveResult(
 	int processedQuarterCount,
 	int insertedCount,
-	int skippedCount
+	int skippedCount,
+	String triggerType,
+	String executionId
 ) {
 }

@@ -2,6 +2,7 @@ package com.aivle.project.metricaverage.batch;
 
 import com.aivle.project.metricaverage.service.MetricAverageBatchSaveResult;
 import com.aivle.project.metricaverage.service.MetricAverageBatchService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,8 +22,11 @@ public class MetricAverageScheduler {
 
 	@Scheduled(cron = "${metric-average.schedule.cron:0 0 3 * * *}")
 	public void saveMissingMetricAveragesDaily() {
-		MetricAverageBatchSaveResult result = metricAverageBatchService.calculateAndInsertMissingAllQuarters();
-		log.info("metric_averages 스케줄 저장 완료. processedQuarterCount={}, insertedCount={}, skippedCount={}",
-			result.processedQuarterCount(), result.insertedCount(), result.skippedCount());
+		MetricAverageBatchSaveResult result = metricAverageBatchService.calculateAndInsertMissingAllQuarters(
+			"SCHEDULE",
+			UUID.randomUUID().toString()
+		);
+		log.info("metric_averages 스케줄 저장 완료. triggerType={}, executionId={}, processedQuarterCount={}, insertedCount={}, skippedCount={}",
+			result.triggerType(), result.executionId(), result.processedQuarterCount(), result.insertedCount(), result.skippedCount());
 	}
 }

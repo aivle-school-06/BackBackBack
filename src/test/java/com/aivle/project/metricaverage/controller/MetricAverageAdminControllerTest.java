@@ -1,6 +1,7 @@
 package com.aivle.project.metricaverage.controller;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,8 +37,8 @@ class MetricAverageAdminControllerTest {
 	@DisplayName("전체 분기 metric_averages 초기 저장 API가 성공한다")
 	void initialize_shouldReturnBatchResult() throws Exception {
 		// given
-		given(metricAverageBatchService.calculateAndInsertMissingAllQuarters())
-			.willReturn(new MetricAverageBatchSaveResult(10, 120, 80));
+		given(metricAverageBatchService.calculateAndInsertMissingAllQuarters(anyString(), anyString()))
+			.willReturn(new MetricAverageBatchSaveResult(10, 120, 80, "MANUAL", "exec-1"));
 
 		// when & then
 		mockMvc.perform(post("/api/admin/metric-averages/initialize")
@@ -46,6 +47,8 @@ class MetricAverageAdminControllerTest {
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.processedQuarterCount").value(10))
 			.andExpect(jsonPath("$.data.insertedCount").value(120))
-			.andExpect(jsonPath("$.data.skippedCount").value(80));
+			.andExpect(jsonPath("$.data.skippedCount").value(80))
+			.andExpect(jsonPath("$.data.triggerType").value("MANUAL"))
+			.andExpect(jsonPath("$.data.executionId").value("exec-1"));
 	}
 }
