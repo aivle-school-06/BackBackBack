@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-05 | 작업: 뉴스 컨트롤러 Swagger 문서 보강 | 결과: NewsController에 bearerAuth 보안 요구사항 및 200/401/404 응답 문서(@ApiResponses) 추가, 뉴스 컨트롤러 테스트 통과 | 이슈: 없음
 - 2026-02-05 | 작업: companies-업종 코드 외래키 마이그레이션 추가 | 결과: MySQL/H2에 V15__add_companies_industry_code_fk.sql 추가로 companies.industry_code_id 컬럼/인덱스/FK(fk_companies_industry_code, ON DELETE SET NULL) 반영 | 이슈: 없음
 - 2026-02-05 | 작업: watchlist 중복 저장 정책을 충돌 에러로 변경 | 결과: 중복 등록 시 restore 대신 WATCHLIST_DUPLICATE(409, '중복저장입니다.')를 ApiResponse 오류 포맷으로 반환하도록 WatchlistErrorCode/서비스/테스트 반영 | 이슈: 없음
 - 2026-02-05 | 작업: 분기 전체 대상 metric_averages 배치 서비스 구현 | 결과: quarters 전체 순회로 분기별 비위험 ACTUAL 최신버전 집계를 저장하는 MetricAverageBatchService 및 테스트 추가, 관련 테스트 통과 | 이슈: 없음

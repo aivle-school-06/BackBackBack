@@ -4,7 +4,11 @@ import com.aivle.project.common.dto.ApiResponse;
 import com.aivle.project.company.news.dto.NewsAnalysisResponse;
 import com.aivle.project.company.news.service.NewsService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +35,13 @@ public class NewsController {
      */
     @PostMapping("/{stockCode}/news/fetch")
     @Operation(summary = "뉴스 분석 수집", description = "AI 서버에서 뉴스 분석 데이터를 가져와 저장합니다.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "뉴스 수집 및 저장 성공",
+                    content = @Content(schema = @Schema(implementation = com.aivle.project.common.dto.ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "기업을 찾을 수 없음")
+    })
     public ResponseEntity<ApiResponse<NewsAnalysisResponse>> fetchNews(
             @Parameter(description = "기업 코드 (stock_code)", example = "000020")
             @PathVariable String stockCode
@@ -47,6 +58,13 @@ public class NewsController {
      */
     @GetMapping("/{stockCode}/news/latest")
     @Operation(summary = "최신 뉴스 조회", description = "기업의 최신 뉴스 분석 결과를 조회합니다.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "최신 뉴스 조회 성공",
+                    content = @Content(schema = @Schema(implementation = com.aivle.project.common.dto.ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "기업을 찾을 수 없음")
+    })
     public ResponseEntity<ApiResponse<NewsAnalysisResponse>> getLatestNews(
             @Parameter(description = "기업 코드 (stock_code)", example = "000020")
             @PathVariable String stockCode
@@ -74,6 +92,13 @@ public class NewsController {
      */
     @GetMapping("/{stockCode}/news/history")
     @Operation(summary = "뉴스 분석 이력 조회", description = "특정 기간의 뉴스 분석 이력을 조회합니다.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "뉴스 이력 조회 성공",
+                    content = @Content(schema = @Schema(implementation = com.aivle.project.common.dto.ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "기업을 찾을 수 없음")
+    })
     public ResponseEntity<ApiResponse<java.util.List<NewsAnalysisResponse>>> getNewsHistory(
             @Parameter(description = "기업 코드 (stock_code)", example = "000020")
             @PathVariable String stockCode,
