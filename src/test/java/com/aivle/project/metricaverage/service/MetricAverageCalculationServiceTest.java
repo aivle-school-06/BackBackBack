@@ -102,6 +102,48 @@ class MetricAverageCalculationServiceTest {
 		assertThat(saved.getAvgValue()).isEqualByComparingTo("40.0000");
 	}
 
+	@Test
+	@DisplayName("이미 저장된 분기-지표는 insert 대상에서 제외한다")
+	void calculateAndInsertMissingByQuarter_skipExisting() {
+		// given
+		QuartersEntity quarter = quartersRepository.save(QuartersEntity.create(
+			2026, 1, 20261, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31)
+		));
+		CompaniesEntity company = companiesRepository.save(CompaniesEntity.create(
+			"00020001", "SKIP", "SKIP", "200001", LocalDate.now()
+		));
+		List<MetricsEntity> nonRiskMetrics = metricsRepository.findAll().stream()
+			.filter(metric -> !metric.isRiskIndicator())
+			.limit(2)
+			.toList();
+		MetricsEntity roe = nonRiskMetrics.get(0);
+		MetricsEntity anotherMetric = nonRiskMetrics.get(1);
+
+		CompanyReportsEntity report = companyReportsRepository.save(CompanyReportsEntity.create(company, quarter, null));
+		CompanyReportVersionsEntity version = createVersion(report, 1);
+		companyReportMetricValuesRepository.save(CompanyReportMetricValuesEntity.create(
+			version, roe, quarter, new BigDecimal("10"), MetricValueType.ACTUAL));
+		companyReportMetricValuesRepository.save(CompanyReportMetricValuesEntity.create(
+			version, anotherMetric, quarter, new BigDecimal("20"), MetricValueType.ACTUAL));
+
+		metricAverageRepository.save(MetricAverageEntity.create(
+			quarter, roe,
+			new BigDecimal("99.0000"), new BigDecimal("99.0000"), new BigDecimal("99.0000"),
+			new BigDecimal("99.0000"), BigDecimal.ZERO.setScale(4), 1, LocalDateTime.now(), 1
+		));
+
+		// when
+		QuarterMetricAverageSaveResult result = service.calculateAndInsertMissingByQuarter(quarter.getId());
+
+		// then
+		assertThat(result.insertedCount()).isEqualTo(1);
+		assertThat(result.skippedCount()).isEqualTo(1);
+		assertThat(metricAverageRepository.count()).isEqualTo(2);
+
+		MetricAverageEntity existing = metricAverageRepository.findByQuarterIdAndMetricId(quarter.getId(), roe.getId()).orElseThrow();
+		assertThat(existing.getAvgValue()).isEqualByComparingTo("99.0000");
+	}
+
 	private CompanyReportVersionsEntity createVersion(CompanyReportsEntity report, int versionNo) {
 		return companyReportVersionsRepository.save(
 			CompanyReportVersionsEntity.create(report, versionNo, LocalDateTime.now(), false, null)

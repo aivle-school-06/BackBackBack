@@ -88,6 +88,38 @@ class MetricAverageBatchServiceTest {
 			});
 	}
 
+	@Test
+	@DisplayName("전체 분기 저장 시 기존 데이터는 skip한다")
+	void calculateAndInsertMissingAllQuarters_skipExisting() {
+		// given
+		QuartersEntity q1 = quartersRepository.save(QuartersEntity.create(
+			2026, 1, 20261, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31)
+		));
+		QuartersEntity q2 = quartersRepository.save(QuartersEntity.create(
+			2026, 2, 20262, LocalDate.of(2026, 4, 1), LocalDate.of(2026, 6, 30)
+		));
+		MetricsEntity roe = metricsRepository.findByMetricCode("ROE").orElseThrow();
+		CompaniesEntity company = companiesRepository.save(CompaniesEntity.create(
+			"90000002", "배치기업2", "BATCH2", "900002", LocalDate.of(2026, 1, 1)
+		));
+		saveActualMetric(company, q1, roe, new BigDecimal("15"));
+		saveActualMetric(company, q2, roe, new BigDecimal("25"));
+
+		metricAverageRepository.save(MetricAverageEntity.create(
+			q1, roe,
+			new BigDecimal("88.0000"), new BigDecimal("88.0000"), new BigDecimal("88.0000"),
+			new BigDecimal("88.0000"), BigDecimal.ZERO.setScale(4), 1, LocalDateTime.now(), 1
+		));
+
+		// when
+		MetricAverageBatchSaveResult result = metricAverageBatchService.calculateAndInsertMissingAllQuarters();
+
+		// then
+		assertThat(result.processedQuarterCount()).isGreaterThanOrEqualTo(2);
+		assertThat(result.insertedCount()).isEqualTo(1);
+		assertThat(result.skippedCount()).isEqualTo(1);
+	}
+
 	private void saveActualMetric(CompaniesEntity company, QuartersEntity quarter, MetricsEntity metric, BigDecimal value) {
 		CompanyReportsEntity report = companyReportsRepository.save(CompanyReportsEntity.create(company, quarter, null));
 		CompanyReportVersionsEntity version = companyReportVersionsRepository.save(

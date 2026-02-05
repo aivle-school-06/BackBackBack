@@ -27,4 +27,20 @@ public class MetricAverageBatchService {
 		}
 		return processedQuarterCount;
 	}
+
+	@Transactional
+	public MetricAverageBatchSaveResult calculateAndInsertMissingAllQuarters() {
+		List<QuartersEntity> quarters = quartersRepository.findAll();
+		int processedQuarterCount = 0;
+		int insertedCount = 0;
+		int skippedCount = 0;
+		for (QuartersEntity quarter : quarters) {
+			QuarterMetricAverageSaveResult result =
+				metricAverageCalculationService.calculateAndInsertMissingByQuarter(quarter.getId());
+			processedQuarterCount++;
+			insertedCount += result.insertedCount();
+			skippedCount += result.skippedCount();
+		}
+		return new MetricAverageBatchSaveResult(processedQuarterCount, insertedCount, skippedCount);
+	}
 }
