@@ -4,6 +4,7 @@ import com.aivle.project.common.security.CurrentUser;
 import com.aivle.project.risk.entity.RiskLevel;
 import com.aivle.project.watchlist.dto.WatchlistAddRequest;
 import com.aivle.project.watchlist.dto.WatchlistDashboardResponse;
+import com.aivle.project.watchlist.dto.WatchlistMetricAveragesResponse;
 import com.aivle.project.watchlist.service.CompanyWatchlistService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -76,6 +77,23 @@ public class CompanyWatchlistController {
 		@Parameter(description = "위험도 필터", example = "DANGER") @RequestParam(required = false) RiskLevel riskLevel
 	) {
 		WatchlistDashboardResponse response = companyWatchlistService.getDashboard(userId, year, quarter, metricCodes, riskLevel);
+		return ResponseEntity.ok(com.aivle.project.common.dto.ApiResponse.ok(response));
+	}
+
+	@GetMapping("/metric-averages")
+	@Operation(summary = "워치리스트 지표 평균 조회", description = "선택한 분기에 대해 내 워치리스트 기업들의 비위험 지표 평균(ACTUAL, 최신 발행 버전 기준)을 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "조회 성공"),
+		@ApiResponse(responseCode = "400", description = "요청 값 오류"),
+		@ApiResponse(responseCode = "401", description = "인증 필요")
+	})
+	public ResponseEntity<com.aivle.project.common.dto.ApiResponse<WatchlistMetricAveragesResponse>> metricAverages(
+		@CurrentUser Long userId,
+		@Parameter(description = "조회 연도", example = "2026") @RequestParam int year,
+		@Parameter(description = "조회 분기", example = "1") @RequestParam int quarter,
+		@Parameter(description = "조회할 지표 코드 목록(미입력 시 전체)", example = "ROE,ROA") @RequestParam(required = false) List<String> metricCodes
+	) {
+		WatchlistMetricAveragesResponse response = companyWatchlistService.getWatchlistMetricAverages(userId, year, quarter, metricCodes);
 		return ResponseEntity.ok(com.aivle.project.common.dto.ApiResponse.ok(response));
 	}
 }

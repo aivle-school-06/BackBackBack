@@ -12,6 +12,8 @@ import com.aivle.project.user.repository.UserRepository;
 import com.aivle.project.watchlist.dto.WatchlistDashboardMetricRow;
 import com.aivle.project.watchlist.dto.WatchlistDashboardResponse;
 import com.aivle.project.watchlist.dto.WatchlistDashboardRiskRow;
+import com.aivle.project.watchlist.dto.WatchlistMetricAverageRow;
+import com.aivle.project.watchlist.dto.WatchlistMetricAveragesResponse;
 import com.aivle.project.watchlist.entity.CompanyWatchlistEntity;
 import com.aivle.project.watchlist.error.WatchlistErrorCode;
 import com.aivle.project.watchlist.repository.CompanyWatchlistRepository;
@@ -84,5 +86,29 @@ public class CompanyWatchlistService {
 		)).toList();
 
 		return new WatchlistDashboardResponse(year, quarter, metrics, risks);
+	}
+
+	@Transactional(readOnly = true)
+	public WatchlistMetricAveragesResponse getWatchlistMetricAverages(Long userId, int year, int quarter, List<String> metricCodes) {
+		quartersRepository.findByYearAndQuarter((short) year, (byte) quarter)
+			.orElseThrow(() -> new IllegalArgumentException("유효하지 않은 분기입니다."));
+		List<String> codes = metricCodes == null ? List.of() : metricCodes.stream().map(String::trim).filter(s -> !s.isBlank()).toList();
+		boolean emptyCodes = codes.isEmpty();
+
+		List<WatchlistMetricAverageRow> metrics = companyWatchlistRepository.findWatchlistMetricAverages(
+			userId,
+			(short) year,
+			(byte) quarter,
+			MetricValueType.ACTUAL,
+			emptyCodes ? List.of("__none__") : codes,
+			emptyCodes
+		).stream().map(p -> new WatchlistMetricAverageRow(
+			p.getMetricCode(),
+			p.getMetricNameKo(),
+			p.getAvgValue(),
+			p.getSampleCompanyCount()
+		)).toList();
+
+		return new WatchlistMetricAveragesResponse(year, quarter, metrics);
 	}
 }
