@@ -144,6 +144,36 @@ class MetricAverageCalculationServiceTest {
 		assertThat(existing.getAvgValue()).isEqualByComparingTo("99.0000");
 	}
 
+	@Test
+	@DisplayName("company_report의 base 분기와 값의 분기가 달라도 값의 분기 기준으로 집계한다")
+	void calculateByQuarter_whenReportQuarterDiffers_usesValueQuarter() {
+		// given
+		QuartersEntity baseQuarter = quartersRepository.save(QuartersEntity.create(
+			2025, 3, 20253, LocalDate.of(2025, 7, 1), LocalDate.of(2025, 9, 30)
+		));
+		QuartersEntity targetQuarter = quartersRepository.save(QuartersEntity.create(
+			2025, 2, 20252, LocalDate.of(2025, 4, 1), LocalDate.of(2025, 6, 30)
+		));
+		CompaniesEntity company = companiesRepository.save(CompaniesEntity.create(
+			"00030001", "OFFSET", "OFFSET", "300001", LocalDate.now()
+		));
+		MetricsEntity roe = metricsRepository.findByMetricCode("ROE").orElseThrow();
+
+		CompanyReportsEntity report = companyReportsRepository.save(CompanyReportsEntity.create(company, baseQuarter, null));
+		CompanyReportVersionsEntity version = createVersion(report, 1);
+		companyReportMetricValuesRepository.save(CompanyReportMetricValuesEntity.create(
+			version, roe, targetQuarter, new BigDecimal("42"), MetricValueType.ACTUAL
+		));
+
+		// when
+		List<MetricAverageResult> results = service.calculateAndUpsertByQuarter(targetQuarter.getId());
+
+		// then
+		assertThat(results).hasSize(1);
+		assertThat(results.get(0).metricId()).isEqualTo(roe.getId());
+		assertThat(results.get(0).avgValue()).isEqualByComparingTo("42.0000");
+	}
+
 	private CompanyReportVersionsEntity createVersion(CompanyReportsEntity report, int versionNo) {
 		return companyReportVersionsRepository.save(
 			CompanyReportVersionsEntity.create(report, versionNo, LocalDateTime.now(), false, null)

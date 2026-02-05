@@ -111,8 +111,7 @@ public interface CompanyReportMetricValuesRepository extends JpaRepository<Compa
 		join v.reportVersion rv
 		join rv.companyReport cr
 		join v.metric m
-		where cr.quarter.id = :quarterId
-			and v.quarter.id = :quarterId
+		where v.quarter.id = :quarterId
 			and v.valueType = :valueType
 			and m.isRiskIndicator = false
 			and v.metricValue is not null
