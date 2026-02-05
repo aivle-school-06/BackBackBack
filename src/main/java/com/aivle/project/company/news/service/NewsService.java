@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,7 +58,7 @@ public class NewsService {
                         .totalCount(apiResponse.totalCount())
                         .averageScore(apiResponse.averageScore() != null ?
                                 BigDecimal.valueOf(apiResponse.averageScore()) : null)
-                        .analyzedAt(apiResponse.analyzedAt())
+                        .analyzedAt(parseToUtcLocalDateTime(apiResponse.analyzedAt(), "analyzedAt"))
                         .build();
 
         com.aivle.project.company.news.entity.NewsAnalysisEntity savedAnalysis =
@@ -140,9 +143,25 @@ public class NewsService {
                 .title(item.title())
                 .summary(item.summary())
                 .score(item.score() != null ? BigDecimal.valueOf(item.score()) : null)
-                .publishedAt(item.date())
+                .publishedAt(parseToUtcLocalDateTime(item.date(), "news.date"))
                 .link(item.link())
                 .sentiment(item.sentiment() != null ? item.sentiment() : "NEU")
                 .build();
+    }
+
+    // AI 서버가 offset 포함/미포함 datetime을 혼합 응답하므로 둘 다 허용합니다.
+    private LocalDateTime parseToUtcLocalDateTime(String rawDateTime, String fieldName) {
+        if (rawDateTime == null || rawDateTime.isBlank()) {
+            return null;
+        }
+        try {
+            return OffsetDateTime.parse(rawDateTime).atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        } catch (DateTimeParseException ignored) {
+            try {
+                return LocalDateTime.parse(rawDateTime);
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Invalid datetime format for " + fieldName + ": " + rawDateTime, e);
+            }
+        }
     }
 }

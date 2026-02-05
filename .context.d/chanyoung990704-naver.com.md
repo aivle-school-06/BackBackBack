@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-05 | 작업: 뉴스 datetime 파싱 혼재 포맷 대응 | 결과: News DTO의 날짜 필드를 문자열로 수신하고 서비스에서 offset 포함/미포함을 모두 처리하는 파서(OffsetDateTime→LocalDateTime fallback) 추가, NewsArticleDto 변환 로직도 문자열 날짜 파싱 지원으로 보강, 관련 테스트 통과 | 이슈: 없음
 - 2026-02-05 | 작업: 뉴스 AI 응답 날짜 파싱 오류 대응 | 결과: NewsApiResponse/NewsItemResponse 날짜 타입을 LocalDateTime으로 변경하고 NewsService 저장 로직을 무오프셋 포맷에 맞게 수정, NewsClient에 DecodingException 분기 처리로 "AI Server response format error" 메시지 분리, 관련 뉴스 서비스/컨트롤러 테스트 통과 | 이슈: 없음
 - 2026-02-05 | 작업: 뉴스 컨트롤러 Swagger 문서 보강 | 결과: NewsController에 bearerAuth 보안 요구사항 및 200/401/404 응답 문서(@ApiResponses) 추가, 뉴스 컨트롤러 테스트 통과 | 이슈: 없음
 - 2026-02-05 | 작업: companies-업종 코드 외래키 마이그레이션 추가 | 결과: MySQL/H2에 V15__add_companies_industry_code_fk.sql 추가로 companies.industry_code_id 컬럼/인덱스/FK(fk_companies_industry_code, ON DELETE SET NULL) 반영 | 이슈: 없음

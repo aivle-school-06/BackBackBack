@@ -68,7 +68,7 @@ class NewsServiceTest {
                 "동화약품, 연구개발본부장에 장재원 전무",
                 "기사의 본문이 제공되지 않아 구체적인 내용을 요약할 수 없습니다.",
                 0.0007,
-                LocalDateTime.parse("2026-01-30T09:34:00"),
+                "2026-01-30T09:34:00+09:00",
                 "https://n.news.naver.com/mnews/article/003/0013739277?sid=102",
                 "NEU"
         );
@@ -78,7 +78,7 @@ class NewsServiceTest {
                 1,
                 List.of(newsItem),
                 0.0007,
-                LocalDateTime.now()
+                "2026-02-05T14:10:57.932669"
         );
 
         when(companiesRepository.findByStockCode(stockCode)).thenReturn(Optional.of(company));
@@ -158,7 +158,7 @@ class NewsServiceTest {
                 "동화약품, 연구개발본부장에 장재원 전무",
                 "기사의 본문이 제공되지 않아 구체적인 내용을 요약할 수 없습니다.",
                 0.0007,
-                LocalDateTime.parse("2026-01-30T09:34:00"),
+                "2026-01-30T09:34:00+09:00",
                 "https://n.news.naver.com/mnews/article/003/0013739277?sid=102",
                 "NEU"
         );
@@ -168,7 +168,7 @@ class NewsServiceTest {
                 newsItem.title(),
                 newsItem.summary(),
                 BigDecimal.valueOf(newsItem.score()),
-                newsItem.date(),
+                LocalDateTime.parse("2026-01-30T00:34:00"),
                 newsItem.link(),
                 newsItem.sentiment()
         );
@@ -256,7 +256,7 @@ class NewsServiceTest {
                 "동화약품, 연구개발본부장에 장재원 전무",
                 "기사의 본문이 제공되지 않아 구체적인 내용을 요약할 수 없습니다.",
                 0.0007,
-                LocalDateTime.parse("2026-01-30T09:34:00"),
+                "2026-01-30T09:34:00+09:00",
                 "https://n.news.naver.com/mnews/article/003/0013739277?sid=102",
                 "NEU"
         );
@@ -266,7 +266,7 @@ class NewsServiceTest {
                 newsItem.title(),
                 newsItem.summary(),
                 BigDecimal.valueOf(newsItem.score()),
-                newsItem.date(),
+                LocalDateTime.parse("2026-01-30T00:34:00"),
                 newsItem.link(),
                 newsItem.sentiment()
         );

@@ -3,7 +3,6 @@ package com.aivle.project.company.news.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -16,6 +15,6 @@ public record NewsApiResponse(
     Integer totalCount,
     List<NewsItemResponse> news,
     Double averageScore,
-    LocalDateTime analyzedAt
+    String analyzedAt
 ) {
 }

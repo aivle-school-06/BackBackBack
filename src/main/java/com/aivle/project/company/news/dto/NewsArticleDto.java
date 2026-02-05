@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 
 /**
  * 뉴스 기사 DTO.
@@ -61,10 +62,21 @@ public record NewsArticleDto(
             item.title(),
             item.summary(),
             item.score() != null ? item.score() : null,
-            item.date() != null ? item.date().atOffset(ZoneOffset.UTC) : null,
+            parseDate(item.date()),
             item.link(),
             item.sentiment(),
             OffsetDateTime.now(ZoneOffset.UTC)
         );
+    }
+
+    private static OffsetDateTime parseDate(String rawDate) {
+        if (rawDate == null || rawDate.isBlank()) {
+            return null;
+        }
+        try {
+            return OffsetDateTime.parse(rawDate);
+        } catch (DateTimeParseException ignored) {
+            return LocalDateTime.parse(rawDate).atOffset(ZoneOffset.UTC);
+        }
     }
 }
