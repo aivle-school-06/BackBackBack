@@ -16,7 +16,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +68,7 @@ class NewsServiceTest {
                 "동화약품, 연구개발본부장에 장재원 전무",
                 "기사의 본문이 제공되지 않아 구체적인 내용을 요약할 수 없습니다.",
                 0.0007,
-                OffsetDateTime.parse("2026-01-30T09:34:00+09:00"),
+                LocalDateTime.parse("2026-01-30T09:34:00"),
                 "https://n.news.naver.com/mnews/article/003/0013739277?sid=102",
                 "NEU"
         );
@@ -79,7 +78,7 @@ class NewsServiceTest {
                 1,
                 List.of(newsItem),
                 0.0007,
-                OffsetDateTime.now()
+                LocalDateTime.now()
         );
 
         when(companiesRepository.findByStockCode(stockCode)).thenReturn(Optional.of(company));
@@ -159,7 +158,7 @@ class NewsServiceTest {
                 "동화약품, 연구개발본부장에 장재원 전무",
                 "기사의 본문이 제공되지 않아 구체적인 내용을 요약할 수 없습니다.",
                 0.0007,
-                OffsetDateTime.parse("2026-01-30T09:34:00+09:00"),
+                LocalDateTime.parse("2026-01-30T09:34:00"),
                 "https://n.news.naver.com/mnews/article/003/0013739277?sid=102",
                 "NEU"
         );
@@ -169,7 +168,7 @@ class NewsServiceTest {
                 newsItem.title(),
                 newsItem.summary(),
                 BigDecimal.valueOf(newsItem.score()),
-                newsItem.date().atZoneSameInstant(java.time.ZoneOffset.UTC).toLocalDateTime(),
+                newsItem.date(),
                 newsItem.link(),
                 newsItem.sentiment()
         );
@@ -257,7 +256,7 @@ class NewsServiceTest {
                 "동화약품, 연구개발본부장에 장재원 전무",
                 "기사의 본문이 제공되지 않아 구체적인 내용을 요약할 수 없습니다.",
                 0.0007,
-                OffsetDateTime.parse("2026-01-30T09:34:00+09:00"),
+                LocalDateTime.parse("2026-01-30T09:34:00"),
                 "https://n.news.naver.com/mnews/article/003/0013739277?sid=102",
                 "NEU"
         );
@@ -267,7 +266,7 @@ class NewsServiceTest {
                 newsItem.title(),
                 newsItem.summary(),
                 BigDecimal.valueOf(newsItem.score()),
-                newsItem.date().atZoneSameInstant(java.time.ZoneOffset.UTC).toLocalDateTime(),
+                newsItem.date(),
                 newsItem.link(),
                 newsItem.sentiment()
         );

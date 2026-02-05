@@ -55,7 +55,7 @@ public class NewsService {
                         .totalCount(apiResponse.totalCount())
                         .averageScore(apiResponse.averageScore() != null ?
                                 BigDecimal.valueOf(apiResponse.averageScore()) : null)
-                        .analyzedAt(apiResponse.analyzedAt().atZoneSameInstant(java.time.ZoneOffset.UTC).toLocalDateTime())
+                        .analyzedAt(apiResponse.analyzedAt())
                         .build();
 
         com.aivle.project.company.news.entity.NewsAnalysisEntity savedAnalysis =
@@ -140,7 +140,7 @@ public class NewsService {
                 .title(item.title())
                 .summary(item.summary())
                 .score(item.score() != null ? BigDecimal.valueOf(item.score()) : null)
-                .publishedAt(item.date() != null ? item.date().atZoneSameInstant(java.time.ZoneOffset.UTC).toLocalDateTime() : null)
+                .publishedAt(item.date())
                 .link(item.link())
                 .sentiment(item.sentiment() != null ? item.sentiment() : "NEU")
                 .build();

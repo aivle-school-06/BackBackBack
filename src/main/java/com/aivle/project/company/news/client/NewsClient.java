@@ -4,6 +4,7 @@ import com.aivle.project.company.news.dto.NewsApiResponse;
 import com.aivle.project.company.news.dto.NewsItemResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.codec.DecodingException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -43,6 +44,9 @@ public class NewsClient {
                     .retrieve()
                     .bodyToMono(NewsApiResponse.class)
                     .block();
+        } catch (DecodingException e) {
+            log.error("Failed to decode AI news response for company {}: {}", companyCode, e.getMessage());
+            throw new RuntimeException("AI Server response format error: invalid datetime field", e);
         } catch (Exception e) {
             log.error("Failed to fetch news for company {}: {}", companyCode, e.getMessage());
             throw new RuntimeException("AI Server connection failed", e);

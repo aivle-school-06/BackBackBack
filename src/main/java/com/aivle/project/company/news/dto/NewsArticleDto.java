@@ -61,7 +61,7 @@ public record NewsArticleDto(
             item.title(),
             item.summary(),
             item.score() != null ? item.score() : null,
-            item.date(),
+            item.date() != null ? item.date().atOffset(ZoneOffset.UTC) : null,
             item.link(),
             item.sentiment(),
             OffsetDateTime.now(ZoneOffset.UTC)
