@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-05 | 작업: 위험도 요약 전체 대상 배치 서비스 구현 | 결과: 최신 보고서 버전 기준(company+quarter별 max version_no)으로 risk_score_summaries를 페이지 배치 처리하는 RiskScoreBatchService/프로젝션/리포지토리 쿼리 추가, risk_level 저장(DANGER/CAUTION) 검증 테스트 포함 | 이슈: 없음
 - 2026-02-05 | 작업: watchlist 대시보드 기반 기능 및 users.company_id 제거 | 결과: company_watchlists 생성(V11), users.company_id 제거(V12, MySQL/H2), Watchlist 등록/삭제/대시보드 API 및 서비스 추가(비위험 ACTUAL 최신버전 + 위험도 분리 조회), 보안 경로 반영, 서비스 테스트 추가 후 `./gradlew test` 전체 통과 | 이슈: 없음
 - 2026-02-05 | 작업: 분기별 비위험 지표 통계(metric_averages) 집계 기능 추가 | 결과: metric_averages 테이블 마이그레이션(V10, MySQL/H2) 추가, 비위험(`is_risk_indicator=0`) + ACTUAL + 최신 보고서 버전 기준 집계 쿼리/서비스 구현(avg/median/min/max/stddev/company_count), 집계 테스트 추가 후 `./gradlew test` 전체 통과 | 이슈: 없음
 - 2026-02-05 | 작업: 위험도 요약 집계(risk_score_summaries) 기능 추가 | 결과: risk_score_summaries 테이블 마이그레이션(V9, MySQL/H2) 추가, RiskLevel(UNDEFINED 포함)·RiskScoreSummary 엔티티/리포지토리/계산 서비스 구현, `is_risk_indicator=1` + `ACTUAL`만 집계하도록 쿼리 추가, 위험도 계산/UNDEFINED 처리 테스트 추가 후 `./gradlew test` 전체 통과 | 이슈: 없음
