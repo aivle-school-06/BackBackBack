@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-06 | 작업: 최신 지표 조회 시 ACTUAL/PREDICTED가 있는 최신 버전 선택 보정 | 결과: 최신 버전 서브쿼리에 값 존재 조건 추가 및 서비스 테스트 통과 | 이슈: MockBean deprecated 경고
 - 2026-02-06 | 작업: 워치리스트 최신 버전 조회에서 발행 조건 제거 | 결과: published 필터 제거 및 관련 테스트 통과 | 이슈: MockBean deprecated 경고
 - 2026-02-06 | 작업: 워치리스트 지표 값 범위 조회 API 확장 | 결과: from/to 파라미터 지원 및 컨트롤러 테스트 통과 | 이슈: MockBean deprecated 경고
 - 2026-02-06 | 작업: 워치리스트 지표 값 범위 조회 서비스 추가 | 결과: 분기 범위( from/to ) 조회 쿼리와 그룹핑 응답 구현, 서비스 테스트 통과 | 이슈: 없음

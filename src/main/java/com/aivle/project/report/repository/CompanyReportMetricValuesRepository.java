@@ -38,6 +38,13 @@ public interface CompanyReportMetricValuesRepository extends JpaRepository<Compa
 				select max(rv2.versionNo)
 				from CompanyReportVersionsEntity rv2
 				where rv2.companyReport = cr
+					and exists (
+						select 1
+						from CompanyReportMetricValuesEntity v2
+						where v2.reportVersion = rv2
+							and v2.valueType = com.aivle.project.metric.entity.MetricValueType.ACTUAL
+							and v2.metricValue is not null
+					)
 			)
 		order by q.quarterKey, m.metricCode
 		""")
@@ -74,6 +81,13 @@ public interface CompanyReportMetricValuesRepository extends JpaRepository<Compa
 				select max(rv2.versionNo)
 				from CompanyReportVersionsEntity rv2
 				where rv2.companyReport = cr
+					and exists (
+						select 1
+						from CompanyReportMetricValuesEntity v2
+						where v2.reportVersion = rv2
+							and v2.valueType = :valueType
+							and v2.metricValue is not null
+					)
 			)
 		order by m.metricCode
 		""")
@@ -120,6 +134,13 @@ public interface CompanyReportMetricValuesRepository extends JpaRepository<Compa
 				select max(rv2.versionNo)
 				from CompanyReportVersionsEntity rv2
 				where rv2.companyReport = cr
+					and exists (
+						select 1
+						from CompanyReportMetricValuesEntity v2
+						where v2.reportVersion = rv2
+							and v2.valueType = :valueType
+							and v2.metricValue is not null
+					)
 			)
 		""")
 	List<MetricValueSampleProjection> findNonRiskActualMetricSamplesByQuarterId(
