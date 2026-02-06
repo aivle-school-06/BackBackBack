@@ -102,6 +102,7 @@ public class SecurityConfig {
 				authorize.requestMatchers(HttpMethod.PATCH, "/api/posts/**").authenticated();
 				authorize.requestMatchers(HttpMethod.DELETE, "/api/posts/**").authenticated();
 				authorize.requestMatchers(HttpMethod.GET, "/api/companies/search").hasRole("USER");
+				authorize.requestMatchers(HttpMethod.GET, "/api/companies/*/insights").hasAnyRole("USER", "ADMIN");
 				authorize.requestMatchers(HttpMethod.GET, "/api/watchlists/dashboard").hasRole("USER");
 				authorize.requestMatchers(HttpMethod.GET, "/api/watchlists/metric-averages").hasRole("USER");
 				authorize.requestMatchers(HttpMethod.GET, "/api/watchlists/metric-values").hasRole("USER");
