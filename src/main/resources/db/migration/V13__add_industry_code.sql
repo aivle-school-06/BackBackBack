@@ -12,7 +12,16 @@ CREATE TABLE `industry_codes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='산업 코드';
 
 -- ============================================
--- 7. 업종 코드 초기 데이터
+-- 7. 업종 코드 컬럼 추가 (companies)
+-- ============================================
+ALTER TABLE `companies`
+    ADD COLUMN `industry_code` VARCHAR(5) NULL COMMENT '산업 코드' AFTER `stock_code`,
+    ADD CONSTRAINT `fk_companies_industry`
+        FOREIGN KEY (`industry_code`) REFERENCES `industry_codes`(`industry_code`)
+            ON DELETE SET NULL;
+
+-- ============================================
+-- 8. 업종 코드 초기 데이터
 -- ============================================
 
 
