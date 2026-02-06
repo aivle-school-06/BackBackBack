@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-06 | 작업: 워치리스트 등록 컨트롤러 테스트 추가 | 결과: /api/watchlists 등록 성공/중복(409) 응답 검증 테스트 통과 | 이슈: MockBean deprecated 경고
 - 2026-02-06 | 작업: 워치리스트 분기 지표 평균 조회 API 추가 | 결과: `/api/watchlists/metric-averages`(ACTUAL+비위험+최신 발행 버전 기준) 구현, 보안 경로/Swagger 반영, 서비스 테스트 및 전체 테스트 통과 | 이슈: 없음
 - 2026-02-06 | 작업: metric_averages 실행 추적 필드 확장 | 결과: 배치 결과에 triggerType/executionId 추가, 수동 API/스케줄러에서 실행 원인과 UUID 전달 및 로그 반영, 관련 테스트 통과 | 이슈: 없음
 - 2026-02-06 | 작업: metric_averages 수동/스케줄 저장 경로 추가 | 결과: 관리자 초기 실행 API(`/api/admin/metric-averages/initialize`)와 새벽 3시 스케줄러 추가, dev/prod 스케줄 설정 반영, 컨트롤러/스케줄러 테스트 통과 | 이슈: 없음
@@ -209,3 +210,5 @@
 
 ## 3. History (이전 기록)
 - YYYY-MM-DD | 작업: ... | 결과: ... | 이슈: ...
+- 2026-02-06 | 작업: 보고서 PDF 단독 업로드 서비스 추가 | 결과: CompanyReportPdfPublishService 및 테스트 추가(기업 미존재 스킵), PDF만 업로드해 버전 발행 처리 | 이슈: 없음
+- 2026-02-06 | 작업: 보고서 PDF 단독 업로드 API 추가 | 결과: /api/admin/reports/pdf 컨트롤러 및 테스트 추가, PDF 단일 업로드 지원 | 이슈: 없음
