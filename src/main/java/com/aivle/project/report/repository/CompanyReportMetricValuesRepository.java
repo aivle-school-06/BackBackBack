@@ -4,6 +4,7 @@ import com.aivle.project.report.dto.ReportMetricRowProjection;
 import com.aivle.project.report.dto.ReportPredictMetricRowProjection;
 import com.aivle.project.report.dto.MetricValueSampleProjection;
 import com.aivle.project.report.entity.CompanyReportMetricValuesEntity;
+import com.aivle.project.report.entity.CompanyReportVersionsEntity;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,11 @@ import com.aivle.project.metric.entity.MetricValueType;
  * 보고서 지표 값 조회/저장 리포지토리.
  */
 public interface CompanyReportMetricValuesRepository extends JpaRepository<CompanyReportMetricValuesEntity, Long> {
+
+	boolean existsByReportVersionAndValueTypeAndMetricValueIsNotNull(
+		CompanyReportVersionsEntity reportVersion,
+		MetricValueType valueType
+	);
 
 	@Query("""
 		select c.corpName as corpName,

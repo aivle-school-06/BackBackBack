@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-06 | 작업: 보고서 PDF/지표 입력 분리 및 미발행 버전 재사용 로직 적용 | 결과: PDF/지표 수동/엑셀/예측 입력 모두 최신 미발행 버전 재사용(해당 타입 값/ PDF 없을 때)으로 개선, /api/admin/reports/metrics JSON 수동 적재 엔드포인트 및 콘솔 갱신, 관련 테스트 통과 | 이슈: MockBean deprecated 경고
 - 2026-02-06 | 작업: 최신 지표 조회 시 ACTUAL/PREDICTED가 있는 최신 버전 선택 보정 | 결과: 최신 버전 서브쿼리에 값 존재 조건 추가 및 서비스 테스트 통과 | 이슈: MockBean deprecated 경고
 - 2026-02-06 | 작업: 워치리스트 최신 버전 조회에서 발행 조건 제거 | 결과: published 필터 제거 및 관련 테스트 통과 | 이슈: MockBean deprecated 경고
 - 2026-02-06 | 작업: 워치리스트 지표 값 범위 조회 API 확장 | 결과: from/to 파라미터 지원 및 컨트롤러 테스트 통과 | 이슈: MockBean deprecated 경고
