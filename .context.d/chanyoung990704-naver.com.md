@@ -6,6 +6,8 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-07 | 작업: Swagger CurrentUser 파라미터 숨김 및 파일 업로드 multipart 적용 | 결과: @CurrentUser에 @Parameter(hidden=true) 적용, 파일 업로드 API consumes=multipart/form-data 추가 | 이슈: 없음
+- 2026-02-07 | 작업: spring-boot-devtools 의존성 추가 | 결과: build.gradle에 developmentOnly devtools 추가 | 이슈: 없음
 - 2026-02-06 | 작업: 테스트 실패 정리 및 H2/Flyway 설정 보정 | 결과: test 프로필 Flyway 활성화 및 db/migration-h2 사용, H2 report_contents summary 타입 TEXT로 정합화, 중복 V16 마이그레이션 정리 후 ./gradlew test 통과 | 이슈: 없음
 - 2026-02-06 | 작업: 테스트 실패 정리 및 H2/Flyway 설정 보정 | 결과: test 프로필 Flyway 활성화 및 db/migration-h2 사용, H2 report_contents summary 타입 TEXT로 정합화, 중복 V16 마이그레이션 정리 후 ./gradlew test 통과 | 이슈: 없음
 - 2026-02-06 | 작업: 인사이트 폴링 첫 응답 빈 배열 이슈 수정 | 결과: CompanyInsightService.getInsights의 @Transactional 제거로 최신 커밋 데이터 조회 가능, 컨트롤러 테스트 통과 | 이슈: finalize() deprecated 경고 2건

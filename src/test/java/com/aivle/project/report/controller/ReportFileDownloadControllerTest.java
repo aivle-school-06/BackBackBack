@@ -92,20 +92,40 @@ class ReportFileDownloadControllerTest {
 	}
 
 	@Test
-	@DisplayName("보고서 PDF 다운로드는 ROLE_ADMIN만으로는 403을 반환한다")
-	void downloadReportPdf_forbiddenForAdminOnly() throws Exception {
+	@DisplayName("보고서 PDF 다운로드는 ROLE_ADMIN도 접근 가능하다 (권한 계층)")
+	void downloadReportPdf_allowedForAdmin() throws Exception {
+		// given
+		FilesEntity pdf = filesRepository.save(FilesEntity.create(
+			FileUsageType.REPORT_PDF,
+			"http://example.com/report.pdf",
+			null,
+			"report.pdf",
+			1200L,
+			"application/pdf"
+		));
+
 		// when & then
-		mockMvc.perform(get("/api/reports/files/1")
+		mockMvc.perform(get("/api/reports/files/" + pdf.getId())
 				.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-			.andExpect(status().isForbidden());
+			.andExpect(status().isFound());
 	}
 
 	@Test
-	@DisplayName("보고서 PDF URL 조회는 ROLE_ADMIN만으로는 403을 반환한다")
-	void downloadReportPdfUrl_forbiddenForAdminOnly() throws Exception {
+	@DisplayName("보고서 PDF URL 조회는 ROLE_ADMIN도 접근 가능하다 (권한 계층)")
+	void downloadReportPdfUrl_allowedForAdmin() throws Exception {
+		// given
+		FilesEntity pdf = filesRepository.save(FilesEntity.create(
+			FileUsageType.REPORT_PDF,
+			"http://example.com/report.pdf",
+			null,
+			"report.pdf",
+			1200L,
+			"application/pdf"
+		));
+
 		// when & then
-		mockMvc.perform(get("/api/reports/files/1/url")
+		mockMvc.perform(get("/api/reports/files/" + pdf.getId() + "/url")
 				.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-			.andExpect(status().isForbidden());
+			.andExpect(status().isOk());
 	}
 }
