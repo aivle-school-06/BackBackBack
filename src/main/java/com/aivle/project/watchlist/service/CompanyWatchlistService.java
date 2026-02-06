@@ -14,10 +14,17 @@ import com.aivle.project.watchlist.dto.WatchlistDashboardResponse;
 import com.aivle.project.watchlist.dto.WatchlistDashboardRiskRow;
 import com.aivle.project.watchlist.dto.WatchlistMetricAverageRow;
 import com.aivle.project.watchlist.dto.WatchlistMetricAveragesResponse;
+import com.aivle.project.watchlist.dto.WatchlistMetricValueRow;
+import com.aivle.project.watchlist.dto.WatchlistMetricValuesResponse;
+import com.aivle.project.watchlist.dto.WatchlistQuarterMetricValues;
 import com.aivle.project.watchlist.entity.CompanyWatchlistEntity;
 import com.aivle.project.watchlist.error.WatchlistErrorCode;
 import com.aivle.project.watchlist.repository.CompanyWatchlistRepository;
+import com.aivle.project.watchlist.repository.WatchlistMetricValueProjection;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,5 +117,39 @@ public class CompanyWatchlistService {
 		)).toList();
 
 		return new WatchlistMetricAveragesResponse(year, quarter, metrics);
+	}
+
+	@Transactional(readOnly = true)
+	public WatchlistMetricValuesResponse getWatchlistMetricValuesByQuarter(Long userId, int year, int quarter) {
+		quartersRepository.findByYearAndQuarter((short) year, (byte) quarter)
+			.orElseThrow(() -> new IllegalArgumentException("유효하지 않은 분기입니다."));
+
+		List<WatchlistMetricValueProjection> rows = companyWatchlistRepository.findWatchlistMetricValues(
+			userId,
+			(short) year,
+			(byte) quarter,
+			MetricValueType.ACTUAL
+		);
+
+		Map<String, WatchlistQuarterMetricValues> grouped = new LinkedHashMap<>();
+		for (WatchlistMetricValueProjection row : rows) {
+			String key = row.getYear() + "-" + row.getQuarter();
+			WatchlistQuarterMetricValues bucket = grouped.get(key);
+			if (bucket == null) {
+				bucket = new WatchlistQuarterMetricValues(row.getYear(), row.getQuarter(), new ArrayList<>());
+				grouped.put(key, bucket);
+			}
+			bucket.items().add(new WatchlistMetricValueRow(
+				row.getWatchlistId(),
+				row.getCompanyId(),
+				row.getCorpName(),
+				row.getCorpCode(),
+				row.getMetricCode(),
+				row.getMetricNameKo(),
+				row.getMetricValue()
+			));
+		}
+
+		return new WatchlistMetricValuesResponse(new ArrayList<>(grouped.values()));
 	}
 }
