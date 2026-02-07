@@ -3,8 +3,10 @@ package com.aivle.project.report.repository;
 import com.aivle.project.company.entity.QCompaniesEntity;
 import com.aivle.project.file.entity.QFilesEntity;
 import com.aivle.project.metric.entity.MetricValueType;
+import com.aivle.project.metric.entity.QMetricDescriptionEntity;
 import com.aivle.project.metric.entity.QMetricsEntity;
 import com.aivle.project.quarter.entity.QQuartersEntity;
+import com.aivle.project.report.dto.CompanyOverviewMetricRowProjection;
 import com.aivle.project.report.dto.MetricValueSampleProjection;
 import com.aivle.project.report.dto.ReportMetricRowProjection;
 import com.aivle.project.report.dto.ReportPredictMetricRowProjection;
@@ -205,6 +207,181 @@ public class CompanyReportMetricValuesRepositoryImpl implements CompanyReportMet
 	}
 
 	@Override
+	public List<CompanyOverviewMetricRowProjection> findLatestOverviewMetricsByCompanyQuarter(
+		Long companyId,
+		Long quarterId,
+		MetricValueType valueType,
+		String locale
+	) {
+		QCompanyReportMetricValuesEntity v = QCompanyReportMetricValuesEntity.companyReportMetricValuesEntity;
+		QCompanyReportVersionsEntity rv = QCompanyReportVersionsEntity.companyReportVersionsEntity;
+		QCompanyReportsEntity cr = QCompanyReportsEntity.companyReportsEntity;
+		QCompaniesEntity c = QCompaniesEntity.companiesEntity;
+		QMetricsEntity m = QMetricsEntity.metricsEntity;
+		QQuartersEntity q = QQuartersEntity.quartersEntity;
+		QMetricDescriptionEntity md = QMetricDescriptionEntity.metricDescriptionEntity;
+
+		QCompanyReportVersionsEntity rv2 = new QCompanyReportVersionsEntity("rv2");
+		QCompanyReportMetricValuesEntity v2 = new QCompanyReportMetricValuesEntity("v2");
+		QMetricsEntity m2 = new QMetricsEntity("m2");
+		QCompanyReportVersionsEntity rv3 = new QCompanyReportVersionsEntity("rv3");
+		QCompanyReportMetricValuesEntity v3 = new QCompanyReportMetricValuesEntity("v3");
+		QMetricsEntity m3 = new QMetricsEntity("m3");
+
+		var latestRiskVersion = JPAExpressions.select(rv2.versionNo.max())
+			.from(rv2)
+			.where(
+				rv2.companyReport.eq(cr),
+				JPAExpressions.selectOne()
+					.from(v2)
+					.join(v2.metric, m2)
+					.where(
+						v2.reportVersion.eq(rv2),
+						v2.valueType.eq(valueType),
+						v2.metricValue.isNotNull(),
+						m2.isRiskIndicator.isTrue()
+					)
+					.exists()
+			);
+
+		var latestNonRiskVersion = JPAExpressions.select(rv3.versionNo.max())
+			.from(rv3)
+			.where(
+				rv3.companyReport.eq(cr),
+				JPAExpressions.selectOne()
+					.from(v3)
+					.join(v3.metric, m3)
+					.where(
+						v3.reportVersion.eq(rv3),
+						v3.valueType.eq(valueType),
+						v3.metricValue.isNotNull(),
+						m3.isRiskIndicator.isFalse()
+					)
+					.exists()
+			);
+
+		return queryFactory
+			.select(Projections.constructor(CompanyOverviewMetricRowDto.class,
+				m.metricCode,
+				m.metricNameKo,
+				m.unit,
+				v.metricValue,
+				v.valueType,
+				q.quarterKey,
+				v.signalColor,
+				md.description,
+				md.interpretation,
+				md.actionHint
+			))
+			.from(v)
+			.join(v.reportVersion, rv)
+			.join(rv.companyReport, cr)
+			.join(cr.company, c)
+			.join(v.metric, m)
+			.join(v.quarter, q)
+			.leftJoin(md).on(md.metric.eq(m).and(md.locale.eq(locale)))
+			.where(
+				c.id.eq(companyId),
+				q.id.eq(quarterId),
+				v.valueType.eq(valueType),
+				v.metricValue.isNotNull(),
+				m.isRiskIndicator.isTrue().and(rv.versionNo.eq(latestRiskVersion))
+					.or(m.isRiskIndicator.isFalse().and(rv.versionNo.eq(latestNonRiskVersion)))
+			)
+			.orderBy(m.metricCode.asc())
+			.fetch()
+			.stream()
+			.map(dto -> (CompanyOverviewMetricRowProjection) dto)
+			.toList();
+	}
+
+	@Override
+	public List<CompanyOverviewMetricRowProjection> findLatestOverviewMetricsByStockCodeAndQuarterRange(
+		String stockCode,
+		int fromQuarterKey,
+		int toQuarterKey,
+		String locale
+	) {
+		QCompanyReportMetricValuesEntity v = QCompanyReportMetricValuesEntity.companyReportMetricValuesEntity;
+		QCompanyReportVersionsEntity rv = QCompanyReportVersionsEntity.companyReportVersionsEntity;
+		QCompanyReportsEntity cr = QCompanyReportsEntity.companyReportsEntity;
+		QCompaniesEntity c = QCompaniesEntity.companiesEntity;
+		QMetricsEntity m = QMetricsEntity.metricsEntity;
+		QQuartersEntity q = QQuartersEntity.quartersEntity;
+		QMetricDescriptionEntity md = QMetricDescriptionEntity.metricDescriptionEntity;
+
+		QCompanyReportVersionsEntity rv2 = new QCompanyReportVersionsEntity("rv2");
+		QCompanyReportMetricValuesEntity v2 = new QCompanyReportMetricValuesEntity("v2");
+		QMetricsEntity m2 = new QMetricsEntity("m2");
+		QCompanyReportVersionsEntity rv3 = new QCompanyReportVersionsEntity("rv3");
+		QCompanyReportMetricValuesEntity v3 = new QCompanyReportMetricValuesEntity("v3");
+		QMetricsEntity m3 = new QMetricsEntity("m3");
+
+		var latestRiskVersion = JPAExpressions.select(rv2.versionNo.max())
+			.from(rv2)
+			.where(
+				rv2.companyReport.eq(cr),
+				JPAExpressions.selectOne()
+					.from(v2)
+					.join(v2.metric, m2)
+					.where(
+						v2.reportVersion.eq(rv2),
+						v2.metricValue.isNotNull(),
+						m2.isRiskIndicator.isTrue()
+					)
+					.exists()
+			);
+
+		var latestNonRiskVersion = JPAExpressions.select(rv3.versionNo.max())
+			.from(rv3)
+			.where(
+				rv3.companyReport.eq(cr),
+				JPAExpressions.selectOne()
+					.from(v3)
+					.join(v3.metric, m3)
+					.where(
+						v3.reportVersion.eq(rv3),
+						v3.metricValue.isNotNull(),
+						m3.isRiskIndicator.isFalse()
+					)
+					.exists()
+			);
+
+		return queryFactory
+			.select(Projections.constructor(CompanyOverviewMetricRowDto.class,
+				m.metricCode,
+				m.metricNameKo,
+				m.unit,
+				v.metricValue,
+				v.valueType,
+				q.quarterKey,
+				v.signalColor,
+				md.description,
+				md.interpretation,
+				md.actionHint
+			))
+			.from(v)
+			.join(v.reportVersion, rv)
+			.join(rv.companyReport, cr)
+			.join(cr.company, c)
+			.join(v.metric, m)
+			.join(v.quarter, q)
+			.leftJoin(md).on(md.metric.eq(m).and(md.locale.eq(locale)))
+			.where(
+				c.stockCode.eq(stockCode),
+				q.quarterKey.between(fromQuarterKey, toQuarterKey),
+				v.metricValue.isNotNull(),
+				m.isRiskIndicator.isTrue().and(rv.versionNo.eq(latestRiskVersion))
+					.or(m.isRiskIndicator.isFalse().and(rv.versionNo.eq(latestNonRiskVersion)))
+			)
+			.orderBy(q.quarterKey.asc(), m.metricCode.asc())
+			.fetch()
+			.stream()
+			.map(dto -> (CompanyOverviewMetricRowProjection) dto)
+			.toList();
+	}
+
+	@Override
 	public List<BigDecimal> findRiskMetricValuesByCompanyQuarterAndVersion(
 		Long companyId,
 		Long quarterId,
@@ -317,5 +494,20 @@ public class CompanyReportMetricValuesRepositoryImpl implements CompanyReportMet
 	public static class MetricValueSampleDto implements MetricValueSampleProjection {
 		private final Long metricId;
 		private final BigDecimal metricValue;
+	}
+
+	@Getter
+	@RequiredArgsConstructor
+	public static class CompanyOverviewMetricRowDto implements CompanyOverviewMetricRowProjection {
+		private final String metricCode;
+		private final String metricNameKo;
+		private final String unit;
+		private final BigDecimal metricValue;
+		private final MetricValueType valueType;
+		private final int quarterKey;
+		private final com.aivle.project.report.entity.SignalColor signalColor;
+		private final String description;
+		private final String interpretation;
+		private final String actionHint;
 	}
 }

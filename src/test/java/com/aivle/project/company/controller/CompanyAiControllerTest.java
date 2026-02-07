@@ -4,6 +4,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -12,6 +13,9 @@ import com.aivle.project.company.service.CompanyAiService;
 import com.aivle.project.file.entity.FileUsageType;
 import com.aivle.project.file.entity.FilesEntity;
 import com.aivle.project.common.config.TestSecurityConfig;
+import com.aivle.project.file.storage.FileStreamService;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +39,9 @@ class CompanyAiControllerTest {
 
     @MockBean
     private CompanyAiService companyAiService;
+
+    @MockBean
+    private FileStreamService fileStreamService;
 
     @Test
     @DisplayName("ROLE_USER로 기업 AI 분석을 조회한다")
@@ -138,5 +145,59 @@ class CompanyAiControllerTest {
         mockMvc.perform(post("/api/companies/005930/ai-report")
                 .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_USER"))))
             .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("기업 AI 리포트 PDF를 스트리밍으로 다운로드한다")
+    void downloadAiReport_streamsFile() throws Exception {
+        // given
+        FilesEntity file = FilesEntity.create(
+            FileUsageType.REPORT_PDF,
+            "https://bucket.s3.ap-northeast-2.amazonaws.com/reports/a.pdf",
+            "reports/a.pdf",
+            "report_005930.pdf",
+            12L,
+            "application/pdf"
+        );
+        given(companyAiService.getReportFile("005930", 2026, 1)).willReturn(file);
+        given(fileStreamService.openStream(file))
+            .willReturn(new ByteArrayInputStream("report".getBytes(StandardCharsets.UTF_8)));
+
+        // when & then
+        mockMvc.perform(get("/api/companies/005930/ai-report/download")
+                .param("year", "2026")
+                .param("quarter", "1")
+                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_USER"))))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", "application/pdf"))
+            .andExpect(header().string("Content-Disposition", "attachment; filename=\"report_005930.pdf\""))
+            .andExpect(header().string("Cache-Control", "private, no-store"));
+    }
+
+    @Test
+    @DisplayName("기업 AI 리포트 PDF를 ID 기준으로 스트리밍 다운로드한다")
+    void downloadAiReportById_streamsFile() throws Exception {
+        // given
+        FilesEntity file = FilesEntity.create(
+            FileUsageType.REPORT_PDF,
+            "https://bucket.s3.ap-northeast-2.amazonaws.com/reports/b.pdf",
+            "reports/b.pdf",
+            "report_005930.pdf",
+            12L,
+            "application/pdf"
+        );
+        given(companyAiService.getReportFileById(1L, 2026, 1)).willReturn(file);
+        given(fileStreamService.openStream(file))
+            .willReturn(new ByteArrayInputStream("report".getBytes(StandardCharsets.UTF_8)));
+
+        // when & then
+        mockMvc.perform(get("/api/companies/id/1/ai-report/download")
+                .param("year", "2026")
+                .param("quarter", "1")
+                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_USER"))))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", "application/pdf"))
+            .andExpect(header().string("Content-Disposition", "attachment; filename=\"report_005930.pdf\""))
+            .andExpect(header().string("Cache-Control", "private, no-store"));
     }
 }

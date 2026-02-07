@@ -28,6 +28,20 @@ public interface CompanyReportMetricValuesRepositoryCustom {
 		MetricValueType valueType
 	);
 
+	List<com.aivle.project.report.dto.CompanyOverviewMetricRowProjection> findLatestOverviewMetricsByCompanyQuarter(
+		Long companyId,
+		Long quarterId,
+		MetricValueType valueType,
+		String locale
+	);
+
+	List<com.aivle.project.report.dto.CompanyOverviewMetricRowProjection> findLatestOverviewMetricsByStockCodeAndQuarterRange(
+		String stockCode,
+		int fromQuarterKey,
+		int toQuarterKey,
+		String locale
+	);
+
 	List<BigDecimal> findRiskMetricValuesByCompanyQuarterAndVersion(
 		Long companyId,
 		Long quarterId,

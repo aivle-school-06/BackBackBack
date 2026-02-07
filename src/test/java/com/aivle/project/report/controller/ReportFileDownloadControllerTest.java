@@ -10,12 +10,16 @@ import com.aivle.project.common.config.TestSecurityConfig;
 import com.aivle.project.file.entity.FileUsageType;
 import com.aivle.project.file.entity.FilesEntity;
 import com.aivle.project.file.repository.FilesRepository;
+import com.aivle.project.file.storage.FileStreamService;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,9 +38,12 @@ class ReportFileDownloadControllerTest {
 	@Autowired
 	private FilesRepository filesRepository;
 
+	@MockBean
+	private FileStreamService fileStreamService;
+
 	@Test
-	@DisplayName("ROLE_USER 보고서 PDF 다운로드는 외부 URL로 리다이렉트된다")
-	void downloadReportPdf_redirectsToStorageUrl() throws Exception {
+	@DisplayName("ROLE_USER 보고서 PDF 다운로드는 스트리밍 응답으로 반환된다")
+	void downloadReportPdf_streamsFile() throws Exception {
 		// given
 		FilesEntity pdf = filesRepository.save(FilesEntity.create(
 			FileUsageType.REPORT_PDF,
@@ -48,14 +55,18 @@ class ReportFileDownloadControllerTest {
 		));
 
 		// when & then
+		org.mockito.BDDMockito.given(fileStreamService.openStream(pdf))
+			.willReturn(new ByteArrayInputStream("report".getBytes(StandardCharsets.UTF_8)));
 		mockMvc.perform(get("/api/reports/files/" + pdf.getId())
 					.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_USER"))))
-					.andExpect(status().isFound())
-					.andExpect(header().string("Location", "http://example.com/report.pdf"));
+					.andExpect(status().isOk())
+					.andExpect(header().string("Content-Type", "application/pdf"))
+					.andExpect(header().string("Content-Disposition", "attachment; filename=\"report.pdf\""))
+					.andExpect(header().string("Cache-Control", "private, no-store"));
 	}
 
 	@Test
-	@DisplayName("ROLE_USER 보고서 PDF 다운로드 URL 조회는 공통 응답으로 반환된다")
+	@DisplayName("ROLE_USER 보고서 PDF 다운로드 URL 조회는 내부 경로로 반환된다")
 	void downloadReportPdfUrl_returnsApiResponse() throws Exception {
 		// given
 		FilesEntity pdf = filesRepository.save(FilesEntity.create(
@@ -72,7 +83,7 @@ class ReportFileDownloadControllerTest {
 					.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_USER"))))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.success").value(true))
-				.andExpect(jsonPath("$.data.url").value("http://example.com/report.pdf"));
+				.andExpect(jsonPath("$.data.url").value("http://localhost/api/reports/files/" + pdf.getId()));
 	}
 
 	@Test
@@ -105,9 +116,11 @@ class ReportFileDownloadControllerTest {
 		));
 
 		// when & then
+		org.mockito.BDDMockito.given(fileStreamService.openStream(pdf))
+			.willReturn(new ByteArrayInputStream("report".getBytes(StandardCharsets.UTF_8)));
 		mockMvc.perform(get("/api/reports/files/" + pdf.getId())
 				.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-			.andExpect(status().isFound());
+			.andExpect(status().isOk());
 	}
 
 	@Test

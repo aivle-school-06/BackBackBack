@@ -17,6 +17,7 @@ import com.aivle.project.watchlist.entity.QCompanyWatchlistEntity;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.math.BigDecimal;
@@ -284,7 +285,7 @@ public class CompanyWatchlistRepositoryImpl implements CompanyWatchlistRepositor
 			.select(Projections.constructor(WatchlistMetricAverageRow.class,
 				m.metricCode,
 				m.metricNameKo,
-				crmv.metricValue.avg(),
+				Expressions.numberTemplate(BigDecimal.class, "cast({0} as bigdecimal)", crmv.metricValue.avg()),
 				c.id.countDistinct()
 			))
 			.from(cw)
