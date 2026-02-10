@@ -11,7 +11,10 @@ phases:
       - chmod +x scripts/*.sh
   build:
     commands:
-      - ./gradlew clean test bootJar
+      - ./gradlew clean test --stacktrace --info
+  post_build:
+    commands:
+      - ./gradlew bootJar -x test
 
 artifacts:
   files:
