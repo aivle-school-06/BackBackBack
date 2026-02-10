@@ -95,57 +95,34 @@ public class SecurityConfig {
 	};
 
 	private static final String[] AUTHENTICATED_PATCH_ENDPOINTS = {
-		"/api/posts/**",
-		"/api/comments/**"
+		"/api/posts/**"
 	};
 
 	private static final String[] AUTHENTICATED_DELETE_ENDPOINTS = {
-		"/api/posts/**",
-		"/api/comments/**"
+		"/api/posts/**"
 	};
 
 	private static final String[] USER_GET_ENDPOINTS = {
 		"/api/companies",
-		"/api/companies/me",
-		"/api/companies/*",
-		"/api/companies/*/overview",
 		"/api/companies/*/insights",
-		"/api/companies/*/analysis",
-		"/api/companies/*/ai-analysis",
-		"/api/companies/*/ai-report/download",
-		"/api/companies/*/ai-reports/file",
-		"/api/companies/*/ai-report/status/*",
-		"/api/companies/*/ai-reports/requests/*",
-		"/api/companies/*/news",
-		"/api/companies/*/news/latest",
-		"/api/companies/*/news/history",
-		"/api/companies/*/report/latest",
-		"/api/companies/*/reports/latest",
+		"/api/companies/*/overview",
+		"/api/dashboard/summary",
+		"/api/dashboard/risk-records",
 		"/api/watchlists/dashboard",
 		"/api/watchlists/metric-averages",
 		"/api/watchlists/metric-values",
-		"/api/watchlists/metrics/values",
+		"/api/companies/*/ai-analysis",
+		"/api/companies/*/ai-report/download",
 		"/api/reports/metrics/grouped",
 		"/api/reports/metrics/predict-latest",
 		"/api/reports/files/*",
-		"/api/reports/files/*/url",
-		"/api/files/*",
-		"/api/files/*/url",
-		"/api/files/*/download-url"
+		"/api/reports/files/*/url"
 	};
 
 	private static final String[] USER_POST_ENDPOINTS = {
-		"/api/watchlists",
-		"/api/companies/*/ai-report",
-		"/api/companies/*/ai-reports",
-		"/api/companies/*/ai-report/request",
-		"/api/companies/*/ai-reports/requests",
 		"/api/companies/*/news/refresh-latest",
-		"/api/companies/*/news/refresh",
-		"/api/companies/*/news/fetch",
-		"/api/companies/*/news/sync",
-		"/api/companies/*/report/fetch",
-		"/api/companies/*/reports/sync"
+		"/api/watchlists",
+		"/api/companies/*/ai-report"
 	};
 
 	private static final String[] USER_DELETE_ENDPOINTS = {
@@ -183,7 +160,7 @@ public class SecurityConfig {
 				authorize.requestMatchers(PUBLIC_AUTH_ENDPOINTS).permitAll();
 				authorize.requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll();
 
-				// 게시글/댓글 작성·수정·삭제는 로그인 필요
+				// 게시글 작성/수정/삭제는 로그인 필요
 				authorize.requestMatchers(HttpMethod.POST, AUTHENTICATED_POST_ENDPOINTS).authenticated();
 				authorize.requestMatchers(HttpMethod.PATCH, AUTHENTICATED_PATCH_ENDPOINTS).authenticated();
 				authorize.requestMatchers(HttpMethod.DELETE, AUTHENTICATED_DELETE_ENDPOINTS).authenticated();
