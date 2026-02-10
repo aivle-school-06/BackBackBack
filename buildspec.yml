@@ -12,7 +12,7 @@ phases:
   build:
     commands:
       - rm -rf build/test-results/test build/reports/tests/test
-      - ./gradlew cleanTest test --rerun-tasks --stacktrace --info
+      - JWT_PRIVATE_KEY_PATH=src/test/resources/jwt/private.pem JWT_PUBLIC_KEY_PATH=src/test/resources/jwt/public.pem JWT_CURRENT_KID=test-key ./gradlew cleanTest test --rerun-tasks --stacktrace --info
   post_build:
     commands:
       - ./gradlew bootJar -x test
