@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-10 | 작업: 게시글 API REST 경로 정규화 1차 | 결과: `PostController`에 신 경로(`/api/posts?categoryName=...`, `/api/posts/{postId}`, `POST /api/posts`)와 구 경로 하위호환 매핑을 추가하고, `PostService`에 postId 기준 조회/수정/삭제 메서드를 추가했으며, `PostControllerIntegrationTest` 신 경로 테스트 4건을 통과시킴 | 이슈: 없음
 - 2026-02-09 | 작업: 워치리스트 삭제 후 재등록 중복 오류 수정 | 결과: 활성 데이터만 중복 판정하도록 변경하고, 소프트 삭제 데이터는 restore + note 갱신으로 재등록 처리, 관련 서비스/컨트롤러 테스트 통과 | 이슈: 없음
 - 2026-02-09 | 작업: 인사이트 조회 refresh 파라미터 기반 강제 최신화 추가 | 결과: `GET /api/companies/{companyId}/insights`에 `refresh` 추가, refresh=true 시 뉴스/사업보고서 재수집과 external_health_score 동기화까지 수행, 관련 테스트 통과 | 이슈: 없음
 - 2026-02-09 | 작업: 기업 AI 종합 코멘트 캐시 저장/수동 적재 API 구현 | 결과: ai-comment 클라이언트/서비스 추가, company_key_metrics.ai_comment 저장, 워치리스트 등록 시 선행 캐시, 관리자 수동 캐시 API 및 테스트 추가, cleanTest test 통과 | 이슈: 전체 테스트 최초 실행 시 Gradle 결과 XML 쓰기 오류가 cleanTest 재실행 후 해소됨
