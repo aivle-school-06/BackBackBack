@@ -59,6 +59,99 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+	private static final String[] PUBLIC_RESOURCE_ENDPOINTS = {
+		"/favicon.ico",
+		"/css/**",
+		"/js/**",
+		"/images/**",
+		"/webjars/**",
+		"/assets/**",
+		"/api-docs",
+		"/api-docs/**",
+		"/swagger-ui.html",
+		"/swagger-ui/**",
+		"/openapi/**",
+		"/actuator/health",
+		"/actuator/health/**",
+		"/error"
+	};
+
+	private static final String[] PUBLIC_AUTH_ENDPOINTS = {
+		"/api/auth/login",
+		"/api/auth/refresh",
+		"/api/auth/signup",
+		"/api/auth/verify-email",
+		"/api/auth/resend-verification"
+	};
+
+	private static final String[] PUBLIC_GET_ENDPOINTS = {
+		"/api/posts/**",
+		"/api/categories",
+		"/api/companies/search"
+	};
+
+	private static final String[] AUTHENTICATED_POST_ENDPOINTS = {
+		"/api/posts/**"
+	};
+
+	private static final String[] AUTHENTICATED_PATCH_ENDPOINTS = {
+		"/api/posts/**",
+		"/api/comments/**"
+	};
+
+	private static final String[] AUTHENTICATED_DELETE_ENDPOINTS = {
+		"/api/posts/**",
+		"/api/comments/**"
+	};
+
+	private static final String[] USER_GET_ENDPOINTS = {
+		"/api/companies",
+		"/api/companies/me",
+		"/api/companies/*",
+		"/api/companies/*/overview",
+		"/api/companies/*/insights",
+		"/api/companies/*/analysis",
+		"/api/companies/*/ai-analysis",
+		"/api/companies/*/ai-report/download",
+		"/api/companies/*/ai-reports/file",
+		"/api/companies/*/ai-report/status/*",
+		"/api/companies/*/ai-reports/requests/*",
+		"/api/companies/*/news",
+		"/api/companies/*/news/latest",
+		"/api/companies/*/news/history",
+		"/api/companies/*/report/latest",
+		"/api/companies/*/reports/latest",
+		"/api/watchlists/dashboard",
+		"/api/watchlists/metric-averages",
+		"/api/watchlists/metric-values",
+		"/api/watchlists/metrics/values",
+		"/api/reports/metrics/grouped",
+		"/api/reports/metrics/predict-latest",
+		"/api/reports/files/*",
+		"/api/reports/files/*/url",
+		"/api/files/*",
+		"/api/files/*/url",
+		"/api/files/*/download-url"
+	};
+
+	private static final String[] USER_POST_ENDPOINTS = {
+		"/api/watchlists",
+		"/api/companies/*/ai-report",
+		"/api/companies/*/ai-reports",
+		"/api/companies/*/ai-report/request",
+		"/api/companies/*/ai-reports/requests",
+		"/api/companies/*/news/refresh-latest",
+		"/api/companies/*/news/refresh",
+		"/api/companies/*/news/fetch",
+		"/api/companies/*/news/sync",
+		"/api/companies/*/report/fetch",
+		"/api/companies/*/reports/sync"
+	};
+
+	private static final String[] USER_DELETE_ENDPOINTS = {
+		"/api/watchlists/*"
+	};
+
 	private final JwtKeyProvider jwtKeyProvider;
 	private final JwtProperties jwtProperties;
 	private final RestAuthenticationEntryPoint authenticationEntryPoint;
@@ -85,49 +178,21 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(authorize -> {
-				authorize
-				.requestMatchers(
-					"/favicon.ico",
-					"/css/**",
-					"/js/**",
-					"/images/**",
-					"/webjars/**",
-					"/assets/**",
-					"/api-docs",
-					"/api-docs/**",
-					"/swagger-ui.html",
-					"/swagger-ui/**",
-					"/openapi/**",
-					"/api/auth/login",
-					"/api/auth/refresh",
-					"/api/auth/signup",
-					"/api/auth/verify-email",
-					"/api/auth/resend-verification",
-					"/actuator/health",
-					"/actuator/health/**",
-					"/error"
-				).permitAll();
-				authorize.requestMatchers(HttpMethod.GET, "/api/posts/**", "/api/categories").permitAll();
-				authorize.requestMatchers(HttpMethod.GET, "/api/companies").hasRole("USER");
-				authorize.requestMatchers(HttpMethod.GET, "/api/companies/search").permitAll();
-				authorize.requestMatchers(HttpMethod.POST, "/api/posts/**").authenticated();
-				authorize.requestMatchers(HttpMethod.PATCH, "/api/posts/**").authenticated();
-				authorize.requestMatchers(HttpMethod.DELETE, "/api/posts/**").authenticated();
-					authorize.requestMatchers(HttpMethod.GET, "/api/companies/*/insights").hasRole("USER");
-					authorize.requestMatchers(HttpMethod.GET, "/api/companies/*/overview").hasRole("USER");
-					authorize.requestMatchers(HttpMethod.POST, "/api/companies/*/news/refresh-latest").hasRole("USER");
-					authorize.requestMatchers(HttpMethod.GET, "/api/watchlists/dashboard").hasRole("USER");
-				authorize.requestMatchers(HttpMethod.GET, "/api/watchlists/metric-averages").hasRole("USER");
-				authorize.requestMatchers(HttpMethod.GET, "/api/watchlists/metric-values").hasRole("USER");
-				authorize.requestMatchers(HttpMethod.POST, "/api/watchlists").hasRole("USER");
-				authorize.requestMatchers(HttpMethod.DELETE, "/api/watchlists/*").hasRole("USER");
-				authorize.requestMatchers(HttpMethod.GET, "/api/companies/*/ai-analysis").hasRole("USER");
-				authorize.requestMatchers(HttpMethod.POST, "/api/companies/*/ai-report").hasRole("USER");
-				authorize.requestMatchers(HttpMethod.GET, "/api/companies/*/ai-report/download").hasRole("USER");
-					authorize.requestMatchers(HttpMethod.GET, "/api/reports/metrics/grouped", "/api/reports/metrics/predict-latest")
-						.hasRole("USER");
-					authorize.requestMatchers(HttpMethod.GET, "/api/reports/files/*", "/api/reports/files/*/url")
-						.hasRole("USER");
+				// 정적 리소스/문서/헬스체크 공개
+				authorize.requestMatchers(PUBLIC_RESOURCE_ENDPOINTS).permitAll();
+				authorize.requestMatchers(PUBLIC_AUTH_ENDPOINTS).permitAll();
+				authorize.requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll();
+
+				// 게시글/댓글 작성·수정·삭제는 로그인 필요
+				authorize.requestMatchers(HttpMethod.POST, AUTHENTICATED_POST_ENDPOINTS).authenticated();
+				authorize.requestMatchers(HttpMethod.PATCH, AUTHENTICATED_PATCH_ENDPOINTS).authenticated();
+				authorize.requestMatchers(HttpMethod.DELETE, AUTHENTICATED_DELETE_ENDPOINTS).authenticated();
+
+				// 사용자 권한 API
+				authorize.requestMatchers(HttpMethod.GET, USER_GET_ENDPOINTS).hasRole("USER");
+				authorize.requestMatchers(HttpMethod.POST, USER_POST_ENDPOINTS).hasRole("USER");
+				authorize.requestMatchers(HttpMethod.DELETE, USER_DELETE_ENDPOINTS).hasRole("USER");
+
 				if (isDevProfile()) {
 					authorize.requestMatchers("/dev/**").permitAll();
 				}
