@@ -11,11 +11,10 @@ phases:
       - chmod +x scripts/*.sh
   build:
     commands:
-      - ./gradlew clean build -x test
+      - ./gradlew clean test bootJar
 
 artifacts:
   files:
     - appspec.yml
     - build/libs/*.jar
-    - docker-compose*.yml
     - scripts/**/*
