@@ -65,7 +65,7 @@ class RefreshTokenServiceTest {
 	void setUp() {
 		ObjectMapper objectMapper = new ObjectMapper();
 		lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-		when(redisTemplate.opsForSet()).thenReturn(setOperations);
+		lenient().when(redisTemplate.opsForSet()).thenReturn(setOperations);
 		refreshTokenService = new RefreshTokenService(redisTemplate, objectMapper, refreshTokenRepository, jwtTokenService);
 	}
 
@@ -144,6 +144,32 @@ class RefreshTokenServiceTest {
 		verify(setOperations).remove("sessions:" + USER_ID, "rt-old");
 		verify(valueOperations).set(eq("refresh:rt-new"), any(String.class), any(Duration.class));
 		verify(refreshTokenRepository, atLeastOnce()).save(any(RefreshTokenEntity.class));
+	}
+
+	@Test
+	@DisplayName("초 단위 레거시 캐시 토큰도 유효하면 정상 로드된다")
+	void loadValidToken_shouldSupportLegacySecondEpochCache() throws Exception {
+		// given: 레거시(초 단위) 캐시 토큰이 Redis에 저장되어 있다
+		long nowSeconds = System.currentTimeMillis() / 1000;
+		RefreshTokenCache legacyCache = new RefreshTokenCache(
+			"legacy-rt",
+			USER_ID,
+			"device-1",
+			"ios",
+			"127.0.0.1",
+			nowSeconds - 10,
+			nowSeconds + 600,
+			nowSeconds - 10
+		);
+		String legacyJson = new ObjectMapper().writeValueAsString(legacyCache);
+		when(valueOperations.get("refresh:legacy-rt")).thenReturn(legacyJson);
+
+		// when
+		RefreshTokenCache loaded = refreshTokenService.loadValidToken("legacy-rt");
+
+		// then
+		assertThat(loaded.token()).isEqualTo("legacy-rt");
+		assertThat(loaded.userId()).isEqualTo(USER_ID);
 	}
 
 	@Test

@@ -19,12 +19,14 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Refresh Token 저장 및 검증 처리.
  */
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RefreshTokenService {
 
 	private static final String REFRESH_TOKEN_KEY = "refresh:%s";
@@ -37,6 +39,7 @@ public class RefreshTokenService {
 	private final JwtTokenService jwtTokenService;
 	private final Clock clock = Clock.systemUTC();
 
+	@Transactional
 	public RefreshTokenCache storeToken(
 		CustomUserDetails userDetails,
 		String refreshToken,
@@ -65,6 +68,7 @@ public class RefreshTokenService {
 		return cache;
 	}
 
+	@Transactional
 	public RefreshTokenCache rotateToken(String oldToken, String newToken) {
 		RefreshTokenCache current = loadValidToken(oldToken);
 		revokeRedis(oldToken, current.userId());
@@ -91,12 +95,14 @@ public class RefreshTokenService {
 		return cache;
 	}
 
+	@Transactional
 	public void revokeToken(String refreshToken) {
 		RefreshTokenCache cache = loadValidToken(refreshToken);
 		revokeRedis(refreshToken, cache.userId());
 		revokeEntity(refreshToken);
 	}
 
+	@Transactional
 	public void revokeAllByUserId(Long userId) {
 		if (userId == null) {
 			return;
