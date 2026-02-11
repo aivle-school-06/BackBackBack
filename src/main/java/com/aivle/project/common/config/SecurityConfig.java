@@ -175,6 +175,7 @@ public class SecurityConfig {
 				}
 				if (isPerfProfile()) {
 					authorize.requestMatchers("/api/perf/**").permitAll();
+					authorize.requestMatchers("/actuator/metrics", "/actuator/metrics/**").permitAll();
 				}
 				authorize.requestMatchers("/api/admin/**").hasRole("ADMIN");
 				authorize.anyRequest().authenticated();

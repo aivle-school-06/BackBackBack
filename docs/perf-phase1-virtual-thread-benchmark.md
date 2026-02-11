@@ -35,8 +35,12 @@
 
 - `perf/results/<run_id>/before/results.jtl`
 - `perf/results/<run_id>/before/html-report/`
+- `perf/results/<run_id>/before/runtime-metrics.csv`
+- `perf/results/<run_id>/before/runtime-metrics-summary.md`
 - `perf/results/<run_id>/after/results.jtl`
 - `perf/results/<run_id>/after/html-report/`
+- `perf/results/<run_id>/after/runtime-metrics.csv`
+- `perf/results/<run_id>/after/runtime-metrics-summary.md`
 - `perf/results/<run_id>/comparison-summary.md`
 
 ## 5. 시나리오
@@ -51,3 +55,4 @@
 - `perf` 프로파일은 외부 AI/Turnstile 의존성을 mock 처리합니다.
 - `run-before.sh`/`run-after.sh`는 내부적으로 서버를 기동/종료합니다.
 - 결과 비교는 동일 `run_id`를 사용해야 합니다.
+- `comparison-summary.md`에는 응답시간/TPS와 함께 런타임 계측(before/after) 비교가 포함됩니다.
