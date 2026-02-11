@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-11 | 작업: ai-report 동시성 500 오류(UK_REPORT_VERSION_INDEX_2) 완화 | 결과: `CompanyAiService` 버전 생성 시 `company_reports` 비관적 락(`findByIdForUpdate`) 적용, `PerfDataInitializer`에 2026Q1 분기/보고서 선생성 추가, `application-perf.yaml` 메일 설정 보강. `CompanyAiServiceTest`/`PerfBenchmarkControllerTest` 통과 및 perf 병렬 호출(100회, 동시 20)에서 HTTP 200 100건/유니크 충돌 로그 0건 확인 | 이슈: 없음
 - 2026-02-11 | 작업: Phase1 Virtual Thread 도입 및 JMeter 벤치마크 기반 구축(#95) | 결과: `insightExecutor`/`emailExecutor`에 Virtual Thread 토글을 도입하고 perf 프로파일(`application-perf.yaml`), perf 벤치마크 API(`/api/perf/benchmark/*`), 외부 의존성 mock(AI/Turnstile), JMeter 플랜/실행·비교 스크립트(`perf/jmeter`, `perf/scripts`) 및 문서를 추가함. 관련 단위 테스트와 `./gradlew test` 전체 통과 | 이슈: 실행 환경에 `jmeter` CLI가 없어 before/after 실측 리포트 생성은 미실행
 - 2026-02-11 | 작업: logout-all 이후 refresh 재발급 차단 보안 보강(#93) | 결과: `logoutAll` 시 사용자 refresh 토큰을 Redis/DB에서 일괄 폐기하도록 보강하고, `refresh` 경로에 logout-all 기준시각 검증을 추가함. `AuthServiceTest`/`RefreshTokenServiceTest`/`AuthIntegrationTest` 보강 후 `./gradlew test` 전체 통과, upstream PR #94 생성 | 이슈: 없음
 - 2026-02-11 | 작업: 관리자 사용자 목록에서 ROLE_ADMIN 제외(#91) | 결과: `UserRepository`에 `NOT EXISTS` 기반 역할 제외 쿼리를 추가하고 `AdminUserQueryService` 호출을 변경했으며, `UserRepositoryTest`로 관리자/복합권한 제외 동작을 검증함. `./gradlew test` 전체 통과 | 이슈: 없음

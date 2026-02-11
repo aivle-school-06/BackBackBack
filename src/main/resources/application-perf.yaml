@@ -19,6 +19,15 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
+  mail:
+    host: ${PERF_SMTP_HOST:localhost}
+    port: ${PERF_SMTP_PORT:2525}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
 
 app:
   email:
