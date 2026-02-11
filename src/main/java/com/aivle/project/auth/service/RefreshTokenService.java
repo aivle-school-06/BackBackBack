@@ -13,7 +13,9 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -92,6 +94,29 @@ public class RefreshTokenService {
 		RefreshTokenCache cache = loadValidToken(refreshToken);
 		revokeRedis(refreshToken, cache.userId());
 		revokeEntity(refreshToken);
+	}
+
+	public void revokeAllByUserId(Long userId) {
+		if (userId == null) {
+			return;
+		}
+
+		String key = sessionKey(userId);
+		Set<String> tokens = redisTemplate.opsForSet().members(key);
+		if (tokens != null) {
+			for (String token : tokens) {
+				redisTemplate.delete(redisKey(token));
+			}
+		}
+		redisTemplate.delete(key);
+
+		List<RefreshTokenEntity> activeTokens = refreshTokenRepository.findAllByUserIdAndRevokedFalse(userId);
+		for (RefreshTokenEntity entity : activeTokens) {
+			entity.revoke();
+		}
+		if (!activeTokens.isEmpty()) {
+			refreshTokenRepository.saveAll(activeTokens);
+		}
 	}
 
 	private void storeRedis(RefreshTokenCache cache) {

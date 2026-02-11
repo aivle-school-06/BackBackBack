@@ -22,6 +22,7 @@ import com.aivle.project.user.entity.UserEntity;
 import com.aivle.project.user.security.CustomUserDetails;
 import com.aivle.project.user.security.CustomUserDetailsService;
 import com.aivle.project.user.service.UserDomainService;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -253,5 +254,23 @@ class AuthServiceTest {
 
 		// then
 		verify(userDomainService).updatePassword(1L, "encodedNew");
+	}
+
+	@Test
+	@DisplayName("전체 로그아웃 시 사용자 refresh 토큰을 폐기하고 logout-all 기준 시각을 기록한다")
+	void logoutAll_shouldRevokeRefreshTokensAndMarkLogoutAll() {
+		// given
+		AuthService authService = new AuthService(authenticationManager, jwtTokenService, refreshTokenService, accessTokenBlacklistService, userDetailsService, userDomainService, passwordEncoder, userMapper);
+		UserEntity user = mock(UserEntity.class);
+		UUID uuid = UUID.randomUUID();
+		when(user.getId()).thenReturn(1L);
+		when(user.getUuid()).thenReturn(uuid);
+
+		// when
+		authService.logoutAll(user);
+
+		// then
+		verify(refreshTokenService).revokeAllByUserId(1L);
+		verify(accessTokenBlacklistService).markLogoutAll(eq(uuid.toString()), any(Instant.class));
 	}
 }

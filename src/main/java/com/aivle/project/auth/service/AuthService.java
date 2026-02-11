@@ -103,6 +103,7 @@ public class AuthService {
 	}
 
 	public void logoutAll(UserEntity user) {
+		refreshTokenService.revokeAllByUserId(user.getId());
 		accessTokenBlacklistService.markLogoutAll(user.getUuid().toString(), Instant.now());
 	}
 
