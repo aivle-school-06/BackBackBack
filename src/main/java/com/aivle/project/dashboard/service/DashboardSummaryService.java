@@ -143,13 +143,17 @@ public class DashboardSummaryService {
 	}
 
 	private int resolveLatestActualQuarterKey(List<CompanyWatchlistEntity> watchlists) {
-		return watchlists.stream()
+		List<String> stockCodes = watchlists.stream()
 			.map(CompanyWatchlistEntity::getCompany)
 			.map(CompaniesEntity::getStockCode)
 			.filter(stockCode -> stockCode != null && !stockCode.isBlank())
-			.map(stockCode -> companyReportMetricValuesRepository.findMaxActualQuarterKeyByStockCode(stockCode).orElse(null))
-			.filter(java.util.Objects::nonNull)
-			.max(Comparator.naturalOrder())
+			.toList();
+
+		if (stockCodes.isEmpty()) {
+			throw new IllegalArgumentException("관심 기업의 종목 코드를 찾을 수 없습니다.");
+		}
+
+		return companyReportMetricValuesRepository.findMaxActualQuarterKeyByStockCodes(stockCodes)
 			.orElseThrow(() -> new IllegalArgumentException("ACTUAL 분기 데이터를 찾을 수 없습니다."));
 	}
 
