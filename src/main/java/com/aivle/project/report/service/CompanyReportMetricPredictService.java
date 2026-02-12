@@ -2,6 +2,7 @@ package com.aivle.project.report.service;
 
 import com.aivle.project.company.entity.CompaniesEntity;
 import com.aivle.project.company.repository.CompaniesRepository;
+import com.aivle.project.common.util.GetOrCreateResolver;
 import com.aivle.project.metric.entity.MetricValueType;
 import com.aivle.project.metric.entity.MetricsEntity;
 import com.aivle.project.metric.repository.MetricsRepository;
@@ -65,13 +66,7 @@ public class CompanyReportMetricPredictService {
 		YearQuarter baseQuarter = QuarterCalculator.parseQuarterKey(quarterKey);
 		QuartersEntity quarter = getOrCreateQuarter(quarterKey, baseQuarter);
 
-		CompanyReportsEntity report = companyReportsRepository.findByCompanyIdAndQuarterId(
-			company.get().getId(),
-			quarter.getId()
-		).orElse(null);
-		if (report == null) {
-			report = companyReportsRepository.save(CompanyReportsEntity.create(company.get(), quarter, null));
-		}
+		CompanyReportsEntity report = getOrCreateReport(company.get(), quarter);
 
 		CompanyReportVersionsEntity version = resolveMetricVersion(report);
 
@@ -135,15 +130,26 @@ public class CompanyReportMetricPredictService {
 		return companyReportVersionIssueService.issueNextVersion(report, false, null);
 	}
 
+	private CompanyReportsEntity getOrCreateReport(CompaniesEntity company, QuartersEntity quarter) {
+		return GetOrCreateResolver.resolve(
+			() -> companyReportsRepository.findByCompanyIdAndQuarterId(company.getId(), quarter.getId()),
+			() -> companyReportsRepository.save(CompanyReportsEntity.create(company, quarter, null)),
+			() -> companyReportsRepository.findByCompanyIdAndQuarterId(company.getId(), quarter.getId())
+		);
+	}
+
 	private QuartersEntity getOrCreateQuarter(int quarterKey, YearQuarter yearQuarter) {
-		return quartersRepository.findByQuarterKey(quarterKey)
-			.orElseGet(() -> quartersRepository.save(QuartersEntity.create(
+		return GetOrCreateResolver.resolve(
+			() -> quartersRepository.findByQuarterKey(quarterKey),
+			() -> quartersRepository.save(QuartersEntity.create(
 				yearQuarter.year(),
 				yearQuarter.quarter(),
 				quarterKey,
 				QuarterCalculator.startDate(yearQuarter),
 				QuarterCalculator.endDate(yearQuarter)
-			)));
+			)),
+			() -> quartersRepository.findByQuarterKey(quarterKey)
+		);
 	}
 
 	private String normalizeStockCode(String stockCode) {

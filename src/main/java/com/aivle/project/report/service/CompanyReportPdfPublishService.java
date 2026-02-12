@@ -2,6 +2,7 @@ package com.aivle.project.report.service;
 
 import com.aivle.project.company.entity.CompaniesEntity;
 import com.aivle.project.company.repository.CompaniesRepository;
+import com.aivle.project.common.util.GetOrCreateResolver;
 import com.aivle.project.file.entity.FileUsageType;
 import com.aivle.project.file.entity.FilesEntity;
 import com.aivle.project.file.exception.FileErrorCode;
@@ -62,10 +63,7 @@ public class CompanyReportPdfPublishService {
 		YearQuarter baseQuarter = QuarterCalculator.parseQuarterKey(quarterKey);
 		QuartersEntity quarter = getOrCreateQuarter(quarterKey, baseQuarter);
 
-		CompanyReportsEntity report = companyReportsRepository.findByCompanyIdAndQuarterId(
-			company.get().getId(),
-			quarter.getId()
-		).orElseGet(() -> companyReportsRepository.save(CompanyReportsEntity.create(company.get(), quarter, null)));
+		CompanyReportsEntity report = getOrCreateReport(company.get(), quarter);
 
 		CompanyReportVersionsEntity version = resolvePdfVersion(report);
 		FilesEntity pdfEntity = savePdf(report, version, pdfFile);
@@ -91,15 +89,26 @@ public class CompanyReportPdfPublishService {
 		return companyReportVersionIssueService.issueNextVersion(report, false, null);
 	}
 
+	private CompanyReportsEntity getOrCreateReport(CompaniesEntity company, QuartersEntity quarter) {
+		return GetOrCreateResolver.resolve(
+			() -> companyReportsRepository.findByCompanyIdAndQuarterId(company.getId(), quarter.getId()),
+			() -> companyReportsRepository.save(CompanyReportsEntity.create(company, quarter, null)),
+			() -> companyReportsRepository.findByCompanyIdAndQuarterId(company.getId(), quarter.getId())
+		);
+	}
+
 	private QuartersEntity getOrCreateQuarter(int quarterKey, YearQuarter yearQuarter) {
-		return quartersRepository.findByQuarterKey(quarterKey)
-			.orElseGet(() -> quartersRepository.save(QuartersEntity.create(
+		return GetOrCreateResolver.resolve(
+			() -> quartersRepository.findByQuarterKey(quarterKey),
+			() -> quartersRepository.save(QuartersEntity.create(
 				yearQuarter.year(),
 				yearQuarter.quarter(),
 				quarterKey,
 				QuarterCalculator.startDate(yearQuarter),
 				QuarterCalculator.endDate(yearQuarter)
-			)));
+			)),
+			() -> quartersRepository.findByQuarterKey(quarterKey)
+		);
 	}
 
 	private FilesEntity savePdf(CompanyReportsEntity report, CompanyReportVersionsEntity version, MultipartFile file) {
