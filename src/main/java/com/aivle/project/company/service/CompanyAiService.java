@@ -431,22 +431,21 @@ public class CompanyAiService {
 
             log.info("Target quarter for report: year={}, quarter={}", targetYear, targetQuarter);
 
-            // PROCESSING 상태로 업데이트
-            aiReportRequestStatusService.updateProcessing(requestId);
-
-            // 해당 기업+분기의 보고서가 이미 존재하는지 확인
-            FilesEntity file;
+            String downloadUrl = "/api/companies/" + companyId + "/ai-report/download?year=" + targetYear + "&quarter=" + targetQuarter;
+            // 해당 기업+분기의 PDF 리포트가 이미 존재하면 바로 COMPLETED 처리
             try {
-                file = getReportFileById(companyId, targetYear, targetQuarter);
+                FilesEntity existingFile = getReportFileById(companyId, targetYear, targetQuarter);
                 log.info("Report already exists for companyId: {}, year: {}, quarter: {}", companyId, targetYear, targetQuarter);
+                aiReportRequestStatusService.updateCompleted(requestId, String.valueOf(existingFile.getId()), downloadUrl);
+                log.info("Completed async report generation for requestId: {} (existing file)", requestId);
+                return;
             } catch (IllegalArgumentException e) {
-                // 보고서가 없으면 새로 생성
                 log.info("Report not found. Generating new report for companyId: {}, year: {}, quarter: {}", companyId, targetYear, targetQuarter);
-                file = generateAndSaveReport(companyId, targetYear, targetQuarter);
             }
 
-            // COMPLETED 상태로 업데이트
-            String downloadUrl = "/api/companies/" + companyId + "/ai-report/download?year=" + targetYear + "&quarter=" + targetQuarter;
+            // 보고서가 없을 때만 PROCESSING -> 생성 -> COMPLETED 순서로 처리
+            aiReportRequestStatusService.updateProcessing(requestId);
+            FilesEntity file = generateAndSaveReport(companyId, targetYear, targetQuarter);
             aiReportRequestStatusService.updateCompleted(requestId, String.valueOf(file.getId()), downloadUrl);
 
             log.info("Completed async report generation for requestId: {}", requestId);
