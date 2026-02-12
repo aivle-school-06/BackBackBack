@@ -17,7 +17,6 @@ import com.aivle.project.report.entity.CompanyReportsEntity;
 import com.aivle.project.report.repository.CompanyReportMetricValuesRepository;
 import com.aivle.project.report.repository.CompanyReportVersionsRepository;
 import com.aivle.project.report.repository.CompanyReportsRepository;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -43,6 +42,7 @@ public class CompanyReportMetricImportService {
 	private final CompanyReportsRepository companyReportsRepository;
 	private final CompanyReportVersionsRepository companyReportVersionsRepository;
 	private final CompanyReportMetricValuesRepository companyReportMetricValuesRepository;
+	private final CompanyReportVersionIssueService companyReportVersionIssueService;
 
 	@Transactional
 	public ReportImportResult importMetrics(int baseQuarterKey, List<CompanyMetricValueCommand> commands) {
@@ -220,17 +220,7 @@ public class CompanyReportMetricImportService {
 	}
 
 	private CompanyReportVersionsEntity createNewVersion(CompanyReportsEntity report) {
-		int nextVersion = companyReportVersionsRepository.findTopByCompanyReportOrderByVersionNoDesc(report)
-			.map(existing -> existing.getVersionNo() + 1)
-			.orElse(1);
-		CompanyReportVersionsEntity version = CompanyReportVersionsEntity.create(
-			report,
-			nextVersion,
-			LocalDateTime.now(),
-			false,
-			null
-		);
-		return companyReportVersionsRepository.save(version);
+		return companyReportVersionIssueService.issueNextVersion(report, false, null);
 	}
 
 	private QuartersEntity getOrCreateQuarter(int quarterKey, YearQuarter yearQuarter) {

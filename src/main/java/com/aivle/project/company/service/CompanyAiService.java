@@ -21,9 +21,9 @@ import com.aivle.project.report.entity.CompanyReportsEntity;
 import com.aivle.project.report.repository.CompanyReportMetricValuesRepository;
 import com.aivle.project.report.repository.CompanyReportVersionsRepository;
 import com.aivle.project.report.repository.CompanyReportsRepository;
+import com.aivle.project.report.service.CompanyReportVersionIssueService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,6 +51,7 @@ public class CompanyAiService {
     private final MetricsRepository metricsRepository;
     private final CompanyReportMetricValuesRepository companyReportMetricValuesRepository;
     private final AiReportRequestStatusService aiReportRequestStatusService;
+    private final CompanyReportVersionIssueService companyReportVersionIssueService;
 
     /**
      * 특정 기업의 AI 재무 분석 예측 결과를 조회하고 저장합니다.
@@ -175,7 +176,7 @@ public class CompanyAiService {
                 .orElseGet(() -> companyReportsRepository.save(CompanyReportsEntity.create(company, targetQuarterEntity, null)));
 
             // 5. 새 리포트 버전 생성 (report row 잠금으로 version_no 충돌 방지)
-            CompanyReportVersionsEntity version = createNextReportVersionWithLock(report, true, null);
+            CompanyReportVersionsEntity version = companyReportVersionIssueService.issueNextVersion(report, true, null);
 
             // 6. 지표 매핑 및 값 저장
             Map<String, Double> predictions = response.predictions();
@@ -254,7 +255,7 @@ public class CompanyAiService {
             storedFile.fileSize(),
             storedFile.contentType()
         );
-        filesRepository.save(filesEntity);
+        FilesEntity savedFileEntity = filesRepository.save(filesEntity);
 
         // 7. 분기 조회 또는 생성
         QuartersEntity quarterEntity = quartersRepository.findByYearAndQuarter((short) targetYear, (byte) targetQuarter)
@@ -265,11 +266,11 @@ public class CompanyAiService {
             .orElseGet(() -> companyReportsRepository.save(CompanyReportsEntity.create(company, quarterEntity, null)));
 
         // 9. 새 버전 등록 (report row 잠금으로 version_no 충돌 방지)
-        CompanyReportVersionsEntity version = createNextReportVersionWithLock(report, true, filesEntity);
+        CompanyReportVersionsEntity version = companyReportVersionIssueService.issueNextVersion(report, true, savedFileEntity);
         log.info("Linked AI report to company_report_versions (ID: {}, Year: {}, Quarter: {}, Version: {})",
             report.getId(), targetYear, targetQuarter, version.getVersionNo());
 
-        return filesEntity;
+        return savedFileEntity;
     }
 
     /**
@@ -357,32 +358,6 @@ public class CompanyAiService {
 
         QuartersEntity newQuarter = QuartersEntity.create(year, quarter, quarterKey, startDate, endDate);
         return quartersRepository.save(newQuarter);
-    }
-
-    private CompanyReportVersionsEntity createNextReportVersionWithLock(
-        CompanyReportsEntity report,
-        boolean published,
-        FilesEntity pdfFile
-    ) {
-        CompanyReportsEntity targetReport = report;
-        if (report.getId() != null) {
-            targetReport = companyReportsRepository.findByIdForUpdate(report.getId())
-                .orElse(report);
-        }
-
-        int nextVersionNo = companyReportVersionsRepository.findTopByCompanyReportOrderByVersionNoDesc(targetReport)
-            .map(v -> v.getVersionNo() + 1)
-            .orElse(1);
-
-        CompanyReportVersionsEntity version = CompanyReportVersionsEntity.create(
-            targetReport,
-            nextVersionNo,
-            LocalDateTime.now(),
-            published,
-            pdfFile
-        );
-
-        return companyReportVersionsRepository.save(version);
     }
 
     /**

@@ -19,7 +19,6 @@ import com.aivle.project.report.entity.CompanyReportVersionsEntity;
 import com.aivle.project.report.entity.CompanyReportsEntity;
 import com.aivle.project.report.repository.CompanyReportVersionsRepository;
 import com.aivle.project.report.repository.CompanyReportsRepository;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +41,7 @@ public class CompanyReportPdfPublishService {
 	private final FileStorageService fileStorageService;
 	private final FileValidator fileValidator;
 	private final FilesRepository filesRepository;
+	private final CompanyReportVersionIssueService companyReportVersionIssueService;
 
 	@Transactional
 	public ReportPdfPublishResult publishPdfOnly(String stockCode, int quarterKey, MultipartFile pdfFile) {
@@ -88,17 +88,7 @@ public class CompanyReportPdfPublishService {
 	}
 
 	private CompanyReportVersionsEntity createNewVersion(CompanyReportsEntity report) {
-		int nextVersion = companyReportVersionsRepository.findTopByCompanyReportOrderByVersionNoDesc(report)
-			.map(existing -> existing.getVersionNo() + 1)
-			.orElse(1);
-		CompanyReportVersionsEntity version = CompanyReportVersionsEntity.create(
-			report,
-			nextVersion,
-			LocalDateTime.now(),
-			false,
-			null
-		);
-		return companyReportVersionsRepository.save(version);
+		return companyReportVersionIssueService.issueNextVersion(report, false, null);
 	}
 
 	private QuartersEntity getOrCreateQuarter(int quarterKey, YearQuarter yearQuarter) {
