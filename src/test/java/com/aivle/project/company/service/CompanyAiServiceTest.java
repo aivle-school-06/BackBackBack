@@ -282,6 +282,52 @@ class CompanyAiServiceTest {
     }
 
     @Test
+    @DisplayName("최신 버전에 PDF가 없어도 PDF가 있는 최신 버전을 조회한다")
+    void getReportFileById_ReturnsLatestVersionWithPdf() {
+        // given
+        Long companyId = 1L;
+        Integer year = 2026;
+        Integer quarter = 1;
+
+        CompaniesEntity company = CompaniesEntity.create("00000001", "삼성전자", null, "005930", LocalDate.now());
+        ReflectionTestUtils.setField(company, "id", companyId);
+        QuartersEntity quarterEntity = QuartersEntity.create(year, quarter, 20261, LocalDate.now(), LocalDate.now());
+        CompanyReportsEntity report = CompanyReportsEntity.create(company, quarterEntity, null);
+        FilesEntity pdfFile = FilesEntity.create(
+            FileUsageType.REPORT_PDF,
+            "http://localhost/files/report.pdf",
+            "reports/005930/2026/1/report.pdf",
+            "report_005930.pdf",
+            100L,
+            "application/pdf"
+        );
+        CompanyReportVersionsEntity versionWithPdf = CompanyReportVersionsEntity.create(
+            report,
+            1,
+            java.time.LocalDateTime.now(),
+            true,
+            pdfFile
+        );
+
+        given(companiesRepository.findById(companyId)).willReturn(Optional.of(company));
+        given(quartersRepository.findByYearAndQuarter(year.shortValue(), quarter.byteValue())).willReturn(Optional.of(quarterEntity));
+        given(companyReportsRepository.findByCompanyIdAndQuarterId(companyId, quarterEntity.getId()))
+            .willReturn(Optional.of(report));
+        given(companyReportVersionsRepository.findTopByCompanyReportAndPdfFileIsNotNullOrderByVersionNoDesc(report))
+            .willReturn(Optional.of(versionWithPdf));
+
+        // when
+        FilesEntity result = companyAiService.getReportFileById(companyId, year, quarter);
+
+        // then
+        assertThat(result).isEqualTo(pdfFile);
+        verify(companyReportVersionsRepository)
+            .findTopByCompanyReportAndPdfFileIsNotNullOrderByVersionNoDesc(report);
+        verify(companyReportVersionsRepository, org.mockito.Mockito.never())
+            .findTopByCompanyReportOrderByVersionNoDesc(any());
+    }
+
+    @Test
     @DisplayName("리포트 ID가 있으면 버전 저장 전에 비관적 락 조회를 수행한다")
     void generateAndSaveReport_WithReportId_LockBeforeVersionInsert() {
         // given

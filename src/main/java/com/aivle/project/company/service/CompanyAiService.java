@@ -297,8 +297,9 @@ public class CompanyAiService {
         CompanyReportsEntity report = companyReportsRepository.findByCompanyIdAndQuarterId(company.getId(), quarterEntity.getId())
             .orElseThrow(() -> new IllegalArgumentException("해당 분기의 리포트가 존재하지 않습니다."));
 
-        CompanyReportVersionsEntity version = companyReportVersionsRepository.findTopByCompanyReportOrderByVersionNoDesc(report)
-            .orElseThrow(() -> new IllegalArgumentException("리포트 버전이 존재하지 않습니다."));
+        CompanyReportVersionsEntity version = companyReportVersionsRepository
+            .findTopByCompanyReportAndPdfFileIsNotNullOrderByVersionNoDesc(report)
+            .orElseThrow(() -> new IllegalArgumentException("해당 분기의 PDF 리포트가 존재하지 않습니다."));
 
         FilesEntity file = version.getPdfFile();
         if (file == null) {
@@ -334,8 +335,9 @@ public class CompanyAiService {
         CompanyReportsEntity report = companyReportsRepository.findByCompanyIdAndQuarterId(company.getId(), quarterEntity.getId())
             .orElseThrow(() -> new IllegalArgumentException("해당 분기의 리포트가 존재하지 않습니다."));
 
-        CompanyReportVersionsEntity version = companyReportVersionsRepository.findTopByCompanyReportOrderByVersionNoDesc(report)
-            .orElseThrow(() -> new IllegalArgumentException("리포트 버전이 존재하지 않습니다."));
+        CompanyReportVersionsEntity version = companyReportVersionsRepository
+            .findTopByCompanyReportAndPdfFileIsNotNullOrderByVersionNoDesc(report)
+            .orElseThrow(() -> new IllegalArgumentException("해당 분기의 PDF 리포트가 존재하지 않습니다."));
 
         FilesEntity file = version.getPdfFile();
         if (file == null) {
