@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-12 | 작업: 전체 테스트 회귀 보정(role 시드 파급) | 결과: `CompanyOverviewServiceTest`에 `CompanyReportVersionIssueService` mock bean을 추가하고, `CustomUserDetailsServiceTest`를 role 시드 조회 방식으로 전환해 role UNIQUE 충돌을 제거. `./gradlew test` 전체 통과(383 tests, 15 skipped) 확인 | 이슈: 없음
 - 2026-02-12 | 작업: role 시드 고정 + signup duplicate 도메인 변환(P0) | 결과: Flyway `V26__seed_roles`(MySQL/H2)를 추가해 `ROLE_USER/ROLE_ADMIN/ROLE_ANALYST`를 멱등 시드로 고정하고, `UserDomainService`의 역할 동적 생성을 제거해 시드 미존재 시 실패하도록 변경. `SignUpService`에 `DataIntegrityViolationException` -> `EMAIL_ALREADY_EXISTS(409)` 변환을 추가하고 관련 단위/통합 테스트(`SignUpServiceTest`, `UserDomainServiceTest`, `AuthIntegrationTest`, `CompanyWatchlistServiceTest`, `UserRepositoryTest`) 통과 | 이슈: 없음
 - 2026-02-12 | 작업: 리포트 버전 발급 공통화(P0) 1차 | 결과: `CompanyReportVersionIssueService`를 추가해 report row lock + next version 발급을 단일 경로로 통합하고, report import/publish/predict/pdf + `CompanyAiService`가 공통 서비스를 사용하도록 정리. `CompanyAiServiceTest`/`CompanyReportVersionIssueServiceTest` 통과 후 커밋(`fix(report): centralize company report version issuance`) 완료 | 이슈: 없음
 - 2026-02-12 | 작업: getOrCreate 충돌 재조회 패턴 통일(P0) | 결과: `GetOrCreateResolver` 공통 유틸을 추가해 분기/리포트 생성 경로의 UNIQUE 충돌 시 재조회로 수렴하도록 통일하고, `CompanyPredictionCacheService`도 버전 발급 공통 서비스 사용으로 보강. 관련 타깃 테스트(`GetOrCreateResolverTest`, report 서비스 4종, `CompanyAiServiceTest`, `CompanyPredictionCacheServiceTest`) 통과 | 이슈: 없음
