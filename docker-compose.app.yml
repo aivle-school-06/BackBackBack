@@ -6,7 +6,7 @@ services:
     container_name: backbackback-app
     restart: always
     env_file:
-      - /etc/backbackback/backbackback.env
+      - ${APP_ENV_FILE:-/etc/backbackback/backbackback.env}
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       REDIS_HOST: ${REDIS_HOST_DOCKER:-redis}
@@ -33,7 +33,7 @@ services:
           exec redis-server --appendonly yes;
         fi
     env_file:
-      - /etc/backbackback/backbackback.env
+      - ${APP_ENV_FILE:-/etc/backbackback/backbackback.env}
     volumes:
       - redis-data:/data
     ports:
