@@ -63,6 +63,31 @@ export LOG_FILE=./logs/project.log
 ./gradlew bootRun
 ```
 
+## Docker 배포 전환(MVP)
+- 목표: `CodeBuild -> ECR push -> CodeDeploy -> docker compose up` 흐름으로 런타임을 전환합니다.
+- ECR 리포지토리: `160885260227.dkr.ecr.ap-northeast-2.amazonaws.com/aivle-back-app`
+
+### 서버 환경 파일
+- 파일 경로: `/etc/backbackback/backbackback.env`
+- 주요 값:
+  - `DEPLOY_RUNTIME=docker`
+  - `COMPOSE_FILE_PATH=/opt/project/docker-compose.app.yml`
+  - `IMAGE_ENV_FILE=/opt/project/image-uri.env`
+  - `SPRING_PROFILES_ACTIVE=prod`
+  - `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`
+  - `REDIS_PASSWORD` (선택), `REDIS_HOST_DOCKER=redis`
+  - `JWT_PRIVATE_KEY_PATH=/secrets/jwt/private.pem`
+  - `JWT_PUBLIC_KEY_PATH=/secrets/jwt/public.pem`
+
+### 배포 아티팩트
+- `image-uri.env`: `APP_IMAGE=<ecr-image>:<tag>`
+- `docker-compose.app.yml`
+- `scripts/**/*`
+
+### 검증 포인트
+- `scripts/health-check.sh`가 `/actuator/health` 200을 반환해야 합니다.
+- 실패 시 `DEPLOY_RUNTIME=systemd`로 롤백하여 기존 경로를 유지할 수 있습니다.
+
 ## ERD / DB 스키마
 - 현재 적용된 ERD 요약: `ERD.md`
 - DDL 원본(Flyway): `src/main/resources/db/migration/V1__init.sql`
