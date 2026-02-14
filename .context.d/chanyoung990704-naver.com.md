@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-14 | 작업: CodeBuild 댓글 컴파일 오류 수정 및 배포 브랜치 반영 | 결과: `CommentsRepository`에 `findByPostIdAndDeletedAtIsNullOrderByDepthAscSequenceAsc`를 추가하고 `CommentsService.listByPost` 시그니처를 정합화해 CodeBuild `cannot find symbol` 컴파일 실패를 해소. 관련 테스트(`CommentsRepositoryTest`, `CommentIntegrationTest`)와 `compileJava` 통과 확인 후 `origin/main` 및 upstream PR(#117) 반영 진행 | 이슈: 없음
 - 2026-02-14 | 작업: 이슈 #115 사용자명 마스킹 + 로그인 실패 잠금 구현 | 결과: `NameMaskingUtil` 기반으로 `PostMapper`/`CommentMapper`/`UserMapper`/`AdminUserQueryService`의 name 노출을 마스킹 처리하고, `LoginAttemptService`(Redis) + `LoginAttemptProperties` + `AuthService` 연동으로 5회 실패 시 15분 잠금(`AUTH_429`)을 적용. 단위/통합 타깃 테스트 통과 및 `./gradlew cleanTest test` 재실행 통과, upstream 이슈 #115/PR #117 및 Notion 상위·하위 페이지 기록 완료 | 이슈: `cleanTest test` 1회차에서 Gradle XML test-results 쓰기 오류가 간헐 발생했으나 재실행으로 해소
 - 2026-02-13 | 작업: 최소 변경 배포 안전망 반영 | 결과: `buildspec.yml` artifacts에 `build/libs/app.jar`를 추가해 Docker 주 배포 유지 중에도 `DEPLOY_RUNTIME=systemd` 전환 시 JAR 아티팩트 누락 실패를 방지 | 이슈: 없음
 - 2026-02-13 | 작업: CodeBuild YAML 파싱 실패(`YAML_FILE_ERROR`) 수정 | 결과: `buildspec.yml` commands의 `:` 포함 셸 라인을 YAML-safe 문자열로 감싸 `DOWNLOAD_SOURCE` 단계 파싱 오류 해소 | 이슈: 없음

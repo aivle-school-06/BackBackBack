@@ -30,7 +30,7 @@ public class CommentsService {
 
 	@Transactional(readOnly = true)
 	public List<CommentResponse> listByPost(Long postId) {
-		return commentsRepository.findByPostIdOrderByDepthAscSequenceAsc(postId).stream()
+		return commentsRepository.findByPostIdAndDeletedAtIsNullOrderByDepthAscSequenceAsc(postId).stream()
 			.map(commentMapper::toResponse)
 			.toList();
 	}

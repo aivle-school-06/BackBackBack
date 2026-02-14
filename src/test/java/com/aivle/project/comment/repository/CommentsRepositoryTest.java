@@ -31,7 +31,7 @@ class CommentsRepositoryTest {
 
 	@Test
 	@DisplayName("댓글을 depth/sequence 순으로 조회한다")
-	void findByPostIdOrderByDepthAscSequenceAsc_shouldReturnOrdered() {
+	void findByPostIdAndDeletedAtIsNullOrderByDepthAscSequenceAsc_shouldReturnOrdered() {
 		// given
 		UserEntity user = persistUser("comments@test.com");
 		CategoriesEntity category = persistCategory("comments");
@@ -47,7 +47,7 @@ class CommentsRepositoryTest {
 		entityManager.flush();
 
 		// when
-		List<CommentsEntity> results = commentsRepository.findByPostIdOrderByDepthAscSequenceAsc(post.getId());
+		List<CommentsEntity> results = commentsRepository.findByPostIdAndDeletedAtIsNullOrderByDepthAscSequenceAsc(post.getId());
 
 		// then
 		assertThat(results).hasSize(3);
