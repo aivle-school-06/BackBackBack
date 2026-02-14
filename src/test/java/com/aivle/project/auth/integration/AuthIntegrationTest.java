@@ -16,6 +16,7 @@ import com.aivle.project.auth.dto.TokenResponse;
 import com.aivle.project.auth.service.TurnstileService;
 import com.aivle.project.common.dto.ApiResponse;
 import com.aivle.project.common.config.TestSecurityConfig;
+import com.aivle.project.common.util.NameMaskingUtil;
 import com.aivle.project.user.entity.RoleEntity;
 import com.aivle.project.user.entity.RoleName;
 import com.aivle.project.user.entity.UserEntity;
@@ -153,7 +154,7 @@ class AuthIntegrationTest {
 		// then: 사용자 정보가 포함되어 있다
 		assertThat(response.user()).isNotNull();
 		assertThat(response.user().email()).isEqualTo("user@test.com");
-		assertThat(response.user().name()).isEqualTo("test-user");
+		assertThat(response.user().name()).isEqualTo(NameMaskingUtil.mask("test-user"));
 		assertThat(response.user().role()).isEqualTo(RoleName.ROLE_USER);
 
 		// then: 리프레시 토큰이 쿠키에 포함되어 있다

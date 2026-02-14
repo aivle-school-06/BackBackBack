@@ -2,6 +2,7 @@ package com.aivle.project.post.mapper;
 
 import com.aivle.project.category.entity.CategoriesEntity;
 import com.aivle.project.comment.entity.CommentsEntity;
+import com.aivle.project.common.util.NameMaskingUtil;
 import com.aivle.project.post.dto.PostResponse;
 import com.aivle.project.post.entity.PostsEntity;
 import com.aivle.project.post.entity.PostStatus;
@@ -52,6 +53,7 @@ class PostMapperTest {
 
 		// then
 		assertThat(response.qnaStatus()).isEqualTo("pending");
+		assertThat(response.name()).isEqualTo(NameMaskingUtil.mask("user"));
 	}
 
 	@Test
@@ -82,6 +84,7 @@ class PostMapperTest {
 
 		// then
 		assertThat(response.qnaStatus()).isEqualTo("answered");
+		assertThat(response.name()).isEqualTo(NameMaskingUtil.mask("user"));
 	}
 
 	@Test
@@ -99,5 +102,6 @@ class PostMapperTest {
 
 		// then
 		assertThat(response.qnaStatus()).isNull();
+		assertThat(response.name()).isEqualTo(NameMaskingUtil.mask("user"));
 	}
 }
