@@ -9,6 +9,7 @@ import com.aivle.project.common.error.CommonErrorCode;
 import com.aivle.project.common.error.CommonException;
 import com.aivle.project.post.entity.PostsEntity;
 import com.aivle.project.post.repository.PostsRepository;
+import com.aivle.project.post.service.PostReadAccessPolicy;
 import com.aivle.project.user.entity.UserEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class CommentsService {
 
 	private final CommentsRepository commentsRepository;
 	private final PostsRepository postsRepository;
+	private final PostReadAccessPolicy postReadAccessPolicy;
 	private final com.aivle.project.comment.mapper.CommentMapper commentMapper;
 	private final com.aivle.project.post.mapper.PostMapper postMapper;
 
