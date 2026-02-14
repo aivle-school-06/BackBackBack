@@ -6,6 +6,7 @@
 - email: chanyoung990704@naver.com
 
 ## 2. Recent Notes (최근 메모)
+- 2026-02-14 | 작업: 외부 AI 호출 회복탄력성 + 대시보드/게시글 성능 최적화(#113) | 결과: `AiWebClientConfig`와 Resilience4j(timeout/circuit breaker/retry/bulkhead) 적용, 수동 재시도 제거, 벤치마크 전/후 delta CSV(`comparison-api-delta.csv`, `comparison-runtime-delta.csv`) 산출 추가, QnA `qnaStatus`를 role 기반 쿼리로 계산, 대시보드 risk 집계 쿼리 최적화. `./gradlew cleanTest test` 및 변경 범위 타깃 테스트 통과 | 이슈: `upload/` 런타임 산출 디렉터리는 커밋 제외
 - 2026-02-14 | 작업: P0 API 로깅 토큰/쿠키 마스킹 강화(#111) | 결과: `ApiLoggingAspect`에 JWT/Bearer/Cookie 패턴 마스킹과 `@CookieValue` 인자 비노출 처리를 추가하고 `ApiLoggingAspectTest`를 보강, `./gradlew test --tests com.aivle.project.common.logging.ApiLoggingAspectTest` 및 `./gradlew cleanTest test` 통과 | 이슈: 없음
 - 2026-02-13 | 작업: 최소 변경 배포 안전망 반영 | 결과: `buildspec.yml` artifacts에 `build/libs/app.jar`를 추가해 Docker 주 배포 유지 중에도 `DEPLOY_RUNTIME=systemd` 전환 시 JAR 아티팩트 누락 실패를 방지 | 이슈: 없음
 - 2026-02-13 | 작업: CodeBuild YAML 파싱 실패(`YAML_FILE_ERROR`) 수정 | 결과: `buildspec.yml` commands의 `:` 포함 셸 라인을 YAML-safe 문자열로 감싸 `DOWNLOAD_SOURCE` 단계 파싱 오류 해소 | 이슈: 없음
