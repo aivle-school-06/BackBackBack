@@ -8,6 +8,11 @@
 ## 2. Recent Notes (최근 메모)
 - 2026-02-14 | 작업: 외부 AI 호출 회복탄력성 + 대시보드/게시글 성능 최적화(#113) | 결과: `AiWebClientConfig`와 Resilience4j(timeout/circuit breaker/retry/bulkhead) 적용, 수동 재시도 제거, 벤치마크 전/후 delta CSV(`comparison-api-delta.csv`, `comparison-runtime-delta.csv`) 산출 추가, QnA `qnaStatus`를 role 기반 쿼리로 계산, 대시보드 risk 집계 쿼리 최적화. `./gradlew cleanTest test` 및 변경 범위 타깃 테스트 통과 | 이슈: `upload/` 런타임 산출 디렉터리는 커밋 제외
 - 2026-02-14 | 작업: P0 API 로깅 토큰/쿠키 마스킹 강화(#111) | 결과: `ApiLoggingAspect`에 JWT/Bearer/Cookie 패턴 마스킹과 `@CookieValue` 인자 비노출 처리를 추가하고 `ApiLoggingAspectTest`를 보강, `./gradlew test --tests com.aivle.project.common.logging.ApiLoggingAspectTest` 및 `./gradlew cleanTest test` 통과 | 이슈: 없음
+- 2026-02-14 | 작업: P0 API 로깅 토큰/쿠키 마스킹 강화(#111) | 결과: `ApiLoggingAspect`에 JWT/Bearer/Cookie 패턴 마스킹과 `@CookieValue` 인자 비노출 처리를 추가하고 `ApiLoggingAspectTest`를 보강, `./gradlew test --tests com.aivle.project.common.logging.ApiLoggingAspectTest` 및 `./gradlew cleanTest test` 통과 | 이슈: 없음
+- 2026-02-14 | 작업: 토큰 해시 pepper(HMAC) 적용(#109) | 결과: `TokenHashService`를 HMAC-SHA256(+pepper)로 전환하고 `APP_TOKEN_HASH_PEPPER_B64` 미설정/오형식 시 Fail-Fast를 적용, refresh/email verification 조회에 레거시 SHA-256 fallback+자동 마이그레이션을 반영했으며 `./gradlew cleanTest test` 전체 통과 | 이슈: 없음
+- 2026-02-14 | 작업: 인증 재전송 API 보안 전환(#107) | 결과: `POST /api/auth/resend-verification` 인증 기반 경로 추가, legacy `GET`에 Deprecation/Sunset 헤더 적용, Redis 기반 사용자/IP 레이트리밋 추가 및 컨트롤러/서비스 테스트 통과 | 이슈: 없음
+- 2026-02-14 | 작업: 토큰 저장 해시 전환(#107) | 결과: refresh/email verification 토큰을 SHA-256 해시 저장으로 전환하고 MySQL/H2 `V27__hash_auth_tokens` 마이그레이션 추가, dual-read fallback 및 관련 서비스 테스트 통과 | 이슈: 없음
+- 2026-02-14 | 작업: refresh/logout CSRF 더블서브밋 적용(#107) | 결과: `csrf_token` 쿠키 발급 및 `X-CSRF-Token` 검증 추가, CORS 허용 헤더 반영, `AuthIntegrationTest` 포함 `./gradlew cleanTest test` 전체 통과 | 이슈: 없음
 - 2026-02-13 | 작업: 최소 변경 배포 안전망 반영 | 결과: `buildspec.yml` artifacts에 `build/libs/app.jar`를 추가해 Docker 주 배포 유지 중에도 `DEPLOY_RUNTIME=systemd` 전환 시 JAR 아티팩트 누락 실패를 방지 | 이슈: 없음
 - 2026-02-13 | 작업: CodeBuild YAML 파싱 실패(`YAML_FILE_ERROR`) 수정 | 결과: `buildspec.yml` commands의 `:` 포함 셸 라인을 YAML-safe 문자열로 감싸 `DOWNLOAD_SOURCE` 단계 파싱 오류 해소 | 이슈: 없음
 - 2026-02-13 | 작업: CodeBuild Docker build 실패 원인 보정 | 결과: `Dockerfile`을 `build/libs/app.jar` 단일 복사 방식으로 고정하고 `.dockerignore`에서 해당 파일만 include되도록 조정, `buildspec.yml`에 non-plain bootJar 선택/복사 및 push 전 이미지 존재 검사 추가 | 이슈: 없음
