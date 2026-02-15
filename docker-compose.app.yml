@@ -10,9 +10,8 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       REDIS_HOST: ${REDIS_HOST_DOCKER:-redis}
-      # Spring Boot Relaxed Binding을 고려한 명확한 변수명 지정
-      JWT_KEYS_PUBLIC_KEY_PATH: /secrets/jwt/public.pem
-      JWT_KEYS_PRIVATE_KEY_PATH: /secrets/jwt/private.pem
+      # 최우선 순위로 컨테이너 내부 경로 강제 지정
+      SPRING_APPLICATION_JSON: '{"jwt":{"keys":{"public-key-path":"/secrets/jwt/public.pem","private-key-path":"/secrets/jwt/private.pem"}}}'
     ports:
       - "${SERVER_PORT:-8080}:8080"
     depends_on:
