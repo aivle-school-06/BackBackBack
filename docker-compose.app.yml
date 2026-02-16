@@ -10,6 +10,8 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       REDIS_HOST: ${REDIS_HOST_DOCKER:-redis}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+      APP_AI_JOB_KAFKA_ENABLED: ${APP_AI_JOB_KAFKA_ENABLED:-true}
       # 앱은 무조건 컨테이너 내부 마운트 경로를 바라봅니다.
       JWT_KEYS_PUBLIC_KEY_PATH: /secrets/jwt/public.pem
       JWT_KEYS_PRIVATE_KEY_PATH: /secrets/jwt/private.pem
@@ -17,6 +19,7 @@ services:
       - "${SERVER_PORT:-8080}:8080"
     depends_on:
       - redis
+      - kafka
     volumes:
       # 호스트의 키 위치(JWT_HOST_PATH)를 컨테이너 내부(/secrets/jwt)로 연결
       - ${JWT_HOST_PATH:?JWT_HOST_PATH is required}:/secrets/jwt:ro
@@ -42,6 +45,22 @@ services:
       - redis-data:/data
     ports:
       - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: project-kafka
+    restart: always
+    environment:
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "127.0.0.1:${KAFKA_PORT:-9092}:9092"
 
 volumes:
   redis-data:

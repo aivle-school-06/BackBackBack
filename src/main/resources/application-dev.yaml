@@ -40,6 +40,9 @@ app:
   email:
     verification:
       skip: true
+  ai:
+    job:
+      kafka-enabled: ${APP_AI_JOB_KAFKA_ENABLED:true}
 
   file:
     upload:
