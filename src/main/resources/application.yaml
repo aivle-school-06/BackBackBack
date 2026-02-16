@@ -108,9 +108,9 @@ ai:
   server:
     url: ${AI_SERVER_URL:https://bigbig-ai-server.azurewebsites.net}
     http:
-      connect-timeout-ms: ${AI_SERVER_CONNECT_TIMEOUT_MS:3000}
-      response-timeout-ms: ${AI_SERVER_RESPONSE_TIMEOUT_MS:8000}
-      call-timeout-ms: ${AI_SERVER_CALL_TIMEOUT_MS:10000}
+      connect-timeout-ms: ${AI_SERVER_CONNECT_TIMEOUT_MS:5000}
+      response-timeout-ms: ${AI_SERVER_RESPONSE_TIMEOUT_MS:15000}
+      call-timeout-ms: ${AI_SERVER_CALL_TIMEOUT_MS:20000}
       max-connections: ${AI_SERVER_MAX_CONNECTIONS:100}
       pending-acquire-timeout-ms: ${AI_SERVER_PENDING_ACQUIRE_TIMEOUT_MS:2000}
 
