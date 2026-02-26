@@ -443,6 +443,52 @@ public class CompanyAiService {
     }
 
     /**
+     * 다운로드된 PDF 내용을 스토리지와 DB에 저장하고 보고서 버전에 연결합니다.
+     */
+    @Transactional
+    public FilesEntity storeAndLinkReport(Long companyId, int targetYear, int targetQuarter, byte[] pdfContent) {
+        CompaniesEntity company = companiesRepository.findById(companyId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 기업 ID입니다: " + companyId));
+
+        // 4. MultipartFile 생성
+        String filename = String.format("report_%s_%d_%d_%s.pdf", company.getStockCode(), targetYear, targetQuarter, LocalDate.now());
+        MultipartFile multipartFile = new SimpleMultipartFile(
+            "file",
+            filename,
+            "application/pdf",
+            pdfContent
+        );
+
+        // 5. 파일 저장 (로컬 또는 S3)
+        String subDir = String.format("reports/%s/%d/%d", company.getStockCode(), targetYear, targetQuarter);
+        StoredFile storedFile = fileStorageService.store(multipartFile, subDir);
+
+        // 6. DB에 파일 메타데이터 저장
+        FilesEntity filesEntity = FilesEntity.create(
+            FileUsageType.REPORT_PDF,
+            storedFile.storageUrl(),
+            storedFile.storageKey(),
+            storedFile.originalFilename(),
+            storedFile.fileSize(),
+            storedFile.contentType()
+        );
+        FilesEntity savedFileEntity = filesRepository.save(filesEntity);
+
+        // 7. 분기 조회 또는 생성
+        QuartersEntity quarterEntity = getOrCreateQuarter(targetYear, targetQuarter);
+
+        // 8. 기업-분기 보고서 조회 또는 생성
+        CompanyReportsEntity report = getOrCreateReport(company, quarterEntity);
+
+        // 9. 새 버전 등록
+        CompanyReportVersionsEntity version = companyReportVersionIssueService.issueNextVersion(report, true, savedFileEntity);
+        log.info("Linked AI report to company_report_versions (ID: {}, Year: {}, Quarter: {}, Version: {})",
+            report.getId(), targetYear, targetQuarter, version.getVersionNo());
+        
+        return savedFileEntity;
+    }
+
+    /**
      * companyCode가 ID인지 stock_code인지 판단하여 stock_code를 반환합니다.
      * @param companyCode 기업 ID 또는 Stock Code
      * @return Stock Code
